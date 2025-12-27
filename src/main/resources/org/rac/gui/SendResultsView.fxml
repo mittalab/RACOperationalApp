@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.rac.gui.SendResultsViewController"
+      alignment="CENTER" spacing="15">
+    <padding>
+        <Insets top="25" right="25" bottom="25" left="25"/>
+    </padding>
+
+    <Label text="Send Results to Parents" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+
+    <GridPane hgap="10" vgap="10" alignment="CENTER">
+        <Label text="Test Conducted Date:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <DatePicker fx:id="datePicker" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+        <Label text="Class:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <TextField fx:id="classField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+        <Label text="Topic:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+        <TextField fx:id="topicField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+        <Label text="Result Heading:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+        <TextField fx:id="headingField" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+        <Label text="Total Marks:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+        <TextField fx:id="totalMarksField" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+        <Label text="Excel File:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+        <Button text="Choose File" onAction="#handleChooseFile" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+        <Label fx:id="filePathLabel" text="" GridPane.rowIndex="5" GridPane.columnIndex="2"/>
+
+        <Label text="HTML Template:" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+        <Label text="result_template.html (from resources)" GridPane.rowIndex="6" GridPane.columnIndex="1" GridPane.columnSpan="2"/>
+
+<!--        <Label text="Output Destination:" GridPane.rowIndex="7" GridPane.columnIndex="0"/>-->
+<!--        <ChoiceBox fx:id="outputDestinationChoiceBox" GridPane.rowIndex="7" GridPane.columnIndex="1"/>-->
+
+<!--        <Label text="Sender Email:" GridPane.rowIndex="8" GridPane.columnIndex="0"/>-->
+<!--        <TextField fx:id="senderEmailField" promptText="your_email@example.com" GridPane.rowIndex="8" GridPane.columnIndex="1"/>-->
+
+<!--        <Label text="Recipient Email (Optional, overrides Excel):" GridPane.rowIndex="9" GridPane.columnIndex="0"/>-->
+<!--        <TextField fx:id="recipientEmailField" promptText="Leave empty for Excel data" GridPane.rowIndex="9" GridPane.columnIndex="1"/>-->
+
+<!--        <Label text="Email Subject:" GridPane.rowIndex="10" GridPane.columnIndex="0"/>-->
+<!--        <TextField fx:id="emailSubjectField" promptText="Result of &lt;Topic&gt; on &lt;Date&gt;" GridPane.rowIndex="10" GridPane.columnIndex="1"/>-->
+
+    </GridPane>
+
+    <HBox spacing="10" alignment="CENTER">
+        <Button text="Proceed" onAction="#handleProceed"/>
+        <Button text="Abort" onAction="#handleAbort"/>
+        <Button text="Back to Home" onAction="#handleBackToHome"/>
+    </HBox>
+
+    <ProgressBar fx:id="progressBar" progress="0.0" VBox.vgrow="NEVER"/>
+    <Label fx:id="progressLabel" text=""/>
+
+</VBox>
