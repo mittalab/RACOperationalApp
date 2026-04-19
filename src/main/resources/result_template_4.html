@@ -1,0 +1,220 @@
+<html>
+<head>
+    <title>Result</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 10px;
+            background: #f5f5f5;
+        }
+
+        .container {
+            max-width: 420px;
+            margin: auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            padding: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* WATERMARK */
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.05;
+            width: 250px;
+        }
+
+        /* HEADER */
+        .header {
+            text-align: center;
+        }
+
+        .logo {
+            width: 50px;
+        }
+
+        .header h1 {
+            color: red;
+            font-size: 20px;
+            margin: 5px 0;
+        }
+
+        .header p {
+            margin: 0;
+            font-size: 12px;
+            color: #444;
+        }
+
+        /* RESULT TITLE */
+        .result-title {
+            text-align: center;
+            color: #2d5c2d;
+            font-weight: bold;
+            margin: 12px 0;
+            font-size: 16px;
+            text-decoration: underline;
+        }
+
+        /* NAME */
+        .name {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .name span {
+            color: red;
+            font-weight: bold;
+        }
+
+        /* INFO ROW */
+        .info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .info span {
+            color: red;
+            font-weight: bold;
+        }
+
+        /* TOPIC BOX */
+        .topic {
+            background: #eee;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .topic span {
+            color: red;
+            font-weight: bold;
+        }
+        /* MARKS HIGHLIGHT */
+        .marks-box {
+            text-align: center;
+            background: #f0fff0;
+            border: 2px solid #2d5c2d;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+
+        .marks-box h2 {
+            margin: 0;
+            color: red;
+            font-size: 26px;
+        }
+
+        .marks-box p {
+            margin: 3px 0 0;
+            font-size: 12px;
+            color: #555;
+        }
+
+        /* DETAILS */
+        .details {
+            font-size: 14px;
+        }
+
+        .details div {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+            border-right: 1px solid #eee; /* divider line */
+        }
+
+        .details span:first-child {
+            color: #2d5c2d;
+            font-weight: bold;
+        }
+
+        .details span:last-child {
+            text-align: left;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 12px;
+            padding-top: 8px;
+            border-top: 1px dashed #ccc;
+        }
+
+        /* SIGNATURE */
+        .signature {
+            width: 90px;
+            float: right;
+            margin-top: 10px;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <img class="watermark" src="WATERMARK_IMAGE">
+
+    <div class="header">
+        <img class="logo" src="LOGO_IMAGE">
+        <h1>RANK ACHIEVERS CLASSES</h1>
+        <p><b>IX, X (Science) & XI, XII (Chemistry)</b></p>
+    </div>
+
+    <div class="result-title"><b>HEADING_INPUT</b></div>
+
+    <div class="name"><span>NAME: </span><b>NAME_INPUT</b></div>
+
+    <div class="info">
+        <div><span>DATE:</span> <b>DATE_INPUT</b></div>
+        <div><span>CLASS:</span> <b>CLASS_INPUT</b></div>
+    </div>
+
+    <div class="topic">
+        <b><span>TOPIC:</span> TOPIC_INPUT</b>
+    </div>
+
+    <!-- MAIN HIGHLIGHT -->
+    <div class="marks-box">
+        <h2>MARKS_INPUT / TOTAL_MARKS_INPUT</h2>
+        <p>Total Score</p>
+    </div>
+
+    <!-- DETAILS -->
+    <div class="details">
+        <div>
+            <span>Wrong Answers:</span>
+            <span>ADDITIONAL_INPUT</span>
+        </div>
+        <div>
+            <span>Marks Deducted:</span>
+            <span>MARKS_DEDUCTED_INPUT</span>
+        </div>
+    </div>
+
+    <!-- ✅ ADD FOOTER HERE -->
+<!--    <div class="footer">-->
+<!--        <div class="teacher">Nupur Gupta</div>-->
+<!--        <div class="phone">📱 +91-8527940091</div>-->
+<!--    </div>-->
+
+    <img class="signature" src="SIGNATURE_IMAGE">
+
+</div>
+
+</body>
+</html>

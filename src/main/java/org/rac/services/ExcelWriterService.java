@@ -34,7 +34,7 @@ public class ExcelWriterService {
             for (Student student : students) {
                 Row row = sheet.createRow(rowNum++);
                 row.createCell(0).setCellValue(student.getName());
-                row.createCell(1).setCellValue(student.getPhoneNumber());
+                row.createCell(1).setCellValue("");
                 logger.trace("Added student to abort report: {}", student.getName());
             }
 

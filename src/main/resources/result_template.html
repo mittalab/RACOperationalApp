@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html>
 <head>
 <title>Result</title>
@@ -30,20 +29,44 @@
     }
     th, td {
         border: 1px solid black;
+        background-color: #e0ffe0;
         padding: 8px;
         text-align: left;
+    }
+    td:first-child, th:first-child {
+        white-space: nowrap;
+    }
+    watermarked-container {
+<!--        position: relative;-->
+<!--        display: inline-block;-->
+        background-image: url('WATERMARK_IMAGE');
+        background-repeat: no-repeat; /* or repeat, no-repeat, depending on your design */
+        opacity: 100; /* adjust for watermark visibility */
+        /* other positioning and sizing styles */
+    }
+    watermark-image {
+        position: absolute; /* Positions the watermark relative to the container */
+        bottom: 10px;       /* Adjust vertical position (e.g., from bottom) */
+        right: 10px;        /* Adjust horizontal position (e.g., from right) */
+        opacity: 0.5;       /* Sets transparency (0.0 to 1.0) */
+        pointer-events: none; /* Allows clicks to pass through the watermark to the main image */
+        width: 100px;       /* Set an appropriate size for the watermark */
+        height: auto;
     }
 </style>
 </head>
 <body>
-
-    <img class="header-img" src="header.png" alt="Header">
+<div class="watermarked-container">
+<!--
+<img class="watermark-image" src="WATERMARK__IMAGE" alt="CONFIDENTIAL">
+-->
+    <img class="header-img" src="HEADER_IMAGE" alt="Header">
 
     <h1 class="center-text">HEADING_INPUT</h1>
 
     <div class="split-row">
-        <span>Date: DATE_INPUT</span>
-        <span>Class: CLASS_INPUT</span>
+        <span><strong>DATE: DATE_INPUT</strong></span>
+        <span><strong>CLASS: CLASS_INPUT</strong></span>
     </div>
 
     <h2 class="center-text">NAME: NAME_INPUT</h2>
@@ -64,7 +87,7 @@
         </tr>
     </table>
 
-    <img class="signature-img" src="signature.png" alt="Signature">
-
+    <img class="signature-img" src="SIGNATURE_IMAGE" alt="Signature">
+</div>
 </body>
 </html>

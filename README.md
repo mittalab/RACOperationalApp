@@ -57,7 +57,7 @@ You can use `jpackage` to create a self-contained application image (a directory
 2.  Run the following `jpackage` command from the root directory of the project. This command will create an application image directory. Make sure to replace `--input target` with the actual path to your `target` directory and `--main-jar RACOperationalApp-1.0-SNAPSHOT.jar` with the actual name of your JAR file.
 
     ```bash
-    jpackage --name RACOperationalApp --input target --main-jar RACOperationalApp-1.0-SNAPSHOT.jar --main-class org.rac.Main
+    jpackage --name RACOperationalApp --input target --main-jar RACOperationalApp-1.0-SNAPSHOT.jar --main-class org.rac.NewMain
     ```
 
 3.  After successful execution, `jpackage` will create a new directory (e.g., `RACOperationalApp`) in the current directory (or a specified output directory). Inside this directory, you will find the executable (`RACOperationalApp.exe`) which you can run directly.

@@ -4,6 +4,8 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import org.rac.Main;
 import org.rac.model.Student;
@@ -15,16 +17,16 @@ import org.rac.services.WhatsAppService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
+
 
 public class SendResultsViewController {
 
@@ -71,13 +73,14 @@ public class SendResultsViewController {
     public void initialize() {
         logger.info("Initializing SendResultsViewController");
         try {
-            InputStream resourceStream = getClass().getResourceAsStream("/result_template.html");
+            String templateFileInput = "result_template_4.html";
+            InputStream resourceStream = getClass().getResourceAsStream("/" + templateFileInput);
             if (resourceStream == null) {
                 logger.error("result_template.html not found in resources.");
                 showAlert("Error", "result_template.html not found in resources.");
                 return;
             }
-            templateFile = File.createTempFile("result_template", ".html");
+            templateFile = File.createTempFile("result_template_4", ".html");
             templateFile.deleteOnExit();
             Files.copy(resourceStream, templateFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             logger.info("Loaded result_template.html to temporary file: {}", templateFile.getAbsolutePath());
@@ -143,12 +146,21 @@ public class SendResultsViewController {
             return;
         }
 
+        // 4.a creating the tmp folders
+        // 1. Generate UUID
+        String uuid = UUID.randomUUID().toString();
+        File htmlDir = new File(uuid + "_html");
+        File pngDir = new File(uuid + "_png");
+
+        htmlDir.mkdirs();
+        pngDir.mkdirs();
+
         // 4. Start processing
         isAborted = false;
         sentStudents.clear();
         new Thread(() -> {
             logger.info("Starting the result sending process in a new thread");
-            String outputDestination = "Email";
+            String outputDestination = "todo";
             try {
                 if ("WhatsApp".equals(outputDestination)) {
                     whatsAppService.startService();
@@ -177,17 +189,18 @@ public class SendResultsViewController {
                             topicField.getText(),
                             headingField.getText(),
                             totalMarksField.getText(),
-                            templateFile
+                            templateFile,
+                            currentStudentIndex,
+                            htmlDir,
+                            pngDir
                     );
-                    logger.debug("Result image generated: {}", imageFile.getAbsolutePath());
+                    //logger.debug("Result image generated: {}", imageFile.getAbsolutePath());
 
                     // Send message based on destination
                     if ("WhatsApp".equals(outputDestination)) {
-                        logger.debug("Sending WhatsApp message to: {}", student.getPhoneNumber());
-                        whatsAppService.sendMessage(student.getPhoneNumber(), imageFile);
                         logger.info("Successfully sent WhatsApp message to {}", student.getName());
                     } else if ("Email".equals(outputDestination)) {
-                        String recipient = student.getEmail(); // Assuming student has email or using override
+                        String recipient = ""; // Assuming student has email or using override
                         if (recipient == null || recipient.isEmpty()) {
                             logger.warn("Skipping email for {} as no recipient email found.", student.getName());
                             Platform.runLater(() -> showAlert("Warning", "Skipping email for " + student.getName() + " as no recipient email found."));
@@ -202,16 +215,23 @@ public class SendResultsViewController {
                     sentStudents.add(student);
 
                     // Clean up the generated image file
-                    if (imageFile.delete()) {
-                        logger.debug("Cleaned up image file: {}", imageFile.getName());
-                    } else {
-                        logger.warn("Could not delete image file: {}", imageFile.getName());
-                    }
+//                    if (imageFile.delete()) {
+//                        logger.debug("Cleaned up image file: {}", imageFile.getName());
+//                    } else {
+//                        logger.warn("Could not delete image file: {}", imageFile.getName());
+//                    }
                 }
             } catch (Exception e) {
                 logger.error("An error occurred during the result sending process", e);
                 showAlert("Error", "An error occurred during processing: " + e.getMessage());
             } finally {
+                // 9. Open PNG folder automatically
+                try {
+                    Desktop.getDesktop().open(pngDir);
+                } catch (Exception e) {
+                    System.out.println("Could not open folder automatically.");
+                }
+
                 if ("WhatsApp".equals(outputDestination)) {
                     whatsAppService.stopService();
                 }

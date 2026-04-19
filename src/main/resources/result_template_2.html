@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Result Card</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 10px;
+        }
+
+        /* MAIN CARD */
+        .container {
+            width: 420px; /* MOBILE FRIENDLY */
+            margin: auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            padding: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* WATERMARK */
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.04;
+            width: 250px;
+        }
+
+        /* HEADER */
+        .header {
+            text-align: center;
+        }
+
+        .logo {
+            width: 50px;
+        }
+
+        .title {
+            font-size: 20px;
+            color: red;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .subtitle {
+            font-size: 12px;
+            color: #555;
+        }
+
+        /* DATE + CLASS */
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+
+        .info-row span {
+            color: red;
+            font-weight: bold;
+        }
+
+        /* NAME */
+        .name-box {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .name-box p {
+            margin: 4px 0;
+            font-size: 15px;
+        }
+
+        .label {
+            color: red;
+            font-weight: bold;
+        }
+
+        /* MARKS HIGHLIGHT */
+        .marks-box {
+            background: #2d5c2d;
+            color: white;
+            text-align: center;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 12px 0;
+        }
+
+        .marks-box h2 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .marks-box p {
+            margin: 3px 0;
+            font-size: 14px;
+        }
+
+        /* DETAILS */
+        .details {
+            font-size: 14px;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .row span:first-child {
+            color: #2d5c2d;
+            font-weight: bold;
+        }
+
+        /* SIGNATURE */
+        .signature {
+            display: block;
+            margin-left: auto;
+            margin-top: 10px;
+            width: 100px;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <img class="watermark" src="WATERMARK_IMAGE">
+
+    <!-- HEADER -->
+    <div class="header">
+        <img class="logo" src="LOGO_IMAGE">
+        <div class="title">RANK ACHIEVERS CLASSES</div>
+        <div class="subtitle">IX, X (Science) & XI, XII (Chemistry)</div>
+    </div>
+
+    <!-- DATE + CLASS -->
+    <div class="info-row">
+        <div><span>DATE:</span> DATE_INPUT</div>
+        <div><span>CLASS:</span> CLASS_INPUT</div>
+    </div>
+
+    <!-- NAME -->
+    <div class="name-box">
+        <p><span class="label">NAME:</span> NAME_INPUT</p>
+        <p><span class="label">TOPIC:</span> TOPIC_INPUT</p>
+    </div>
+
+    <!-- MARKS HIGHLIGHT -->
+    <div class="marks-box">
+        <p>Total Score</p>
+        <h2>MARKS_INPUT / TOTAL_MARKS_INPUT</h2>
+    </div>
+
+    <!-- DETAILS -->
+    <div class="details">
+        <div class="row">
+            <span>Wrong Answers</span>
+            <span>ADDITIONAL_INPUT</span>
+        </div>
+        <div class="row">
+            <span>Marks Deducted</span>
+            <span>MARKS_DEDUCTED_INPUT</span>
+        </div>
+    </div>
+
+    <!-- SIGNATURE -->
+    <img class="signature" src="SIGNATURE_IMAGE">
+
+</div>
+
+</body>
+</html>
