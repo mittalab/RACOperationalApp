@@ -40,11 +40,10 @@ public class ExcelReaderService {
                 rowNum++;
                 try {
                     String name = getCellStringValue(row.getCell(0));
-                    String phoneNumber = getCellStringValue(row.getCell(1));
-                    double marksObtained = row.getCell(2).getNumericCellValue();
-                    String additionalDetails = getCellStringValue(row.getCell(3));
+                    double marksObtained = row.getCell(1).getNumericCellValue();
+                    String additionalDetails = getCellStringValue(row.getCell(2));
 
-                    students.add(new Student(name, phoneNumber, marksObtained, additionalDetails, phoneNumber));
+                    students.add(new Student(name, marksObtained, additionalDetails));
                     logger.trace("Read student from row {}: {}", rowNum, name);
                 } catch (Exception e) {
                     logger.error("Could not read student data from row {}", rowNum, e);

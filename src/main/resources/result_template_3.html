@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Result</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 10px;
+        }
+
+        .container {
+            width: 900px;
+            margin: auto;
+            border: 3px solid black;
+            padding: 15px;
+            position: relative;
+            background-color: white;
+            line-height: 1.3;
+        }
+
+        /* WATERMARK */
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.05;
+            width: 300px;
+            z-index: 0;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo {
+            width: 70px;
+        }
+
+        .title {
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        .title h1 {
+            color: red;
+            font-size: 30px;
+            margin: 0;
+            font-weight: bold;
+        }
+
+        .title h3 {
+            margin: 2px 0;
+            color: #333;
+        }
+
+        .right-info {
+            text-align: right;
+            color: red;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .result-title {
+            text-align: center;
+            color: #2d5c2d;
+            font-weight: bold;
+            margin: 12px 0;
+            font-size: 16px;
+            text-decoration: underline;
+        }
+
+        /* INFO ROW */
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 12px 0;
+            font-size: 17px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .info-row span {
+            color: red;
+            font-weight: bold;
+        }
+
+        /* NAME BOX */
+        .name-box {
+            padding: 8px;
+            text-align: center;
+            margin: 5px auto;
+            width: 70%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .name-box p {
+            margin: 4px 0;
+            font-size: 17px;
+        }
+
+        .label {
+            color: red;
+            font-weight: bold;
+        }
+
+        /* TABLE */
+        table {
+            width: 100%;
+            margin-top: 15px;
+            border-collapse: collapse;
+            background: #ddd;
+            position: relative;
+            z-index: 1;
+            table-layout: auto;
+        }
+
+        td {
+            padding: 10px;
+            border-top: 1px solid #aaa;
+            font-size: 17px;
+            vertical-align: top;
+        }
+
+        /* COLUMN 1 */
+        td:first-child {
+            color: #2d5c2d;
+            font-weight: bold;
+            white-space: nowrap;
+            width: 1%;
+            border-right: 2px solid #bbb; /* divider line */
+        }
+
+        /* COLUMN 2 */
+        td:last-child {
+            text-align: left;
+            padding-left: 20px;
+        }
+
+        .marks {
+            color: red;
+            font-weight: bold;
+        }
+
+        /* SIGNATURE */
+        .signature {
+            display: block;
+            margin-left: auto;
+            margin-top: 10px;
+            width: 120px;
+            position: relative;
+            z-index: 1;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- WATERMARK -->
+    <img class="watermark" src="WATERMARK_IMAGE" alt="watermark">
+
+    <!-- HEADER -->
+    <div class="header">
+        <img class="logo" src="LOGO_IMAGE" alt="logo">
+
+        <div class="title">
+            <h1>RANK ACHIEVERS CLASSES</h1>
+            <h3>IX, X (Science) & XI, XII (Chemistry)</h3>
+        </div>
+
+        <div class="right-info">
+            NUPUR GUPTA<br>
+            +91-8527940091
+        </div>
+    </div>
+
+    <div class="result-title"><b>HEADING_INPUT</b></div>
+
+    <!-- DATE / CLASS -->
+    <div class="info-row">
+        <div><span>DATE:</span> <b>DATE_INPUT</b></div>
+        <div><span>CLASS:</span> <b>CLASS_INPUT</b></div>
+    </div>
+
+    <!-- NAME / TOPIC -->
+    <div class="name-box">
+        <p><span class="label">NAME:</span> <b>NAME_INPUT</b></p>
+        <p><span class="label">TOPIC:</span> <b>TOPIC_INPUT</b></p>
+    </div>
+
+    <!-- TABLE -->
+    <table>
+        <tr>
+            <td>Wrong Answers Number:</td>
+            <td>ADDITIONAL_INPUT</td>
+        </tr>
+        <tr>
+            <td>Marks Deducted:</td>
+            <td>MARKS_DEDUCTED_INPUT</td>
+        </tr>
+        <tr>
+            <td>TOTAL MARKS:</td>
+            <td class="marks">MARKS_INPUT / TOTAL_MARKS_INPUT</td>
+        </tr>
+    </table>
+
+    <!-- SIGNATURE -->
+    <img class="signature" src="SIGNATURE_IMAGE" alt="signature">
+
+</div>
+
+</body>
+</html>

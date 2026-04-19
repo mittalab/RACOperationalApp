@@ -1,9 +1,11 @@
 package org.rac;
 
+import com.microsoft.playwright.Playwright;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +22,7 @@ public class Main extends Application {
         logger.info("Starting RAC Operational App");
         primaryStage = stage;
         primaryStage.setTitle("RAC Operational App");
+        primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/app_icon.png")));
         showMainView();
     }
 
@@ -41,6 +44,8 @@ public class Main extends Application {
 
 
     public static void main(String[] args) {
+        System.setProperty("PLAYWRIGHT_BROWSERS_PATH", "ms-playwright");
+        Playwright.create();
         launch(args);
     }
 
