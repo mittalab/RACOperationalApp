@@ -5,6 +5,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.geometry.Insets?>
 
+<?import javafx.scene.control.Button?>
 <VBox xmlns="http://javafx.com/javafx/17"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="org.rac.gui.MainViewController"
@@ -15,6 +16,10 @@
 
     <Label text="Welcome to the RAC Operational App" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
 
-    <ListView fx:id="activityListView" onMouseClicked="#handleActivitySelection"/>
+    <VBox fx:id="activityVBox" spacing="10" alignment="CENTER_LEFT">
+        <!-- Radio buttons will be added here dynamically from the controller -->
+    </VBox>
+
+    <Button fx:id="selectActivityButton" text="Go to Activity" onAction="#handleSelectActivity"/>
 
 </VBox>
