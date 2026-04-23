@@ -37,6 +37,8 @@ public class SendResultsViewController {
     @FXML
     private TextField classField;
     @FXML
+    private TextField batchField;
+    @FXML
     private TextField topicField;
     @FXML
     private TextField headingField;
@@ -49,21 +51,12 @@ public class SendResultsViewController {
     @FXML
     private Label progressLabel;
 
-//    @FXML
-//    private ChoiceBox<String> outputDestinationChoiceBox;
-//    @FXML
-//    private TextField senderEmailField;
-//    @FXML
-//    private TextField recipientEmailField;
-//    @FXML
-//    private TextField emailSubjectField;
-
     private File excelFile;
     private File templateFile;
+    private File topperTemplateFile;
     private final ExcelReaderService excelReaderService = new ExcelReaderService();
     private final ResultImageService resultImageService = new ResultImageService();
     private final WhatsAppService whatsAppService = new WhatsAppService();
-    private final EmailService emailService = new EmailService(); // New instance for email
     private final ExcelWriterService excelWriterService = new ExcelWriterService();
 
     private volatile boolean isAborted = false;
@@ -73,33 +66,34 @@ public class SendResultsViewController {
     public void initialize() {
         logger.info("Initializing SendResultsViewController");
         try {
-            String templateFileInput = "result_template_4.html";
-            InputStream resourceStream = getClass().getResourceAsStream("/" + templateFileInput);
-            if (resourceStream == null) {
-                logger.error("result_template.html not found in resources.");
-                showAlert("Error", "result_template.html not found in resources.");
-                return;
-            }
-            templateFile = File.createTempFile("result_template_4", ".html");
-            templateFile.deleteOnExit();
-            Files.copy(resourceStream, templateFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            logger.info("Loaded result_template.html to temporary file: {}", templateFile.getAbsolutePath());
+            templateFile = loadTemplateFromResource("result_template_4.html", "result_template_4");
+            topperTemplateFile = loadTemplateFromResource("topper_template.html", "topper_template");
         } catch (IOException e) {
-            logger.error("Failed to load result_template.html", e);
-            showAlert("Error", "Failed to load result_template.html: " + e.getMessage());
+            logger.error("Failed to load templates", e);
+            showAlert("Error", "Failed to load templates: " + e.getMessage());
         }
 
-//        // Initialize ChoiceBox for output destination
-//        outputDestinationChoiceBox.setItems(FXCollections.observableArrayList("WhatsApp", "Email"));
-//        outputDestinationChoiceBox.setValue("WhatsApp"); // Default selection
-//
-//        // Set visibility of email fields based on selection
-//        senderEmailField.managedProperty().bind(outputDestinationChoiceBox.valueProperty().isEqualTo("Email"));
-//        senderEmailField.visibleProperty().bind(outputDestinationChoiceBox.valueProperty().isEqualTo("Email"));
-//        recipientEmailField.managedProperty().bind(outputDestinationChoiceBox.valueProperty().isEqualTo("Email"));
-//        recipientEmailField.visibleProperty().bind(outputDestinationChoiceBox.valueProperty().isEqualTo("Email"));
-//        emailSubjectField.managedProperty().bind(outputDestinationChoiceBox.valueProperty().isEqualTo("Email"));
-//        emailSubjectField.visibleProperty().bind(outputDestinationChoiceBox.valueProperty().isEqualTo("Email"));
+        datePicker.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                if (newValue.getDayOfWeek() == java.time.DayOfWeek.SATURDAY) {
+                    batchField.setText("Monday Batch");
+                } else {
+                    batchField.setText("Tuesday Batch");
+                }
+            }
+        });
+    }
+
+    private File loadTemplateFromResource(String resourceName, String prefix) throws IOException {
+        InputStream resourceStream = getClass().getResourceAsStream("/" + resourceName);
+        if (resourceStream == null) {
+            throw new IOException(resourceName + " not found in resources.");
+        }
+        File tempFile = File.createTempFile(prefix, ".html");
+        tempFile.deleteOnExit();
+        Files.copy(resourceStream, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        logger.info("Loaded {} to temporary file: {}", resourceName, tempFile.getAbsolutePath());
+        return tempFile;
     }
 
 
@@ -146,6 +140,13 @@ public class SendResultsViewController {
             return;
         }
 
+        // 3.b Show marks profile and get cut-off
+        Double cutOff = showMarksProfileAndGetCutOff(students);
+        if (cutOff == null) {
+            logger.info("User cancelled from the marks profile dialog");
+            return;
+        }
+
         // 4.a creating the tmp folders
         // 1. Generate UUID
         String uuid = UUID.randomUUID().toString();
@@ -158,6 +159,7 @@ public class SendResultsViewController {
         // 4. Start processing
         isAborted = false;
         sentStudents.clear();
+        final List<Student> finalStudents = students;
         new Thread(() -> {
             logger.info("Starting the result sending process in a new thread");
             String outputDestination = "todo";
@@ -166,13 +168,13 @@ public class SendResultsViewController {
                     whatsAppService.startService();
                 }
 
-                int totalStudents = students.size();
+                int totalStudents = finalStudents.size();
                 for (int i = 0; i < totalStudents; i++) {
                     if (isAborted) {
                         logger.warn("Process aborted by user");
                         break;
                     }
-                    Student student = students.get(i);
+                    Student student = finalStudents.get(i);
                     logger.info("Processing student {} of {}: {}", (i + 1), totalStudents, student.getName());
                     final int currentStudentIndex = i;
                     Platform.runLater(() -> {
@@ -197,29 +199,46 @@ public class SendResultsViewController {
                     //logger.debug("Result image generated: {}", imageFile.getAbsolutePath());
 
                     // Send message based on destination
-                    if ("WhatsApp".equals(outputDestination)) {
-                        logger.info("Successfully sent WhatsApp message to {}", student.getName());
-                    } else if ("Email".equals(outputDestination)) {
-                        String recipient = ""; // Assuming student has email or using override
-                        if (recipient == null || recipient.isEmpty()) {
-                            logger.warn("Skipping email for {} as no recipient email found.", student.getName());
-                            Platform.runLater(() -> showAlert("Warning", "Skipping email for " + student.getName() + " as no recipient email found."));
-                            continue;
-                        }
-                        String subject = "RAC Result";
-                        String sender = "29.abhishek.mittal@gmail.com";
-                        logger.debug("Sending email to {} from {} with subject '{}'", recipient, sender, subject);
-                        emailService.sendEmailWithAttachment(recipient, sender, subject, "Please find your result attached.", imageFile);
-                        logger.info("Successfully sent email to {}", student.getName());
-                    }
-                    sentStudents.add(student);
-
-                    // Clean up the generated image file
-//                    if (imageFile.delete()) {
-//                        logger.debug("Cleaned up image file: {}", imageFile.getName());
-//                    } else {
-//                        logger.warn("Could not delete image file: {}", imageFile.getName());
+//                    if ("WhatsApp".equals(outputDestination)) {
+//                        logger.info("Successfully sent WhatsApp message to {}", student.getName());
+//                    } else if ("Email".equals(outputDestination)) {
+//                        String recipient = ""; // Assuming student has email or using override
+//                        if (recipient == null || recipient.isEmpty()) {
+//                            logger.warn("Skipping email for {} as no recipient email found.", student.getName());
+//                            Platform.runLater(() -> showAlert("Warning", "Skipping email for " + student.getName() + " as no recipient email found."));
+//                            continue;
+//                        }
+//                        String subject = "RAC Result";
+//                        String sender = "29.abhishek.mittal@gmail.com";
+//                        logger.debug("Sending email to {} from {} with subject '{}'", recipient, sender, subject);
+//                        emailService.sendEmailWithAttachment(recipient, sender, subject, "Please find your result attached.", imageFile);
+//                        logger.info("Successfully sent email to {}", student.getName());
 //                    }
+                    sentStudents.add(student);
+                }
+
+                if (!isAborted) {
+                    // Generate Topper List Image
+                    logger.info("Generating Topper List Image");
+                    List<Student> toppers = new ArrayList<>();
+                    for (Student s : finalStudents) {
+                        if (s.getMarksObtained() >= cutOff) {
+                            toppers.add(s);
+                        }
+                    }
+                    toppers.sort((s1, s2) -> Double.compare(s2.getMarksObtained(), s1.getMarksObtained()));
+
+                    resultImageService.generateTopperImage(
+                            toppers,
+                            datePicker.getValue().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
+                            classField.getText(),
+                            batchField.getText(),
+                            topicField.getText(),
+                            totalMarksField.getText(),
+                            topperTemplateFile,
+                            htmlDir,
+                            pngDir
+                    );
                 }
             } catch (Exception e) {
                 logger.error("An error occurred during the result sending process", e);
@@ -246,6 +265,35 @@ public class SendResultsViewController {
         }).start();
 
 
+    }
+
+    private Double showMarksProfileAndGetCutOff(List<Student> students) {
+        int totalStudents = students.size();
+        Map<Double, Integer> distribution = new TreeMap<>(Collections.reverseOrder());
+        for (Student s : students) {
+            distribution.put(s.getMarksObtained(), distribution.getOrDefault(s.getMarksObtained(), 0) + 1);
+        }
+
+        StringBuilder profileText = new StringBuilder("Total Students: " + totalStudents + "\n\nMarks Distribution:\n");
+        for (Map.Entry<Double, Integer> entry : distribution.entrySet()) {
+            profileText.append(String.format("%.1f Marks: %d Students\n", entry.getKey(), entry.getValue()));
+        }
+
+        TextInputDialog dialog = new TextInputDialog("");
+        dialog.setTitle("Set Cut-off for Toppers");
+        dialog.setHeaderText(profileText.toString());
+        dialog.setContentText("Enter Cut-off Marks:");
+
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()) {
+            try {
+                return Double.parseDouble(result.get());
+            } catch (NumberFormatException e) {
+                showAlert("Error", "Invalid cut-off marks entered.");
+                return null;
+            }
+        }
+        return null;
     }
     
     private boolean showSummaryAndGetConfirmation(int studentCount) {

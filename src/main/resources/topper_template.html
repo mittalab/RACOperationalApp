@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: white;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            width: 1000px;
+            border: 2px solid black;
+            padding: 20px;
+            position: relative;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        .logo {
+            width: 80px;
+        }
+        .title-section {
+            text-align: center;
+            flex-grow: 1;
+        }
+        .main-title {
+            color: #E34234;
+            font-size: 48px;
+            font-weight: bold;
+            margin: 0;
+        }
+        .sub-title {
+            color: #E34234;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+        .contact-info {
+            text-align: right;
+            color: #E34234;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .list-title {
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            margin: 15px 0;
+            text-decoration: none;
+        }
+        .class-batch {
+            text-align: center;
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th {
+            background-color: #E67E22;
+            color: white;
+            font-size: 22px;
+            padding: 12px;
+            border: 2px solid #D35400;
+        }
+        td {
+            border: 2px solid #D35400;
+            padding: 12px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #FFF5EE;
+        }
+        .marks {
+            color: #E34234;
+            font-size: 22px;
+        }
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 30px;
+        }
+        .congrats {
+            color: #E34234;
+            font-size: 36px;
+            font-style: italic;
+        }
+        .signature {
+            width: 150px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img class="logo" src="LOGO_IMAGE" alt="Logo">
+            <div class="title-section">
+                <p class="main-title">RANK ACHIEVERS CLASSES</p>
+                <p class="sub-title">IX, X (Science) & XI, XII (Chemistry)</p>
+            </div>
+            <div class="contact-info">
+                NUPUR GUPTA<br>
+                +91-8527940091
+            </div>
+        </div>
+
+        <div class="list-title">LIST OF TOPPERS</div>
+        <div class="class-batch">CLASS_BATCH_INPUT</div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 10%;">S.NO.</th>
+                    <th style="width: 25%;">NAME</th>
+                    <th style="width: 20%;">DATE</th>
+                    <th style="width: 30%;">TOPIC</th>
+                    <th style="width: 15%;">MARKS</th>
+                </tr>
+            </thead>
+            <tbody>
+                TABLE_ROWS_INPUT
+            </tbody>
+        </table>
+
+        <div class="footer">
+            <div class="congrats">Congratulations to our Achiever's!!</div>
+            <img class="signature" src="SIGNATURE_IMAGE" alt="Signature">
+        </div>
+    </div>
+</body>
+</html>

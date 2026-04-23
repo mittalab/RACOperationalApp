@@ -17,12 +17,12 @@ import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 //import gui.ava.html2image.HtmlImageGenerator;
 //import gui.ava.html.image.generator.HtmlImageGenerator;
@@ -45,6 +45,48 @@ import java.io.File;
 public class ResultImageService {
 
     private static final Logger logger = LoggerFactory.getLogger(ResultImageService.class);
+
+    public void generateTopperImage(List<Student> toppers, String date, String studentClass, String batch, String topic, String totalMarks, File templateFile, File htmlDirs, File pngDirs) throws IOException {
+        logger.info("Generating topper list image for {} toppers", toppers.size());
+        String templateContent = new String(Files.readAllBytes(templateFile.toPath()));
+
+        StringBuilder tableRows = new StringBuilder();
+        int sno = 1;
+        for (Student topper : toppers) {
+            tableRows.append("<tr>")
+                    .append("<td>").append(sno++).append(".</td>")
+                    .append("<td>").append(topper.getName()).append("</td>")
+                    .append("<td>").append(date).append("</td>")
+                    .append("<td>").append(topic.toUpperCase()).append("</td>")
+                    .append("<td class='marks'>").append((int) topper.getMarksObtained()).append("/").append(totalMarks).append("</td>")
+                    .append("</tr>");
+        }
+
+        String populatedContent = templateContent
+                .replace("CLASS_BATCH_INPUT", "CLASS -" + studentClass.toUpperCase() + " (" + batch.toUpperCase() + ")")
+                .replace("TABLE_ROWS_INPUT", tableRows.toString())
+                .replace("LOGO_IMAGE", ImageUtils.getBase64EncodedImage("/app_icon.png"))
+                .replace("SIGNATURE_IMAGE", ImageUtils.getBase64EncodedImage("/signature.png"));
+
+        String fileNamePNG = "Toppers_List.png";
+        String fileNameHTML = "toppers_list.html";
+
+        File fileHTML = new File(htmlDirs, fileNameHTML);
+        try (java.io.FileWriter fileWriter = new java.io.FileWriter(fileHTML)) {
+            fileWriter.write(populatedContent);
+        }
+
+        try (Playwright playwright = Playwright.create()) {
+            Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(true));
+            Page page = browser.newPage();
+            page.navigate(fileHTML.toURI().toString());
+            Locator element = page.locator(".container");
+            element.screenshot(new Locator.ScreenshotOptions().setPath(Paths.get(pngDirs.getAbsolutePath(), fileNamePNG)));
+            browser.close();
+        } catch (Exception e) {
+            logger.error("Error during playwright topper image generation", e);
+        }
+    }
 
     public File generateImage(Student student, String date, String studentClass, String topic, String heading, String totalMarks, File templateFile, int index, File htmlDirs, File pngDirs) throws IOException {
         logger.info("Generating result image for student: {} , template path: {}", student.getName(), templateFile.toPath());
