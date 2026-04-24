@@ -20,3 +20,6 @@ copy src\main\resources\app_icon.ico dist\app_icon.ico
 
 ## Build Executable
 `jpackage --name RACOperationalApp --input dist --main-jar app.jar --main-class org.rac.NewMain --type app-image --icon dist\app_icon.ico --app-version 1.0 --vendor "Rank Achievers Classes"`
+
+
+copy input_student_data.xlsx RACOperationalApp\input_student_data.xlsx
