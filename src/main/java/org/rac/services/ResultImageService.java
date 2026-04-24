@@ -46,6 +46,13 @@ public class ResultImageService {
 
     private static final Logger logger = LoggerFactory.getLogger(ResultImageService.class);
 
+    private static String formatMarks(double marks) {
+        if (marks == Math.floor(marks) && !Double.isInfinite(marks)) {
+            return String.valueOf((int) marks);
+        }
+        return String.valueOf(marks);
+    }
+
     public void generateTopperImage(List<Student> toppers, String date, String studentClass, String batch, String topic, String totalMarks, File templateFile, File htmlDirs, File pngDirs) throws IOException {
         logger.info("Generating topper list image for {} toppers", toppers.size());
         String templateContent = new String(Files.readAllBytes(templateFile.toPath()));
@@ -58,7 +65,7 @@ public class ResultImageService {
                     .append("<td>").append(topper.getName()).append("</td>")
                     .append("<td>").append(date).append("</td>")
                     .append("<td>").append(topic.toUpperCase()).append("</td>")
-                    .append("<td class='marks'>").append((int) topper.getMarksObtained()).append("/").append(totalMarks).append("</td>")
+                    .append("<td class='marks'>").append(formatMarks(topper.getMarksObtained())).append("/").append(totalMarks).append("</td>")
                     .append("</tr>");
         }
 
@@ -110,12 +117,12 @@ public class ResultImageService {
                 .replace("HEADING_INPUT", heading.toUpperCase())
                 .replace("ADDITIONAL_INPUT", student.getAdditionalDetails())
                 .replace("TOTAL_MARKS_INPUT", totalMarks)
-                .replace("MARKS_INPUT", String.valueOf(student.getMarksObtained()))
+                .replace("MARKS_INPUT", formatMarks(student.getMarksObtained()))
                 .replace("SIGNATURE_IMAGE", signatureImageBase64)
                 .replace("HEADER_IMAGE", headerImageBase64)
                 .replace("WATERMARK_IMAGE", watermarkImageBase64)
                 .replace("LOGO_IMAGE", logoImageBase64)
-                .replace("MARKS_DEDUCTED_INPUT", String.valueOf(Integer.parseInt(totalMarks) - (int) student.getMarksObtained()));
+                .replace("MARKS_DEDUCTED_INPUT", formatMarks(Double.parseDouble(totalMarks) - student.getMarksObtained()));
         logger.info("Populated HTML template with student data");
         logger.info(totalMarks);
         //logger.info(populatedContent);

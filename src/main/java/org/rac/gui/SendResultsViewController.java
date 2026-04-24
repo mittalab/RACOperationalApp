@@ -351,13 +351,13 @@ public class SendResultsViewController {
             return false;
         }
         try {
-            int totalMarks = Integer.parseInt(totalMarksField.getText());
+            double totalMarks = Double.parseDouble(totalMarksField.getText());
             if (totalMarks <= 0) {
-                showAlert("Error", "Total marks must be a positive integer.");
+                showAlert("Error", "Total marks must be a positive number.");
                 return false;
             }
         } catch (NumberFormatException e) {
-            showAlert("Error", "Total marks must be a valid integer.");
+            showAlert("Error", "Total marks must be a valid number.");
             return false;
         }
 
