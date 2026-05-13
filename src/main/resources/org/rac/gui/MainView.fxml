@@ -1,25 +1,101 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.layout.VBox?>
 <?import javafx.geometry.Insets?>
-
 <?import javafx.scene.control.Button?>
-<VBox xmlns="http://javafx.com/javafx/17"
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<!--
+    RAC Operational App — MainView (Redesigned)
+    CSS: place rac-styles.css in the same resources folder as this FXML.
+    Controller: org.rac.gui.MainViewController  (unchanged)
+    fx:id references preserved: activityVBox, selectActivityButton
+    Action handler preserved:   #handleSelectActivity
+-->
+<HBox xmlns="http://javafx.com/javafx/17"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="org.rac.gui.MainViewController"
-      alignment="CENTER" spacing="20">
-    <padding>
-        <Insets top="25" right="25" bottom="25" left="25"/>
-    </padding>
+      stylesheets="@rac-styles.css"
+      prefWidth="900"
+      prefHeight="580">
 
-    <Label text="Welcome to the RAC Operational App" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+    <!-- ══════════════════════════════════════════
+         LEFT SIDEBAR
+         ══════════════════════════════════════════ -->
+    <VBox styleClass="sidebar" spacing="3">
 
-    <VBox fx:id="activityVBox" spacing="10" alignment="CENTER_LEFT">
-        <!-- Radio buttons will be added here dynamically from the controller -->
+        <!-- Logo block -->
+        <HBox styleClass="sidebar-logo-box" prefWidth="42" prefHeight="42">
+            <Label text="RAC" styleClass="sidebar-logo-text"/>
+        </HBox>
+
+        <Region prefHeight="6"/>
+
+        <!-- App name under logo -->
+        <Label text="RAC Operational App"
+               style="-fx-text-fill: #7a9abf; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 4 2;"/>
+
+        <!-- Separator -->
+        <Pane styleClass="section-divider" style="-fx-margin: 6 0 6 0;"/>
+
+        <!-- Nav section -->
+        <Label text="ACTIVITIES" styleClass="sidebar-section-label"/>
+
+        <!-- Purely decorative nav items; the real selection is in activityVBox below -->
+        <Button text="⊞  Dashboard"
+                styleClass="sidebar-nav-item, sidebar-nav-item-active"
+                maxWidth="Infinity"/>
+<!--        <Button text="↑  Send Results"-->
+<!--                styleClass="sidebar-nav-item"-->
+<!--                maxWidth="Infinity"/>-->
+
+        <!-- Push settings to bottom -->
+        <Region VBox.vgrow="ALWAYS"/>
+
+        <Pane styleClass="section-divider"/>
+        <Label text="SYSTEM" styleClass="sidebar-section-label"/>
+<!--        <Button text="⚙  Settings"-->
+<!--                styleClass="sidebar-nav-item"-->
+<!--                maxWidth="Infinity"/>-->
+
     </VBox>
 
-    <Button fx:id="selectActivityButton" text="Go to Activity" onAction="#handleSelectActivity"/>
+    <!-- ══════════════════════════════════════════
+         MAIN CONTENT AREA
+         ══════════════════════════════════════════ -->
+    <VBox styleClass="main-content-area"
+          HBox.hgrow="ALWAYS"
+          spacing="10">
 
-</VBox>
+        <!-- Header text -->
+        <Label text="RAC OPERATIONAL APP" styleClass="main-greeting"/>
+        <Label text="Welcome back 👋"  styleClass="main-title"/>
+        <Label text="Select an activity below and click Go to Activity."
+               styleClass="main-subtitle"/>
+
+        <!--
+            Activity radio buttons are injected here by MainViewController.
+            The controller calls getChildren().add(...) on this VBox.
+            Style the injected RadioButtons via .activity-card /
+            .activity-card-selected CSS classes inside the controller, or
+            add a style-class to each RadioButton:
+               rb.getStyleClass().add("activity-card");
+        -->
+        <VBox fx:id="activityVBox"
+              spacing="10"
+              style="-fx-padding: 8 0 8 0;"
+              maxWidth="480"/>
+
+        <!-- Go to Activity CTA -->
+        <Button fx:id="selectActivityButton"
+                text="Go to Activity  →"
+                styleClass="primary-button"
+                onAction="#handleSelectActivity"
+                style="-fx-pref-width: 200px;"/>
+
+    </VBox>
+
+</HBox>

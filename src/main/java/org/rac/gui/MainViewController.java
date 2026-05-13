@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-public class MainViewController {
+public class  MainViewController {
 
     private static final Logger logger = LoggerFactory.getLogger(MainViewController.class);
 
@@ -40,8 +40,25 @@ public class MainViewController {
             RadioButton radioButton = new RadioButton(activity.getName());
             radioButton.setUserData(activity);
             radioButton.setToggleGroup(activityToggleGroup);
+            radioButton.getStyleClass().add("activity-card");
+            radioButton.setMaxWidth(Double.MAX_VALUE);        // stretch to VBox width
             activityVBox.getChildren().add(radioButton);
         }
+
+        // ADD this listener after the for-loop:
+        activityToggleGroup.selectedToggleProperty().addListener((obs, oldToggle, newToggle) -> {
+            for (javafx.scene.Node node : activityVBox.getChildren()) {
+                if (node instanceof RadioButton rb) {
+                    if (rb == newToggle) {
+                        rb.getStyleClass().remove("activity-card");
+                        rb.getStyleClass().add("activity-card-selected");
+                    } else {
+                        rb.getStyleClass().remove("activity-card-selected");
+                        rb.getStyleClass().add("activity-card");
+                    }
+                }
+            }
+        });
 
         if (!activities.isEmpty()) {
             activityToggleGroup.selectToggle(activityToggleGroup.getToggles().get(0));

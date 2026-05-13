@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!--
+    Confirmation dialog — asks the user to confirm before processing.
+    Controller: org.rac.gui.ConfirmationViewController
+    fx:id: studentCountLabel, whatsAppLabel
+    Handlers: #handleOk, #handleCancel
+-->
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.rac.gui.ConfirmationViewController"
+      stylesheets="@rac-styles.css"
+      styleClass="dialog-root"
+      minWidth="400" maxWidth="480"
+      spacing="0">
+
+    <!-- ── Header bar ───────────────────────────────────────── -->
+    <HBox styleClass="dialog-header" alignment="CENTER_LEFT" spacing="12">
+        <StackPane styleClass="dialog-icon-box">
+            <Label text="?" style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+        </StackPane>
+        <VBox spacing="2">
+            <Label text="Confirm Processing" styleClass="dialog-title"/>
+            <Label text="Review the details below before proceeding"
+                   styleClass="dialog-subtitle"/>
+        </VBox>
+    </HBox>
+
+    <!-- ── Content ──────────────────────────────────────────── -->
+    <VBox styleClass="dialog-content" spacing="14">
+
+        <!-- Info card -->
+        <VBox styleClass="dialog-info-card" spacing="10">
+
+            <HBox spacing="8" alignment="CENTER_LEFT">
+                <Label text="Students:"
+                       style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-min-width: 130px;"/>
+                <Label fx:id="studentCountLabel" styleClass="dialog-highlight-label"/>
+            </HBox>
+
+            <Pane styleClass="section-divider"/>
+
+            <HBox spacing="8" alignment="CENTER_LEFT">
+                <Label text="Send via WhatsApp:"
+                       style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-min-width: 130px;"/>
+                <Label fx:id="whatsAppLabel" styleClass="dialog-wa-yes-label"/>
+            </HBox>
+
+        </VBox>
+
+        <!-- Button row -->
+        <HBox styleClass="dialog-button-row">
+            <Button text="Cancel" styleClass="cancel-button" onAction="#handleCancel"
+                    cancelButton="true"/>
+            <Button text="▶  Proceed" styleClass="ok-button" onAction="#handleOk"
+                    defaultButton="true"/>
+        </HBox>
+
+    </VBox>
+</VBox>

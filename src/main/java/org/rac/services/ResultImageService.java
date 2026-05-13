@@ -148,6 +148,8 @@ public class ResultImageService {
 //            logger.error("Failed to write populatedContent to abc.html", e);
 //        }
 
+        File pngFile = new File(pngDirs, fileNamePNG);
+
         try (Playwright playwright = Playwright.create()) {
             Browser browser = playwright.chromium().launch(
                     new BrowserType.LaunchOptions().setHeadless(true)
@@ -168,7 +170,7 @@ public class ResultImageService {
             logger.error("Error during playwright", e);
         }
 
-        return null;
+        return pngFile;
 
         // Initialize an HTML document from the file
         // Set Chrome to headless

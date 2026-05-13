@@ -4,20 +4,19 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import org.rac.Main;
+import org.rac.model.MessageDelivery;
 import org.rac.model.Student;
-import org.rac.services.EmailService;
 import org.rac.services.ExcelReaderService;
 import org.rac.services.ExcelWriterService;
 import org.rac.services.ResultImageService;
-import org.rac.services.WhatsAppService;
+import org.rac.services.WhatsAppApiService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
+import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,38 +24,49 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.List;
-
+import java.util.concurrent.CountDownLatch;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SendResultsViewController {
 
     private static final Logger logger = LoggerFactory.getLogger(SendResultsViewController.class);
 
-    @FXML
-    private DatePicker datePicker;
-    @FXML
-    private TextField classField;
-    @FXML
-    private TextField batchField;
-    @FXML
-    private TextField topicField;
-    @FXML
-    private TextField headingField;
-    @FXML
-    private TextField totalMarksField;
-    @FXML
-    private Label filePathLabel;
-    @FXML
-    private ProgressBar progressBar;
-    @FXML
-    private Label progressLabel;
+    private static final Map<String, String> BATCH_TOKEN_MAP = new LinkedHashMap<>();
+    static {
+        BATCH_TOKEN_MAP.put("tuesday_6_7", "Tuesday Batch (6-7 PM)");
+        BATCH_TOKEN_MAP.put("tuesday_7_8", "Tuesday Batch (7-8 PM)");
+        BATCH_TOKEN_MAP.put("tuesday",     "Tuesday Batch");
+        BATCH_TOKEN_MAP.put("monday",      "Monday Batch");
+    }
+
+    private static final List<String> BATCH_OPTIONS = List.of(
+            "Tuesday Batch (6-7 PM)", "Monday Batch",
+            "Tuesday Batch (7-8 PM)", "Tuesday Batch", "Other"
+    );
+
+    @FXML private DatePicker datePicker;
+    @FXML private TextField classField;
+    @FXML private ComboBox<String> batchComboBox;
+    @FXML private Label customBatchLabel;
+    @FXML private TextField customBatchField;
+    @FXML private TextField topicField;
+    @FXML private TextField headingField;
+    @FXML private TextField totalMarksField;
+    @FXML private Label filePathLabel;
+    @FXML private CheckBox sendWhatsAppCheckbox;
+    @FXML private ProgressBar progressBar;
+    @FXML private Label progressLabel;
+    @FXML private HBox customBatchRow;
 
     private File excelFile;
     private File templateFile;
     private File topperTemplateFile;
+    private boolean filenameMatchedPattern = false;
+
     private final ExcelReaderService excelReaderService = new ExcelReaderService();
     private final ResultImageService resultImageService = new ResultImageService();
-    private final WhatsAppService whatsAppService = new WhatsAppService();
+    private final WhatsAppApiService whatsAppApiService = new WhatsAppApiService();
     private final ExcelWriterService excelWriterService = new ExcelWriterService();
 
     private volatile boolean isAborted = false;
@@ -70,310 +80,326 @@ public class SendResultsViewController {
             topperTemplateFile = loadTemplateFromResource("topper_template.html", "topper_template");
         } catch (IOException e) {
             logger.error("Failed to load templates", e);
-            showAlert("Error", "Failed to load templates: " + e.getMessage());
+            showAlertDirect("Error", "Failed to load templates: " + e.getMessage());
         }
 
-        datePicker.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null) {
-                if (newValue.getDayOfWeek() == java.time.DayOfWeek.SATURDAY) {
-                    batchField.setText("Monday Batch");
-                } else {
-                    batchField.setText("Tuesday Batch");
-                }
-            }
+        batchComboBox.setItems(FXCollections.observableArrayList(BATCH_OPTIONS));
+
+//        batchComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
+//            boolean isOther = "Other".equals(newVal);
+//            customBatchLabel.setVisible(isOther);
+//            customBatchLabel.setManaged(isOther);
+//            customBatchField.setVisible(isOther);
+//            customBatchField.setManaged(isOther);
+//        });
+        batchComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
+            boolean isOther = "Other".equals(newVal);
+            customBatchRow.setVisible(isOther);
+            customBatchRow.setManaged(isOther);
         });
     }
 
     private File loadTemplateFromResource(String resourceName, String prefix) throws IOException {
-        InputStream resourceStream = getClass().getResourceAsStream("/" + resourceName);
-        if (resourceStream == null) {
-            throw new IOException(resourceName + " not found in resources.");
-        }
-        File tempFile = File.createTempFile(prefix, ".html");
-        tempFile.deleteOnExit();
-        Files.copy(resourceStream, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-        logger.info("Loaded {} to temporary file: {}", resourceName, tempFile.getAbsolutePath());
-        return tempFile;
+        InputStream stream = getClass().getResourceAsStream("/" + resourceName);
+        if (stream == null) throw new IOException(resourceName + " not found in resources.");
+        File tmp = File.createTempFile(prefix, ".html");
+        tmp.deleteOnExit();
+        Files.copy(stream, tmp.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        return tmp;
     }
-
 
     @FXML
     public void handleChooseFile() {
-        logger.info("handleChooseFile button clicked");
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xls", "*.xlsx"));
-        excelFile = fileChooser.showOpenDialog(null);
+        FileChooser fc = new FileChooser();
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xls", "*.xlsx"));
+        excelFile = fc.showOpenDialog(null);
         if (excelFile != null) {
             filePathLabel.setText(excelFile.getName());
             logger.info("Excel file selected: {}", excelFile.getAbsolutePath());
-        } else {
-            logger.warn("No Excel file selected");
+            autoPopulateFromFilename(excelFile.getName());
         }
     }
-    
+
+    private void autoPopulateFromFilename(String filename) {
+        String baseName = filename.replaceFirst("\\.[^.]+$", "").toLowerCase();
+        Pattern p = Pattern.compile("^file_([^_]+)_(.+)_student_data$", Pattern.CASE_INSENSITIVE);
+        Matcher m = p.matcher(baseName);
+        if (m.find()) {
+            filenameMatchedPattern = true;
+            classField.setText(m.group(1).toUpperCase());
+            String batchToken = m.group(2).toLowerCase();
+            String matched = BATCH_TOKEN_MAP.get(batchToken);
+            batchComboBox.setValue(matched != null ? matched : "Other");
+        } else {
+            filenameMatchedPattern = false;
+            classField.setText("");
+            batchComboBox.setValue("Other");
+        }
+        logger.info("Auto-populated: class='{}', batch='{}', standardFormat={}",
+                classField.getText(), batchComboBox.getValue(), filenameMatchedPattern);
+    }
+
+    private String getBatchValue() {
+        String sel = batchComboBox.getValue();
+        return "Other".equals(sel) ? customBatchField.getText().trim() : (sel != null ? sel : "");
+    }
 
     @FXML
     public void handleProceed() {
-        logger.info("handleProceed button clicked");
-        // 1. Validate inputs
-        if (!validateInputs()) {
-            logger.warn("Input validation failed");
-            return;
-        }
-        logger.info("Input validation successful");
+        logger.info("handleProceed clicked");
+        if (!validateInputs()) return;
 
-        // 2. Read excel file
-        List<Student> students;
-        try {
-            logger.info("Reading students from Excel file: {}", excelFile.getAbsolutePath());
-            students = excelReaderService.readStudentsFromExcel(excelFile);
-            logger.info("Found {} students in the Excel file", students.size());
-        } catch (IOException e) {
-            logger.error("Error reading Excel file", e);
-            showAlert("Error", "Error reading Excel file: " + e.getMessage());
-            return;
-        }
-
-        // 3. Show summary and get confirmation
-        if (!showSummaryAndGetConfirmation(students.size())) {
-            logger.info("User cancelled the operation from the summary dialog");
-            return;
-        }
-
-        // 3.b Show marks profile and get cut-off
-        Double cutOff = showMarksProfileAndGetCutOff(students);
-        if (cutOff == null) {
-            logger.info("User cancelled from the marks profile dialog");
-            return;
-        }
-
-        // 4.a creating the tmp folders
-        // 1. Generate UUID
-        String uuid = UUID.randomUUID().toString();
-        File htmlDir = new File(uuid + "_html");
-        File pngDir = new File(uuid + "_png");
-
-        htmlDir.mkdirs();
-        pngDir.mkdirs();
-
-        // 4. Start processing
         isAborted = false;
         sentStudents.clear();
-        final List<Student> finalStudents = students;
+
+        // Capture UI state on FX thread before background thread starts
+        final boolean sendWA = sendWhatsAppCheckbox.isSelected();
         new Thread(() -> {
-            logger.info("Starting the result sending process in a new thread");
-            String outputDestination = "todo";
+            File pngDir = null;
             try {
-                if ("WhatsApp".equals(outputDestination)) {
-                    whatsAppService.startService();
-                }
+                // 1. Validate
+                updateProgress("Validation in progress...", -1);
+                ExcelReaderService.ExcelReadResult readResult = excelReaderService.readAndValidate(excelFile, filenameMatchedPattern);
 
-                int totalStudents = finalStudents.size();
-                for (int i = 0; i < totalStudents; i++) {
-                    if (isAborted) {
-                        logger.warn("Process aborted by user");
-                        break;
+                if (!readResult.success) {
+                    updateProgress("Validation failed.", 0);
+                    StringBuilder msg = new StringBuilder("Validation failed:\n\n");
+                    for (String err : readResult.validationErrors) {
+                        msg.append("• ").append(err).append("\n");
                     }
-                    Student student = finalStudents.get(i);
-                    logger.info("Processing student {} of {}: {}", (i + 1), totalStudents, student.getName());
-                    final int currentStudentIndex = i;
-                    Platform.runLater(() -> {
-                        progressLabel.setText("Processing " + (currentStudentIndex + 1) + " of " + totalStudents + ": " + student.getName());
-                        progressBar.setProgress((double) (currentStudentIndex + 1) / totalStudents);
-                    });
+                    showAlert("Validation Error", msg.toString());
+                    return;
+                }
+                updateProgress("Validation completed.", 0);
 
-                    // Generate image
-                    logger.debug("Generating result image for student: {}", student.getName());
+                // 2. Dialogs on FX thread
+                List<Student> students = readResult.students;
+                boolean[] proceed = {false};
+                Double[] cutOff = {null};
+                CountDownLatch latch = new CountDownLatch(1);
+                Platform.runLater(() -> {
+                    try {
+                        if (!ConfirmationViewController.show(students.size(), sendWA)) return;
+                        cutOff[0] = CutOffViewController.show(students);
+                        if (cutOff[0] != null) proceed[0] = true;
+                    } catch (IOException e) {
+                        logger.error("Failed to load dialog", e);
+                    } finally {
+                        latch.countDown();
+                    }
+                });
+                latch.await();
+                if (!proceed[0]) { updateProgress("", 0); return; }
+
+                // 3. Temp dirs
+                String uuid = UUID.randomUUID().toString();
+                File htmlDir = new File(uuid + "_html");
+                pngDir = new File(uuid + "_png");
+                htmlDir.mkdirs();
+                pngDir.mkdirs();
+
+                // Capture form values (read on FX thread, but fields are only written on FX so safe to read here)
+                String formattedDate = datePicker.getValue().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+                String whatsAppDate  = datePicker.getValue().format(DateTimeFormatter.ofPattern("dd-MMM"));
+                String className   = classField.getText();
+                String batch       = getBatchValue();
+                String topic       = topicField.getText();
+                String heading     = headingField.getText();
+                String totalMarks  = totalMarksField.getText();
+
+                int total = students.size();
+                int successCount = 0;
+                List<String> sendErrors = new ArrayList<>();
+                List<MessageDelivery> deliveryRecords = new ArrayList<>();
+                boolean[] quotaExceeded = {false};
+                String[] quotaStudentName = {""};
+
+                // 4. Per-student loop
+                for (int i = 0; i < total; i++) {
+                    if (isAborted) { logger.warn("Aborted at student {}", i + 1); break; }
+
+                    Student student = students.get(i);
+                    updateProgress("Processing " + (i + 1) + " of " + total + ": " + student.getName(),
+                            (double) (i + 1) / total);
+
                     File imageFile = resultImageService.generateImage(
-                            student,
-                            datePicker.getValue().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
-                            classField.getText(),
-                            topicField.getText(),
-                            headingField.getText(),
-                            totalMarksField.getText(),
-                            templateFile,
-                            currentStudentIndex,
-                            htmlDir,
-                            pngDir
-                    );
-                    //logger.debug("Result image generated: {}", imageFile.getAbsolutePath());
+                            student, formattedDate, className, topic, heading,
+                            totalMarks, templateFile, i, htmlDir, pngDir);
 
-                    // Send message based on destination
-//                    if ("WhatsApp".equals(outputDestination)) {
-//                        logger.info("Successfully sent WhatsApp message to {}", student.getName());
-//                    } else if ("Email".equals(outputDestination)) {
-//                        String recipient = ""; // Assuming student has email or using override
-//                        if (recipient == null || recipient.isEmpty()) {
-//                            logger.warn("Skipping email for {} as no recipient email found.", student.getName());
-//                            Platform.runLater(() -> showAlert("Warning", "Skipping email for " + student.getName() + " as no recipient email found."));
-//                            continue;
-//                        }
-//                        String subject = "RAC Result";
-//                        String sender = "29.abhishek.mittal@gmail.com";
-//                        logger.debug("Sending email to {} from {} with subject '{}'", recipient, sender, subject);
-//                        emailService.sendEmailWithAttachment(recipient, sender, subject, "Please find your result attached.", imageFile);
-//                        logger.info("Successfully sent email to {}", student.getName());
-//                    }
+                    if (sendWA && !quotaExceeded[0]) {
+                        try {
+                            String phone = normalisePhone(student.getPhone());
+                            String mediaId = whatsAppApiService.uploadMedia(imageFile);
+                            String msgId = whatsAppApiService.sendStudentResult(phone, mediaId, student.getName(), whatsAppDate);
+                            deliveryRecords.add(new MessageDelivery(student.getName(), phone, msgId));
+                            successCount++;
+                            logger.info("WhatsApp sent: {} → {}", student.getName(), phone);
+                        } catch (WhatsAppApiService.QuotaExceededException e) {
+                            quotaExceeded[0] = true;
+                            quotaStudentName[0] = student.getName();
+                            sendErrors.add("Quota exceeded at student " + student.getName()
+                                    + " (" + (i + 1) + "/" + total + ") — WhatsApp sending stopped.");
+                            logger.error("WhatsApp quota exceeded at student {}", student.getName(), e);
+                        } catch (Exception e) {
+                            String errMsg = student.getName() + ": " + e.getMessage();
+                            sendErrors.add(errMsg);
+                            logger.error("WhatsApp failed for {}", student.getName(), e);
+                        }
+                    }
+
                     sentStudents.add(student);
                 }
 
+                // 5. Topper image + admin messages
                 if (!isAborted) {
-                    // Generate Topper List Image
-                    logger.info("Generating Topper List Image");
                     List<Student> toppers = new ArrayList<>();
-                    for (Student s : finalStudents) {
-                        if (s.getMarksObtained() >= cutOff) {
-                            toppers.add(s);
-                        }
+                    for (Student s : students) {
+                        if (s.getMarksObtained() >= cutOff[0]) toppers.add(s);
                     }
-                    toppers.sort((s1, s2) -> Double.compare(s2.getMarksObtained(), s1.getMarksObtained()));
+                    toppers.sort((a, b) -> Double.compare(b.getMarksObtained(), a.getMarksObtained()));
 
                     resultImageService.generateTopperImage(
-                            toppers,
-                            datePicker.getValue().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
-                            classField.getText(),
-                            batchField.getText(),
-                            topicField.getText(),
-                            totalMarksField.getText(),
-                            topperTemplateFile,
-                            htmlDir,
-                            pngDir
-                    );
-                }
-            } catch (Exception e) {
-                logger.error("An error occurred during the result sending process", e);
-                showAlert("Error", "An error occurred during processing: " + e.getMessage());
-            } finally {
-                // 9. Open PNG folder automatically
-                try {
-                    Desktop.getDesktop().open(pngDir);
-                } catch (Exception e) {
-                    System.out.println("Could not open folder automatically.");
+                            toppers, formattedDate, className, batch, topic,
+                            totalMarks, topperTemplateFile, htmlDir, pngDir);
+                    File topperImage = new File(pngDir, "Toppers_List.png");
+
+                    if (sendWA && !quotaExceeded[0]) {
+                        try {
+                            String topperMediaId = whatsAppApiService.uploadMedia(topperImage);
+                            whatsAppApiService.sendTopperResult(topperMediaId, heading, whatsAppDate, className, topic);
+                            logger.info("Topper result sent to admin");
+                        } catch (WhatsAppApiService.QuotaExceededException e) {
+                            sendErrors.add("Quota exceeded — topper image not sent to admin.");
+                            logger.error("Quota exceeded sending topper result", e);
+                        } catch (Exception e) {
+                            sendErrors.add("Topper image (admin): " + e.getMessage());
+                            logger.error("Failed sending topper result", e);
+                        }
+                        try {
+                            whatsAppApiService.sendResultSummary(heading, whatsAppDate, className, topic, successCount);
+                            logger.info("Result summary sent to admin");
+                        } catch (WhatsAppApiService.QuotaExceededException e) {
+                            sendErrors.add("Quota exceeded — result summary not sent to admin.");
+                            logger.error("Quota exceeded sending result summary", e);
+                        } catch (Exception e) {
+                            sendErrors.add("Result summary (admin): " + e.getMessage());
+                            logger.error("Failed sending result summary", e);
+                        }
+                    }
                 }
 
-                if ("WhatsApp".equals(outputDestination)) {
-                    whatsAppService.stopService();
-                }
+                // 6. Completion summary
+                final int finalSuccess = successCount;
+                final int finalTotal = total;
+                final List<String> finalErrors = new ArrayList<>(sendErrors);
+                final List<MessageDelivery> finalDeliveryRecords = new ArrayList<>(deliveryRecords);
+                final boolean waEnabled = sendWA;
+                final boolean finalQuotaExceeded = quotaExceeded[0];
+                final String finalQuotaStudentName = quotaStudentName[0];
                 Platform.runLater(() -> {
-                    if(isAborted){
-                        handleAbort();
+                    try {
+                        CompletionSummaryViewController.show(
+                                finalSuccess, finalTotal, waEnabled,
+                                finalQuotaExceeded, finalQuotaStudentName, finalErrors,
+                                finalDeliveryRecords);
+                    } catch (IOException e) {
+                        logger.error("Failed to load completion summary dialog", e);
                     }
-                    progressLabel.setText("Processing complete.");
-                    logger.info("Result sending process finished");
                 });
+
+            } catch (Exception e) {
+                logger.error("Unexpected error during processing", e);
+                showAlert("Error", "An error occurred: " + e.getMessage());
+            } finally {
+                if (pngDir != null) {
+                    File finalPngDir = pngDir;
+                    try { Desktop.getDesktop().open(finalPngDir); }
+                    catch (Exception e) { logger.warn("Could not open output folder", e); }
+                }
+                updateProgress(isAborted ? "Aborted." : "Processing complete.", isAborted ? 0 : 1.0);
+                if (isAborted) Platform.runLater(this::handleAbort);
             }
         }).start();
-
-
     }
 
-    private Double showMarksProfileAndGetCutOff(List<Student> students) {
-        int totalStudents = students.size();
-        Map<Double, Integer> distribution = new TreeMap<>(Collections.reverseOrder());
-        for (Student s : students) {
-            distribution.put(s.getMarksObtained(), distribution.getOrDefault(s.getMarksObtained(), 0) + 1);
-        }
-
-        StringBuilder profileText = new StringBuilder("Total Students: " + totalStudents + "\n\nMarks Distribution:\n");
-        for (Map.Entry<Double, Integer> entry : distribution.entrySet()) {
-            profileText.append(String.format("%.1f Marks: %d Students\n", entry.getKey(), entry.getValue()));
-        }
-
-        TextInputDialog dialog = new TextInputDialog("");
-        dialog.setTitle("Set Cut-off for Toppers");
-        dialog.setHeaderText(profileText.toString());
-        dialog.setContentText("Enter Cut-off Marks:");
-
-        Optional<String> result = dialog.showAndWait();
-        if (result.isPresent()) {
-            try {
-                return Double.parseDouble(result.get());
-            } catch (NumberFormatException e) {
-                showAlert("Error", "Invalid cut-off marks entered.");
-                return null;
-            }
-        }
-        return null;
+    private String normalisePhone(String phone) {
+        String digits = phone.replaceAll("\\D", "");
+        return digits.length() == 10 ? "91" + digits : digits;
     }
-    
-    private boolean showSummaryAndGetConfirmation(int studentCount) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirmation");
-        alert.setHeaderText("Summary");
-        alert.setContentText("Sending the result for " + studentCount + " students.");
-
-        Optional<ButtonType> result = alert.showAndWait();
-        return result.isPresent() && result.get() == ButtonType.OK;
-    }
-
 
     @FXML
     public void handleAbort() {
-        logger.info("handleAbort button clicked");
+        logger.info("Abort triggered");
         isAborted = true;
         if (!sentStudents.isEmpty()) {
-            logger.info("Generating report for {} students who received the message before abortion", sentStudents.size());
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
-            fileChooser.setInitialFileName("aborted_session_report.xlsx");
-            File file = fileChooser.showSaveDialog(null);
+            FileChooser fc = new FileChooser();
+            fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
+            fc.setInitialFileName("aborted_session_report.xlsx");
+            File file = fc.showSaveDialog(null);
             if (file != null) {
                 try {
                     excelWriterService.writeStudentsToExcel(sentStudents, file);
-                    showAlert("Info", "Aborted session report saved to: " + file.getAbsolutePath());
+                    showAlertDirect("Info", "Abort report saved: " + file.getAbsolutePath());
                 } catch (IOException e) {
                     logger.error("Error saving abort report", e);
-                    showAlert("Error", "Error saving abort report: " + e.getMessage());
+                    showAlertDirect("Error", "Error saving abort report: " + e.getMessage());
                 }
-            } else {
-                logger.warn("User did not select a file to save the abort report");
             }
-        } else {
-            logger.info("Abort was called, but no messages were sent");
         }
     }
 
     @FXML
     public void handleBackToHome() {
-        logger.info("handleBackToHome button clicked");
-        try {
-            Main.showMainView();
-        } catch (IOException e) {
-            logger.error("Failed to show main view", e);
-        }
+        try { Main.showMainView(); }
+        catch (IOException e) { logger.error("Failed to show main view", e); }
     }
 
     private boolean validateInputs() {
-        // Common validations
-        if (datePicker.getValue() == null || classField.getText().isEmpty() || topicField.getText().isEmpty() ||
-                headingField.getText().isEmpty() || totalMarksField.getText().isEmpty() || excelFile == null) {
-            showAlert("Error", "All common fields (Date, Class, Topic, Heading, Total Marks, Excel File) are required.");
-            return false;
+        if (excelFile == null) {
+            showAlertDirect("Error", "Please select an Excel file first."); return false;
+        }
+        if (datePicker.getValue() == null) {
+            showAlertDirect("Error", "Test Conducted Date is required."); return false;
+        }
+        if (classField.getText().isEmpty()) {
+            showAlertDirect("Error", "Class is required."); return false;
+        }
+        if (batchComboBox.getValue() == null) {
+            showAlertDirect("Error", "Batch is required."); return false;
+        }
+        if ("Other".equals(batchComboBox.getValue()) && customBatchField.getText().trim().isEmpty()) {
+            showAlertDirect("Error", "Please enter a custom batch name."); return false;
+        }
+        if (topicField.getText().isEmpty() || headingField.getText().isEmpty() || totalMarksField.getText().isEmpty()) {
+            showAlertDirect("Error", "Topic, Result Heading, and Total Marks are required."); return false;
         }
         try {
-            double totalMarks = Double.parseDouble(totalMarksField.getText());
-            if (totalMarks <= 0) {
-                showAlert("Error", "Total marks must be a positive number.");
-                return false;
-            }
+            double tm = Double.parseDouble(totalMarksField.getText());
+            if (tm <= 0) { showAlertDirect("Error", "Total marks must be positive."); return false; }
         } catch (NumberFormatException e) {
-            showAlert("Error", "Total marks must be a valid number.");
-            return false;
+            showAlertDirect("Error", "Total marks must be a valid number."); return false;
         }
-
         return true;
     }
 
-    private void showAlert(String title, String message) {
+    private void updateProgress(String message, double progress) {
         Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            if(title.equals("Info") || title.equals("Warning")){
-                alert.setAlertType(Alert.AlertType.INFORMATION); // Use INFORMATION for Info/Warning
-            }
-            alert.setTitle(title);
-            alert.setHeaderText(null);
-            alert.setContentText(message);
-            alert.showAndWait();
+            progressLabel.setText(message);
+            if (progress >= 0) progressBar.setProgress(progress);
         });
+    }
+
+    private void showAlertDirect(String title, String message) {
+        Alert.AlertType type = (title.equals("Info") || title.equals("Warning"))
+                ? Alert.AlertType.INFORMATION : Alert.AlertType.ERROR;
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private void showAlert(String title, String message) {
+        Platform.runLater(() -> showAlertDirect(title, message));
     }
 }

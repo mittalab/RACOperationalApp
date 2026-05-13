@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!--
+    Completion summary dialog — shown after processing finishes.
+    Controller: org.rac.gui.CompletionSummaryViewController
+    fx:id: summaryLabel, errorsHeading, errorsArea
+    Handlers: #handleClose
+-->
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.rac.gui.CompletionSummaryViewController"
+      stylesheets="@rac-styles.css"
+      styleClass="dialog-root"
+      minWidth="460" maxWidth="580"
+      spacing="0">
+
+    <!-- ── Header bar (success green) ───────────────────────── -->
+    <HBox styleClass="dialog-header-success" alignment="CENTER_LEFT" spacing="12">
+        <StackPane styleClass="dialog-icon-box">
+            <Label text="✓" style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+        </StackPane>
+        <VBox spacing="2">
+            <Label text="Processing Complete" styleClass="dialog-title"/>
+            <Label text="Here is a summary of what was done"
+                   styleClass="dialog-subtitle"/>
+        </VBox>
+    </HBox>
+
+    <!-- ── Content ──────────────────────────────────────────── -->
+    <VBox styleClass="dialog-content" spacing="14">
+
+        <!-- Summary card -->
+        <VBox styleClass="dialog-info-card" spacing="6">
+            <Label text="SUMMARY" styleClass="form-card-header"/>
+            <Label fx:id="summaryLabel"
+                   styleClass="dialog-info-label"
+                   wrapText="true"/>
+        </VBox>
+
+        <!-- Errors card — hidden when no errors -->
+        <VBox fx:id="errorsHeading"
+              styleClass="dialog-errors-card"
+              visible="false" managed="false"
+              spacing="8">
+            <Label text="ERRORS ENCOUNTERED" styleClass="dialog-errors-heading"/>
+            <TextArea fx:id="errorsArea"
+                      styleClass="dialog-text-area"
+                      editable="false" wrapText="true"
+                      prefRowCount="7"
+                      focusTraversable="false"/>
+        </VBox>
+
+        <!-- Button row -->
+        <HBox alignment="CENTER_RIGHT" spacing="10">
+<!--            TOOD: Uncomment this delivery tracker once webhook is done-->
+<!--            <Button fx:id="trackDeliveryButton"-->
+<!--                    text="↺  Track Delivery"-->
+<!--                    styleClass="proceed-button"-->
+<!--                    onAction="#handleTrackDelivery"-->
+<!--                    visible="false" managed="false"/>-->
+            <Button text="Close" styleClass="close-button" onAction="#handleClose"
+                    defaultButton="true"/>
+        </HBox>
+
+    </VBox>
+</VBox>

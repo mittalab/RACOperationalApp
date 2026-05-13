@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!--
+    Delivery Tracker — polls WhatsApp message status for each sent message.
+    Controller: org.rac.gui.DeliveryTrackerViewController
+    fx:id: deliveryTable, statusLabel, autoRefreshCheckbox
+    Handlers: #handleRefresh, #handleClose, #handleAutoRefreshToggle
+-->
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.rac.gui.DeliveryTrackerViewController"
+      stylesheets="@rac-styles.css"
+      styleClass="dialog-root"
+      minWidth="720" minHeight="460"
+      spacing="0">
+
+    <!-- ── Header bar ───────────────────────────────────────── -->
+    <HBox styleClass="dialog-header" alignment="CENTER_LEFT" spacing="12">
+        <StackPane styleClass="dialog-icon-box">
+            <Label text="↺" style="-fx-text-fill: white; -fx-font-size: 17px; -fx-font-weight: bold;"/>
+        </StackPane>
+        <VBox spacing="2" HBox.hgrow="ALWAYS">
+            <Label text="WhatsApp Delivery Tracker" styleClass="dialog-title"/>
+            <Label text="Track the delivery status of each message sent in this session"
+                   styleClass="dialog-subtitle"/>
+        </VBox>
+    </HBox>
+
+    <!-- ── Table ────────────────────────────────────────────── -->
+    <TableView fx:id="deliveryTable"
+               VBox.vgrow="ALWAYS"
+               style="-fx-background-color: #f4f8fd; -fx-border-color: transparent;">
+        <columns>
+            <TableColumn text="Student / Recipient" fx:id="nameCol" prefWidth="190"/>
+            <TableColumn text="Phone" fx:id="phoneCol" prefWidth="130"/>
+            <TableColumn text="Status" fx:id="statusCol" prefWidth="140"/>
+            <TableColumn text="Last Checked" fx:id="lastCheckedCol" prefWidth="160"/>
+        </columns>
+        <placeholder>
+            <Label text="No messages tracked." style="-fx-text-fill: #94a3b8;"/>
+        </placeholder>
+    </TableView>
+
+    <!-- ── Bottom toolbar ───────────────────────────────────── -->
+    <HBox styleClass="dialog-content"
+          spacing="12" alignment="CENTER_LEFT"
+          style="-fx-padding: 10 18 10 18; -fx-background-color: white;
+                 -fx-border-color: #e2eaf5; -fx-border-width: 1 0 0 0;">
+
+        <CheckBox fx:id="autoRefreshCheckbox"
+                  text="Auto-refresh (30 s)"
+                  onAction="#handleAutoRefreshToggle"
+                  style="-fx-text-fill: #475569; -fx-font-size: 12px;"/>
+
+        <Label fx:id="statusLabel"
+               text=""
+               style="-fx-text-fill: #64748b; -fx-font-size: 11px;"/>
+
+        <Region HBox.hgrow="ALWAYS"/>
+
+        <Button text="↺  Refresh All"
+                styleClass="proceed-button"
+                onAction="#handleRefresh"
+                style="-fx-padding: 8 18 8 18;"/>
+
+        <Button text="Close"
+                styleClass="cancel-button"
+                onAction="#handleClose"
+                cancelButton="true"/>
+    </HBox>
+
+</VBox>

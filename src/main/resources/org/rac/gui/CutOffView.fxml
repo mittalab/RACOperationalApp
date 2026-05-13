@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!--
+    Cut-off marks dialog — shows marks distribution and captures cut-off threshold.
+    Controller: org.rac.gui.CutOffViewController
+    fx:id: distributionArea, cutOffField
+    Handlers: #handleOk, #handleCancel
+-->
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.rac.gui.CutOffViewController"
+      stylesheets="@rac-styles.css"
+      styleClass="dialog-root"
+      minWidth="420" maxWidth="520"
+      spacing="0">
+
+    <!-- ── Header bar ───────────────────────────────────────── -->
+    <HBox styleClass="dialog-header" alignment="CENTER_LEFT" spacing="12">
+        <StackPane styleClass="dialog-icon-box">
+            <Label text="◈" style="-fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold;"/>
+        </StackPane>
+        <VBox spacing="2">
+            <Label text="Set Cut-off for Toppers" styleClass="dialog-title"/>
+            <Label text="Review the marks distribution and enter a threshold"
+                   styleClass="dialog-subtitle"/>
+        </VBox>
+    </HBox>
+
+    <!-- ── Content ──────────────────────────────────────────── -->
+    <VBox styleClass="dialog-content" spacing="14">
+
+        <!-- Marks distribution card -->
+        <VBox styleClass="dialog-info-card" spacing="8">
+            <Label text="MARKS DISTRIBUTION" styleClass="form-card-header"/>
+            <TextArea fx:id="distributionArea"
+                      styleClass="dialog-text-area"
+                      editable="false" wrapText="false"
+                      prefRowCount="9"
+                      focusTraversable="false"/>
+        </VBox>
+
+        <!-- Cut-off input card -->
+        <VBox styleClass="dialog-info-card" spacing="10">
+            <Label text="TOPPER CUT-OFF" styleClass="form-card-header"/>
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <Label text="Minimum marks to qualify:"
+                       style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-min-width: 170px;"/>
+                <TextField fx:id="cutOffField"
+                           styleClass="form-text-field"
+                           promptText="e.g. 15"
+                           prefWidth="120"/>
+            </HBox>
+        </VBox>
+
+        <!-- Button row -->
+        <HBox styleClass="dialog-button-row">
+            <Button text="Cancel" styleClass="cancel-button" onAction="#handleCancel"
+                    cancelButton="true"/>
+            <Button text="▶  Confirm" styleClass="ok-button" onAction="#handleOk"
+                    defaultButton="true"/>
+        </HBox>
+
+    </VBox>
+</VBox>
