@@ -42,6 +42,12 @@ public class DeliveryTrackerViewController {
     @FXML private TableColumn<MessageDelivery, String> lastCheckedCol;
     @FXML private CheckBox autoRefreshCheckbox;
     @FXML private Label    statusLabel;
+    @FXML private Label    sumTotal;
+    @FXML private Label    sumSent;
+    @FXML private Label    sumDelivered;
+    @FXML private Label    sumRead;
+    @FXML private Label    sumFailed;
+    @FXML private Label    sumPending;
 
     private Stage stage;
     private final WamidStatusService wamidStatusService = new WamidStatusService();
@@ -118,6 +124,8 @@ public class DeliveryTrackerViewController {
         this.stage = stage;
         records.setAll(deliveryRecords);
         stage.setOnHidden(e -> stopAutoRefresh());
+        updateSummary();
+        handleRefresh();
     }
 
     @FXML
@@ -159,12 +167,14 @@ public class DeliveryTrackerViewController {
                 Platform.runLater(() -> {
                     updateStatusLabel("Last refreshed at " + LocalTime.now().format(TIME_FMT)
                             + " — " + finalChecked + " checked");
+                    updateSummary();
                     refreshing.set(false);
                 });
             } catch (Exception e) {
                 logger.warn("Batch status check failed: {}", e.getMessage());
                 Platform.runLater(() -> {
                     updateStatusLabel("Refresh failed: " + e.getMessage());
+                    updateSummary();
                     refreshing.set(false);
                 });
             }
@@ -201,6 +211,28 @@ public class DeliveryTrackerViewController {
 
     private void updateStatusLabel(String text) {
         Platform.runLater(() -> statusLabel.setText(text));
+    }
+
+    private void updateSummary() {
+        int total = 0, sent = 0, delivered = 0, read = 0, failed = 0, pending = 0;
+        for (MessageDelivery r : records) {
+            String s = r.getStatus() != null ? r.getStatus().toLowerCase() : "";
+            total++;
+            if (s.startsWith("read"))                          read++;
+            else if (s.startsWith("deliv"))                    delivered++;
+            else if (s.startsWith("fail"))                     failed++;
+            else if (s.equals("sent") || s.equals("accepted")) sent++;
+            else if (s.equals("pending"))                      pending++;
+        }
+        final int t = total, se = sent, d = delivered, r = read, f = failed, p = pending;
+        Platform.runLater(() -> {
+            sumTotal.setText("Total: " + t);
+            sumSent.setText("Sent: " + se);
+            sumDelivered.setText("Delivered: " + d);
+            sumRead.setText("Read: " + r);
+            sumFailed.setText("Failed: " + f);
+            sumPending.setText("Pending: " + p);
+        });
     }
 
     private String formatStatus(WamidStatusService.WamidStatus ws) {

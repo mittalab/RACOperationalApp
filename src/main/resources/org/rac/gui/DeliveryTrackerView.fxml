@@ -46,6 +46,19 @@
         </placeholder>
     </TableView>
 
+    <!-- ── Summary bar ──────────────────────────────────────── -->
+    <HBox spacing="20" alignment="CENTER_LEFT"
+          style="-fx-padding: 7 18 7 18; -fx-background-color: #f0f7ff;
+                 -fx-border-color: #e2eaf5; -fx-border-width: 1 0 0 0;">
+        <Label text="SUMMARY" style="-fx-font-weight: bold; -fx-text-fill: #1a3355; -fx-font-size: 11px;"/>
+        <Label fx:id="sumTotal"     text="Total: 0"     style="-fx-font-size: 11px; -fx-text-fill: #475569;"/>
+        <Label fx:id="sumSent"      text="Sent: 0"      style="-fx-font-size: 11px; -fx-text-fill: #92400e;"/>
+        <Label fx:id="sumDelivered" text="Delivered: 0" style="-fx-font-size: 11px; -fx-text-fill: #1d4ed8;"/>
+        <Label fx:id="sumRead"      text="Read: 0"      style="-fx-font-size: 11px; -fx-text-fill: #166534; -fx-font-weight: bold;"/>
+        <Label fx:id="sumFailed"    text="Failed: 0"    style="-fx-font-size: 11px; -fx-text-fill: #dc2626; -fx-font-weight: bold;"/>
+        <Label fx:id="sumPending"   text="Pending: 0"   style="-fx-font-size: 11px; -fx-text-fill: #94a3b8;"/>
+    </HBox>
+
     <!-- ── Bottom toolbar ───────────────────────────────────── -->
     <HBox styleClass="dialog-content"
           spacing="12" alignment="CENTER_LEFT"

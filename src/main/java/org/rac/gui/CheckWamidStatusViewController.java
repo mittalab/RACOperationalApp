@@ -29,6 +29,12 @@ public class CheckWamidStatusViewController {
     @FXML private Button   checkButton;
     @FXML private Label    statusLabel;
     @FXML private TableView<WamidStatusRow> resultTable;
+    @FXML private Label    wsTotal;
+    @FXML private Label    wsSent;
+    @FXML private Label    wsDelivered;
+    @FXML private Label    wsRead;
+    @FXML private Label    wsFailed;
+    @FXML private Label    wsPending;
     @FXML private TableColumn<WamidStatusRow, String> colWamid;
     @FXML private TableColumn<WamidStatusRow, String> colRecipient;
     @FXML private TableColumn<WamidStatusRow, String> colStatus;
@@ -92,6 +98,7 @@ public class CheckWamidStatusViewController {
         checkButton.setDisable(true);
         statusLabel.setText("Checking " + wamids.size() + " WAMID(s)…");
         rows.clear();
+        resetSummary();
 
         new Thread(() -> {
             try {
@@ -104,6 +111,7 @@ public class CheckWamidStatusViewController {
                 Platform.runLater(() -> {
                     rows.setAll(newRows);
                     statusLabel.setText("Done — " + results.size() + " result(s) returned.");
+                    updateSummary();
                     checkButton.setDisable(false);
                 });
             } catch (Exception e) {
@@ -114,6 +122,34 @@ public class CheckWamidStatusViewController {
                 });
             }
         }, "wamid-check-thread").start();
+    }
+
+    private void updateSummary() {
+        int total = 0, sent = 0, delivered = 0, read = 0, failed = 0, pending = 0;
+        for (WamidStatusRow r : rows) {
+            String s = r.status.get() != null ? r.status.get().toLowerCase() : "";
+            total++;
+            if (s.startsWith("read"))                          read++;
+            else if (s.startsWith("deliv"))                    delivered++;
+            else if (s.startsWith("fail"))                     failed++;
+            else if (s.equals("sent") || s.equals("accepted")) sent++;
+            else if (s.equals("pending"))                      pending++;
+        }
+        wsTotal.setText("Total: " + total);
+        wsSent.setText("Sent: " + sent);
+        wsDelivered.setText("Delivered: " + delivered);
+        wsRead.setText("Read: " + read);
+        wsFailed.setText("Failed: " + failed);
+        wsPending.setText("Pending: " + pending);
+    }
+
+    private void resetSummary() {
+        wsTotal.setText("Total: 0");
+        wsSent.setText("Sent: 0");
+        wsDelivered.setText("Delivered: 0");
+        wsRead.setText("Read: 0");
+        wsFailed.setText("Failed: 0");
+        wsPending.setText("Pending: 0");
     }
 
     @FXML

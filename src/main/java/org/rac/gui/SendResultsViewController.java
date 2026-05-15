@@ -274,7 +274,7 @@ public class SendResultsViewController {
                         try {
                             String topperMediaId = whatsAppApiService.uploadMedia(topperImage);
                             topperMsgId[0] = whatsAppApiService.sendTopperResult(topperMediaId, heading, whatsAppDate, className, topic);
-                            deliveryRecords.add(new MessageDelivery("ADMIN – Topper List", "918527940091", topperMsgId[0]));
+                            deliveryRecords.add(new MessageDelivery("ADMIN – Topper List", "Nupur Madam", topperMsgId[0]));
                             logger.info("Topper result sent to admin, wamid={}", topperMsgId[0]);
                         } catch (WhatsAppApiService.QuotaExceededException e) {
                             sendErrors.add("Quota exceeded — topper image not sent to admin.");
@@ -285,7 +285,7 @@ public class SendResultsViewController {
                         }
                         try {
                             summaryMsgId[0] = whatsAppApiService.sendResultSummary(heading, whatsAppDate, className, topic, successCount);
-                            deliveryRecords.add(new MessageDelivery("ADMIN – Summary", "918527940091", summaryMsgId[0]));
+                            deliveryRecords.add(new MessageDelivery("ADMIN – Summary", "Nupur Madam", summaryMsgId[0]));
                             logger.info("Result summary sent to admin, wamid={}", summaryMsgId[0]);
                         } catch (WhatsAppApiService.QuotaExceededException e) {
                             sendErrors.add("Quota exceeded — result summary not sent to admin.");
