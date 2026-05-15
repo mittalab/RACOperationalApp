@@ -56,12 +56,11 @@
 
         <!-- Button row -->
         <HBox alignment="CENTER_RIGHT" spacing="10">
-<!--            TOOD: Uncomment this delivery tracker once webhook is done-->
-<!--            <Button fx:id="trackDeliveryButton"-->
-<!--                    text="↺  Track Delivery"-->
-<!--                    styleClass="proceed-button"-->
-<!--                    onAction="#handleTrackDelivery"-->
-<!--                    visible="false" managed="false"/>-->
+            <Button fx:id="trackDeliveryButton"
+                    text="↺  Track Delivery"
+                    styleClass="proceed-button"
+                    onAction="#handleTrackDelivery"
+                    visible="false" managed="false"/>
             <Button text="Close" styleClass="close-button" onAction="#handleClose"
                     defaultButton="true"/>
         </HBox>

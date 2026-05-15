@@ -8,6 +8,7 @@ import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import org.rac.Main;
 import org.rac.model.MessageDelivery;
+import org.rac.model.RunRecord;
 import org.rac.model.Student;
 import org.rac.services.ExcelReaderService;
 import org.rac.services.ExcelWriterService;
@@ -211,6 +212,7 @@ public class SendResultsViewController {
                 int successCount = 0;
                 List<String> sendErrors = new ArrayList<>();
                 List<MessageDelivery> deliveryRecords = new ArrayList<>();
+                List<RunRecord> runRecords = new ArrayList<>();
                 boolean[] quotaExceeded = {false};
                 String[] quotaStudentName = {""};
 
@@ -226,11 +228,13 @@ public class SendResultsViewController {
                             student, formattedDate, className, topic, heading,
                             totalMarks, templateFile, i, htmlDir, pngDir);
 
+                    String phone = normalisePhone(student.getPhone());
+                    String msgId = null;
+
                     if (sendWA && !quotaExceeded[0]) {
                         try {
-                            String phone = normalisePhone(student.getPhone());
                             String mediaId = whatsAppApiService.uploadMedia(imageFile);
-                            String msgId = whatsAppApiService.sendStudentResult(phone, mediaId, student.getName(), whatsAppDate);
+                            msgId = whatsAppApiService.sendStudentResult(phone, mediaId, student.getName(), whatsAppDate);
                             deliveryRecords.add(new MessageDelivery(student.getName(), phone, msgId));
                             successCount++;
                             logger.info("WhatsApp sent: {} → {}", student.getName(), phone);
@@ -247,10 +251,13 @@ public class SendResultsViewController {
                         }
                     }
 
+                    runRecords.add(new RunRecord(student.getName(), phone, imageFile.getName(), msgId));
                     sentStudents.add(student);
                 }
 
                 // 5. Topper image + admin messages
+                String[] topperMsgId = {null};
+                String[] summaryMsgId = {null};
                 if (!isAborted) {
                     List<Student> toppers = new ArrayList<>();
                     for (Student s : students) {
@@ -266,8 +273,9 @@ public class SendResultsViewController {
                     if (sendWA && !quotaExceeded[0]) {
                         try {
                             String topperMediaId = whatsAppApiService.uploadMedia(topperImage);
-                            whatsAppApiService.sendTopperResult(topperMediaId, heading, whatsAppDate, className, topic);
-                            logger.info("Topper result sent to admin");
+                            topperMsgId[0] = whatsAppApiService.sendTopperResult(topperMediaId, heading, whatsAppDate, className, topic);
+                            deliveryRecords.add(new MessageDelivery("ADMIN – Topper List", "918527940091", topperMsgId[0]));
+                            logger.info("Topper result sent to admin, wamid={}", topperMsgId[0]);
                         } catch (WhatsAppApiService.QuotaExceededException e) {
                             sendErrors.add("Quota exceeded — topper image not sent to admin.");
                             logger.error("Quota exceeded sending topper result", e);
@@ -276,8 +284,9 @@ public class SendResultsViewController {
                             logger.error("Failed sending topper result", e);
                         }
                         try {
-                            whatsAppApiService.sendResultSummary(heading, whatsAppDate, className, topic, successCount);
-                            logger.info("Result summary sent to admin");
+                            summaryMsgId[0] = whatsAppApiService.sendResultSummary(heading, whatsAppDate, className, topic, successCount);
+                            deliveryRecords.add(new MessageDelivery("ADMIN – Summary", "918527940091", summaryMsgId[0]));
+                            logger.info("Result summary sent to admin, wamid={}", summaryMsgId[0]);
                         } catch (WhatsAppApiService.QuotaExceededException e) {
                             sendErrors.add("Quota exceeded — result summary not sent to admin.");
                             logger.error("Quota exceeded sending result summary", e);
@@ -286,6 +295,14 @@ public class SendResultsViewController {
                             logger.error("Failed sending result summary", e);
                         }
                     }
+                }
+
+                // 5.5 Write run report to PNG directory
+                File reportFile = new File(pngDir, "run_report.xlsx");
+                try {
+                    excelWriterService.writeRunReport(runRecords, topperMsgId[0], summaryMsgId[0], reportFile);
+                } catch (Exception e) {
+                    logger.error("Failed to write run report", e);
                 }
 
                 // 6. Completion summary

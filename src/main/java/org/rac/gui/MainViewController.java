@@ -1,12 +1,7 @@
 package org.rac.gui;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.Toggle;
-import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.VBox;
 import org.rac.Main;
 import org.rac.model.Activity;
@@ -15,73 +10,51 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-public class  MainViewController {
+public class MainViewController {
 
     private static final Logger logger = LoggerFactory.getLogger(MainViewController.class);
 
     @FXML
-    private VBox activityVBox;
-
-    @FXML
-    private Button selectActivityButton;
-
-    private ToggleGroup activityToggleGroup;
+    private VBox navVBox;
 
     private final ActivityService activityService = new ActivityService();
+    private final List<Button> navButtons = new ArrayList<>();
+    private Button homeButton;
 
     @FXML
     public void initialize() {
         logger.info("Initializing MainViewController");
-        activityToggleGroup = new ToggleGroup();
-        ObservableList<Activity> activities = FXCollections.observableArrayList(activityService.getActivities());
 
-        for (Activity activity : activities) {
-            RadioButton radioButton = new RadioButton(activity.getName());
-            radioButton.setUserData(activity);
-            radioButton.setToggleGroup(activityToggleGroup);
-            radioButton.getStyleClass().add("activity-card");
-            radioButton.setMaxWidth(Double.MAX_VALUE);        // stretch to VBox width
-            activityVBox.getChildren().add(radioButton);
+        homeButton = createNavButton("⊞  Home", true);
+        navVBox.getChildren().add(homeButton);
+
+        for (Activity activity : activityService.getActivities()) {
+            Button btn = createNavButton("↑  " + activity.getName(), false);
+            btn.setOnAction(e -> navigateTo(activity, btn));
+            navVBox.getChildren().add(btn);
+            navButtons.add(btn);
         }
 
-        // ADD this listener after the for-loop:
-        activityToggleGroup.selectedToggleProperty().addListener((obs, oldToggle, newToggle) -> {
-            for (javafx.scene.Node node : activityVBox.getChildren()) {
-                if (node instanceof RadioButton rb) {
-                    if (rb == newToggle) {
-                        rb.getStyleClass().remove("activity-card");
-                        rb.getStyleClass().add("activity-card-selected");
-                    } else {
-                        rb.getStyleClass().remove("activity-card-selected");
-                        rb.getStyleClass().add("activity-card");
-                    }
-                }
-            }
-        });
-
-        if (!activities.isEmpty()) {
-            activityToggleGroup.selectToggle(activityToggleGroup.getToggles().get(0));
-        }
-
-        logger.info("Loaded {} activities as radio buttons", activities.size());
+        logger.info("Loaded {} activities in sidebar", navButtons.size());
     }
 
-    @FXML
-    public void handleSelectActivity() {
-        Toggle selectedToggle = activityToggleGroup.getSelectedToggle();
-        if (selectedToggle != null) {
-            Activity selectedActivity = (Activity) selectedToggle.getUserData();
-            logger.info("Activity selected: {}", selectedActivity.getName());
-            try {
-                Main.showActivityView(selectedActivity.getFxmlPath());
-            } catch (IOException e) {
-                logger.error("Failed to load activity view: {}", selectedActivity.getFxmlPath(), e);
-                // Handle error (e.g., show an alert)
-            }
-        } else {
-            logger.warn("No activity selected.");
-            // Optionally, show an alert to the user.
+    private Button createNavButton(String label, boolean active) {
+        Button btn = new Button(label);
+        btn.getStyleClass().add("sidebar-nav-item");
+        if (active) btn.getStyleClass().add("sidebar-nav-item-active");
+        btn.setMaxWidth(Double.MAX_VALUE);
+        return btn;
+    }
+
+    private void navigateTo(Activity activity, Button activeBtn) {
+        logger.info("Navigating to activity: {}", activity.getName());
+        try {
+            Main.showActivityView(activity.getFxmlPath());
+        } catch (IOException e) {
+            logger.error("Failed to load activity view: {}", activity.getFxmlPath(), e);
         }
     }
 }

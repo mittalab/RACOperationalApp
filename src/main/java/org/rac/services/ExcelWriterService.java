@@ -4,6 +4,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.rac.model.RunRecord;
 import org.rac.model.Student;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,50 @@ public class ExcelWriterService {
             logger.info("Successfully wrote {} students to the abort report", students.size());
         } catch (IOException e) {
             logger.error("Failed to write abort report to Excel file: {}", file.getAbsolutePath(), e);
+            throw e;
+        }
+    }
+
+    public void writeRunReport(List<RunRecord> records,
+                               String adminTopperWamid,
+                               String adminSummaryWamid,
+                               File file) throws IOException {
+        logger.info("Writing run report to: {}", file.getAbsolutePath());
+        try (Workbook workbook = new XSSFWorkbook();
+             FileOutputStream fileOut = new FileOutputStream(file)) {
+            Sheet sheet = workbook.createSheet("Run Report");
+
+            Row header = sheet.createRow(0);
+            header.createCell(0).setCellValue("Name");
+            header.createCell(1).setCellValue("Phone");
+            header.createCell(2).setCellValue("Image File");
+            header.createCell(3).setCellValue("WAMID");
+
+            int rowNum = 1;
+            for (RunRecord r : records) {
+                Row row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(r.studentName() != null ? r.studentName() : "");
+                row.createCell(1).setCellValue(r.phone() != null ? r.phone() : "");
+                row.createCell(2).setCellValue(r.imageName() != null ? r.imageName() : "");
+                row.createCell(3).setCellValue(r.wamid() != null ? r.wamid() : "");
+            }
+
+            Row topperRow = sheet.createRow(rowNum++);
+            topperRow.createCell(0).setCellValue("ADMIN – Topper List");
+            topperRow.createCell(1).setCellValue("918527940091");
+            topperRow.createCell(2).setCellValue("Toppers_List.png");
+            topperRow.createCell(3).setCellValue(adminTopperWamid != null ? adminTopperWamid : "");
+
+            Row summaryRow = sheet.createRow(rowNum);
+            summaryRow.createCell(0).setCellValue("ADMIN – Summary");
+            summaryRow.createCell(1).setCellValue("918527940091");
+            summaryRow.createCell(2).setCellValue("—");
+            summaryRow.createCell(3).setCellValue(adminSummaryWamid != null ? adminSummaryWamid : "");
+
+            workbook.write(fileOut);
+            logger.info("Run report written with {} student rows", records.size());
+        } catch (IOException e) {
+            logger.error("Failed to write run report: {}", file.getAbsolutePath(), e);
             throw e;
         }
     }

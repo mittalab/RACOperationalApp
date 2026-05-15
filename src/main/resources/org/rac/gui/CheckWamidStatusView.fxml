@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!--
+    Check WhatsApp Status — manual WAMID batch lookup.
+    Controller: org.rac.gui.CheckWamidStatusViewController
+    fx:id: wamidInput, checkButton, resultTable, statusLabel
+    Handler: #handleCheck, #handleBackToHome
+-->
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.rac.gui.CheckWamidStatusViewController"
+      stylesheets="@rac-styles.css"
+      prefWidth="1000" prefHeight="660"
+      spacing="0">
+
+    <!-- ── Header bar ─────────────────────────────────────────── -->
+    <HBox styleClass="send-header-bar" alignment="CENTER_LEFT" spacing="12">
+        <StackPane styleClass="send-header-icon-box">
+            <Label text="?" style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+        </StackPane>
+        <VBox spacing="2" HBox.hgrow="ALWAYS">
+            <Label text="Check WhatsApp Delivery Status" styleClass="send-header-title"/>
+            <Label text="Look up delivery status for one or more WAMIDs" styleClass="send-header-subtitle"/>
+        </VBox>
+        <Button text="← Home"
+                styleClass="back-button"
+                onAction="#handleBackToHome"/>
+    </HBox>
+
+    <!-- ── Input section ──────────────────────────────────────── -->
+    <VBox styleClass="send-content-vbox" spacing="12">
+
+        <VBox styleClass="form-card" spacing="8">
+            <Label text="WAMID LOOKUP" styleClass="form-card-header"/>
+            <Label text="Enter WAMIDs separated by commas. Maximum 100 per request."
+                   style="-fx-text-fill: #64748b; -fx-font-size: 11px;"/>
+            <TextArea fx:id="wamidInput"
+                      promptText="wamid.ABCDef123..., wamid.XYZGhi456..., ..."
+                      prefRowCount="4"
+                      wrapText="true"
+                      styleClass="dialog-text-area"/>
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Button fx:id="checkButton"
+                        text="Check Status"
+                        styleClass="proceed-button"
+                        onAction="#handleCheck"/>
+                <Label fx:id="statusLabel"
+                       text=""
+                       style="-fx-text-fill: #64748b; -fx-font-size: 12px;"/>
+            </HBox>
+        </VBox>
+
+    </VBox>
+
+    <!-- ── Results table ──────────────────────────────────────── -->
+    <TableView fx:id="resultTable"
+               VBox.vgrow="ALWAYS"
+               style="-fx-background-color: #f4f8fd; -fx-border-color: transparent;">
+        <columns>
+            <TableColumn text="WAMID" fx:id="colWamid" prefWidth="220"/>
+            <TableColumn text="Recipient" fx:id="colRecipient" prefWidth="130"/>
+            <TableColumn text="Status" fx:id="colStatus" prefWidth="140"/>
+            <TableColumn text="Sent At" fx:id="colSentAt" prefWidth="145"/>
+            <TableColumn text="Delivered At" fx:id="colDeliveredAt" prefWidth="145"/>
+            <TableColumn text="Read At" fx:id="colReadAt" prefWidth="145"/>
+            <TableColumn text="Error" fx:id="colError" prefWidth="200"/>
+        </columns>
+        <placeholder>
+            <Label text="Enter WAMIDs above and click Check Status."
+                   style="-fx-text-fill: #94a3b8;"/>
+        </placeholder>
+    </TableView>
+
+</VBox>

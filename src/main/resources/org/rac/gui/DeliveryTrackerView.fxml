@@ -15,7 +15,7 @@
       fx:controller="org.rac.gui.DeliveryTrackerViewController"
       stylesheets="@rac-styles.css"
       styleClass="dialog-root"
-      minWidth="720" minHeight="460"
+      minWidth="900" minHeight="460"
       spacing="0">
 
     <!-- ── Header bar ───────────────────────────────────────── -->
@@ -35,10 +35,11 @@
                VBox.vgrow="ALWAYS"
                style="-fx-background-color: #f4f8fd; -fx-border-color: transparent;">
         <columns>
-            <TableColumn text="Student / Recipient" fx:id="nameCol" prefWidth="190"/>
-            <TableColumn text="Phone" fx:id="phoneCol" prefWidth="130"/>
-            <TableColumn text="Status" fx:id="statusCol" prefWidth="140"/>
-            <TableColumn text="Last Checked" fx:id="lastCheckedCol" prefWidth="160"/>
+            <TableColumn text="Student / Recipient" fx:id="nameCol" prefWidth="170"/>
+            <TableColumn text="Phone" fx:id="phoneCol" prefWidth="120"/>
+            <TableColumn text="WAMID" fx:id="wamidCol" prefWidth="200"/>
+            <TableColumn text="Status" fx:id="statusCol" prefWidth="160"/>
+            <TableColumn text="Last Checked" fx:id="lastCheckedCol" prefWidth="130"/>
         </columns>
         <placeholder>
             <Label text="No messages tracked." style="-fx-text-fill: #94a3b8;"/>

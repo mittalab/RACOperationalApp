@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
@@ -9,11 +8,9 @@
 <?import javafx.scene.layout.VBox?>
 
 <!--
-    RAC Operational App — MainView (Redesigned)
-    CSS: place rac-styles.css in the same resources folder as this FXML.
-    Controller: org.rac.gui.MainViewController  (unchanged)
-    fx:id references preserved: activityVBox, selectActivityButton
-    Action handler preserved:   #handleSelectActivity
+    RAC Operational App — MainView
+    Controller: org.rac.gui.MainViewController
+    fx:id references: navVBox
 -->
 <HBox xmlns="http://javafx.com/javafx/17"
       xmlns:fx="http://javafx.com/fxml/1"
@@ -34,32 +31,17 @@
 
         <Region prefHeight="6"/>
 
-        <!-- App name under logo -->
         <Label text="RAC Operational App"
                style="-fx-text-fill: #7a9abf; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 4 2;"/>
 
-        <!-- Separator -->
         <Pane styleClass="section-divider" style="-fx-margin: 6 0 6 0;"/>
 
-        <!-- Nav section -->
-        <Label text="ACTIVITIES" styleClass="sidebar-section-label"/>
+        <Label text="NAVIGATION" styleClass="sidebar-section-label"/>
 
-        <!-- Purely decorative nav items; the real selection is in activityVBox below -->
-        <Button text="⊞  Dashboard"
-                styleClass="sidebar-nav-item, sidebar-nav-item-active"
-                maxWidth="Infinity"/>
-<!--        <Button text="↑  Send Results"-->
-<!--                styleClass="sidebar-nav-item"-->
-<!--                maxWidth="Infinity"/>-->
+        <!-- Nav items injected here by controller (Home + activities) -->
+        <VBox fx:id="navVBox" spacing="3"/>
 
-        <!-- Push settings to bottom -->
         <Region VBox.vgrow="ALWAYS"/>
-
-        <Pane styleClass="section-divider"/>
-        <Label text="SYSTEM" styleClass="sidebar-section-label"/>
-<!--        <Button text="⚙  Settings"-->
-<!--                styleClass="sidebar-nav-item"-->
-<!--                maxWidth="Infinity"/>-->
 
     </VBox>
 
@@ -70,31 +52,10 @@
           HBox.hgrow="ALWAYS"
           spacing="10">
 
-        <!-- Header text -->
         <Label text="RAC OPERATIONAL APP" styleClass="main-greeting"/>
-        <Label text="Welcome back 👋"  styleClass="main-title"/>
-        <Label text="Select an activity below and click Go to Activity."
+        <Label text="Welcome back 👋" styleClass="main-title"/>
+        <Label text="Select an activity from the left panel to get started."
                styleClass="main-subtitle"/>
-
-        <!--
-            Activity radio buttons are injected here by MainViewController.
-            The controller calls getChildren().add(...) on this VBox.
-            Style the injected RadioButtons via .activity-card /
-            .activity-card-selected CSS classes inside the controller, or
-            add a style-class to each RadioButton:
-               rb.getStyleClass().add("activity-card");
-        -->
-        <VBox fx:id="activityVBox"
-              spacing="10"
-              style="-fx-padding: 8 0 8 0;"
-              maxWidth="480"/>
-
-        <!-- Go to Activity CTA -->
-        <Button fx:id="selectActivityButton"
-                text="Go to Activity  →"
-                styleClass="primary-button"
-                onAction="#handleSelectActivity"
-                style="-fx-pref-width: 200px;"/>
 
     </VBox>
 
