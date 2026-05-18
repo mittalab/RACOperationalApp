@@ -194,10 +194,16 @@ public class ExcelReaderService {
     }
 
     private String validatePhone(String name, String phone) {
-        String digits = phone.replaceAll("\\D", "");
-        if (digits.length() == 10) return null;
-        if (digits.length() == 12 && digits.startsWith("91")) return null;
-        return name + ": invalid phone '" + phone + "' (must be 10 digits or 12 digits starting with 91)";
+        String[] parts = phone.split(",");
+        List<String> invalid = new ArrayList<>();
+        for (String part : parts) {
+            String digits = part.trim().replaceAll("\\D", "");
+            if (digits.length() != 10 && !(digits.length() == 12 && digits.startsWith("91"))) {
+                invalid.add(part.trim());
+            }
+        }
+        if (invalid.isEmpty()) return null;
+        return name + ": invalid phone(s) " + invalid + " (each must be 10 digits or 12 digits starting with 91)";
     }
 
     private String getCellStringValue(Cell cell) {

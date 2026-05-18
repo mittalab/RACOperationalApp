@@ -6,6 +6,5 @@
 
 
 ## Future Enhancements
-1. Support multiple phone numbers for a single child
-2. Publish daily whatsapp status report to google drive
-3. 
+1. Publish daily whatsapp status report to google drive
+2.

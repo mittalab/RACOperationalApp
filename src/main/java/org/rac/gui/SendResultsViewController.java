@@ -228,16 +228,33 @@ public class SendResultsViewController {
                             student, formattedDate, className, topic, heading,
                             totalMarks, templateFile, i, htmlDir, pngDir);
 
-                    String phone = normalisePhone(student.getPhone());
+                    List<String> phones = parsePhones(student.getPhone());
                     String msgId = null;
 
                     if (sendWA && !quotaExceeded[0]) {
                         try {
                             String mediaId = whatsAppApiService.uploadMedia(imageFile);
-                            msgId = whatsAppApiService.sendStudentResult(phone, mediaId, student.getName(), whatsAppDate);
-                            deliveryRecords.add(new MessageDelivery(student.getName(), phone, msgId));
-                            successCount++;
-                            logger.info("WhatsApp sent: {} → {}", student.getName(), phone);
+                            boolean anySuccess = false;
+                            for (String phone : phones) {
+                                if (quotaExceeded[0]) break;
+                                try {
+                                    msgId = whatsAppApiService.sendStudentResult(phone, mediaId, student.getName(), whatsAppDate);
+                                    deliveryRecords.add(new MessageDelivery(student.getName(), phone, msgId));
+                                    anySuccess = true;
+                                    logger.info("WhatsApp sent: {} → {}", student.getName(), phone);
+                                } catch (WhatsAppApiService.QuotaExceededException e) {
+                                    quotaExceeded[0] = true;
+                                    quotaStudentName[0] = student.getName();
+                                    sendErrors.add("Quota exceeded at student " + student.getName()
+                                            + " (" + (i + 1) + "/" + total + ") — WhatsApp sending stopped.");
+                                    logger.error("WhatsApp quota exceeded at student {}", student.getName(), e);
+                                } catch (Exception e) {
+                                    String errMsg = student.getName() + " (" + phone + "): " + e.getMessage();
+                                    sendErrors.add(errMsg);
+                                    logger.error("WhatsApp failed for {} at {}", student.getName(), phone, e);
+                                }
+                            }
+                            if (anySuccess) successCount++;
                         } catch (WhatsAppApiService.QuotaExceededException e) {
                             quotaExceeded[0] = true;
                             quotaStudentName[0] = student.getName();
@@ -251,7 +268,8 @@ public class SendResultsViewController {
                         }
                     }
 
-                    runRecords.add(new RunRecord(student.getName(), phone, imageFile.getName(), msgId));
+                    String joinedPhones = String.join(", ", phones);
+                    runRecords.add(new RunRecord(student.getName(), joinedPhones, imageFile.getName(), msgId));
                     sentStudents.add(student);
                 }
 
@@ -342,6 +360,16 @@ public class SendResultsViewController {
     private String normalisePhone(String phone) {
         String digits = phone.replaceAll("\\D", "");
         return digits.length() == 10 ? "91" + digits : digits;
+    }
+
+    private List<String> parsePhones(String phone) {
+        List<String> result = new ArrayList<>();
+        if (phone == null || phone.isEmpty()) return result;
+        for (String p : phone.split(",")) {
+            String trimmed = p.trim();
+            if (!trimmed.isEmpty()) result.add(normalisePhone(trimmed));
+        }
+        return result;
     }
 
     @FXML
