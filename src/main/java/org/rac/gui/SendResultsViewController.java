@@ -346,13 +346,21 @@ public class SendResultsViewController {
                 logger.error("Unexpected error during processing", e);
                 showAlert("Error", "An error occurred: " + e.getMessage());
             } finally {
+                if (isAborted && !sentStudents.isEmpty() && pngDir != null) {
+                    File reportFile = new File(pngDir, "aborted_session_report.xlsx");
+                    try {
+                        excelWriterService.writeStudentsToExcel(new ArrayList<>(sentStudents), reportFile);
+                    } catch (IOException ex) {
+                        logger.error("Error saving abort report", ex);
+                        showAlert("Error", "Error saving abort report: " + ex.getMessage());
+                    }
+                }
                 if (pngDir != null) {
                     File finalPngDir = pngDir;
                     try { Desktop.getDesktop().open(finalPngDir); }
                     catch (Exception e) { logger.warn("Could not open output folder", e); }
                 }
                 updateProgress(isAborted ? "Aborted." : "Processing complete.", isAborted ? 0 : 1.0);
-                if (isAborted) Platform.runLater(this::handleAbort);
             }
         }).start();
     }
@@ -376,21 +384,6 @@ public class SendResultsViewController {
     public void handleAbort() {
         logger.info("Abort triggered");
         isAborted = true;
-        if (!sentStudents.isEmpty()) {
-            FileChooser fc = new FileChooser();
-            fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
-            fc.setInitialFileName("aborted_session_report.xlsx");
-            File file = fc.showSaveDialog(null);
-            if (file != null) {
-                try {
-                    excelWriterService.writeStudentsToExcel(sentStudents, file);
-                    showAlertDirect("Info", "Abort report saved: " + file.getAbsolutePath());
-                } catch (IOException e) {
-                    logger.error("Error saving abort report", e);
-                    showAlertDirect("Error", "Error saving abort report: " + e.getMessage());
-                }
-            }
-        }
     }
 
     @FXML
@@ -435,13 +428,10 @@ public class SendResultsViewController {
     }
 
     private void showAlertDirect(String title, String message) {
-        Alert.AlertType type = (title.equals("Info") || title.equals("Warning"))
-                ? Alert.AlertType.INFORMATION : Alert.AlertType.ERROR;
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+        if (title.equals("Info") || title.equals("Warning"))
+            MessageDialogViewController.showInfo(title, message);
+        else
+            MessageDialogViewController.showError(title, message);
     }
 
     private void showAlert(String title, String message) {

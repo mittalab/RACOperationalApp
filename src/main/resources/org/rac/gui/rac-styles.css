@@ -491,6 +491,20 @@
     -fx-alignment: center-left;
 }
 
+.dialog-header-error {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 0%, #7f1d1d, #dc2626);
+    -fx-padding: 16 22 16 22;
+    -fx-spacing: 12;
+    -fx-alignment: center-left;
+}
+
+.dialog-header-info {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 0%, #1a3355, #2563eb);
+    -fx-padding: 16 22 16 22;
+    -fx-spacing: 12;
+    -fx-alignment: center-left;
+}
+
 .dialog-icon-box {
     -fx-background-color: rgba(255, 255, 255, 0.15);
     -fx-background-radius: 8;

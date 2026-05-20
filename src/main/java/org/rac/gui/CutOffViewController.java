@@ -4,7 +4,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.Modality;
@@ -46,10 +45,7 @@ public class CutOffViewController {
             result = Double.parseDouble(text);
             stage.close();
         } catch (NumberFormatException e) {
-            Alert err = new Alert(Alert.AlertType.ERROR);
-            err.setHeaderText(null);
-            err.setContentText("Invalid cut-off marks. Please enter a valid number.");
-            err.showAndWait();
+            MessageDialogViewController.showError("Invalid Input", "Invalid cut-off marks. Please enter a valid number.");
         }
     }
 

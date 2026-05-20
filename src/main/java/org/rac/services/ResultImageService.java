@@ -128,8 +128,9 @@ public class ResultImageService {
         //logger.info(populatedContent);
 
 
-        String fileNamePNG = "result_" + student.getName() + "_" + index + ".png";
-        String fileNameHTML = "result_" + student.getName() + "_" + index + ".html";
+        String baseName = "result_" + student.getName() + "_" + student.getPhone() + "_" + index;
+        String fileNamePNG = baseName + ".png";
+        String fileNameHTML = baseName + ".html";
 
         // Write the image to a file
 

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.rac.gui.MessageDialogViewController"
+      stylesheets="@rac-styles.css"
+      styleClass="dialog-root"
+      minWidth="400" maxWidth="520"
+      spacing="0">
+
+    <!-- ── Header bar (style set dynamically by controller) ── -->
+    <HBox fx:id="headerBar" styleClass="dialog-header" alignment="CENTER_LEFT" spacing="12">
+        <StackPane styleClass="dialog-icon-box">
+            <Label fx:id="iconLabel"
+                   text="✕"
+                   style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+        </StackPane>
+        <VBox spacing="2">
+            <Label fx:id="titleLabel" text="" styleClass="dialog-title"/>
+            <Label fx:id="subtitleLabel" text="" styleClass="dialog-subtitle"/>
+        </VBox>
+    </HBox>
+
+    <!-- ── Content ── -->
+    <VBox styleClass="dialog-content" spacing="14">
+
+        <VBox styleClass="dialog-info-card" spacing="6">
+            <Label fx:id="messageLabel"
+                   styleClass="dialog-info-label"
+                   wrapText="true"
+                   maxWidth="460"/>
+        </VBox>
+
+        <HBox alignment="CENTER_RIGHT" spacing="10">
+            <Button text="OK"
+                    styleClass="close-button"
+                    onAction="#handleClose"
+                    defaultButton="true"/>
+        </HBox>
+
+    </VBox>
+</VBox>
