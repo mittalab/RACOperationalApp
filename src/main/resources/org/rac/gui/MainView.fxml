@@ -16,8 +16,8 @@
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="org.rac.gui.MainViewController"
       stylesheets="@rac-styles.css"
-      prefWidth="900"
-      prefHeight="580">
+      prefWidth="1100"
+      prefHeight="1000">
 
     <!-- ══════════════════════════════════════════
          LEFT SIDEBAR

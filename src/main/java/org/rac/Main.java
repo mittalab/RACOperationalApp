@@ -30,7 +30,7 @@ public class Main extends Application {
         logger.info("Showing Main View");
         FXMLLoader loader = new FXMLLoader(Main.class.getResource("/org/rac/gui/MainView.fxml"));
         Parent root = loader.load();
-        primaryStage.setScene(new Scene(root, 800, 600));
+        primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }
 
@@ -38,7 +38,7 @@ public class Main extends Application {
         logger.info("Showing Activity View: {}", fxmlPath);
         FXMLLoader loader = new FXMLLoader(Main.class.getResource(fxmlPath));
         Parent root = loader.load();
-        primaryStage.setScene(new Scene(root, 800, 600));
+        primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }
 

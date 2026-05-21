@@ -21,8 +21,8 @@
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="org.rac.gui.SendResultsViewController"
       stylesheets="@rac-styles.css"
-      prefWidth="820"
-      prefHeight="800">
+      prefWidth="1100"
+      prefHeight="1000">
 
     <!-- ══════════════════════════════════════════
          HEADER BAR  (gradient blue)

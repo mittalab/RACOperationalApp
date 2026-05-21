@@ -14,7 +14,7 @@
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="org.rac.gui.CheckWamidStatusViewController"
       stylesheets="@rac-styles.css"
-      prefWidth="1000" prefHeight="660"
+      prefWidth="1100" prefHeight="1000"
       spacing="0">
 
     <!-- ── Header bar ─────────────────────────────────────────── -->
