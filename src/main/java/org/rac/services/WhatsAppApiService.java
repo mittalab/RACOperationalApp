@@ -223,6 +223,31 @@ public class WhatsAppApiService {
         return postMessage(json);
     }
 
+    /**
+     * Sends the absent_summary template to the admin number.
+     * Returns the WhatsApp message ID, or null if the template is not registered (fault-tolerant).
+     */
+    public String sendAbsentSummary(String testDate, String className, String topicName, String batch)
+            throws IOException, InterruptedException {
+        logger.info("Sending absent summary to admin");
+        String json = "{"
+                + "\"messaging_product\":\"whatsapp\","
+                + "\"to\":\"" + ADMIN_PHONE + "\","
+                + "\"type\":\"template\","
+                + "\"template\":{"
+                + "\"name\":\"absent_summary\","
+                + "\"language\":{\"code\":\"en\"},"
+                + "\"components\":["
+                + "{\"type\":\"body\",\"parameters\":["
+                + "{\"type\":\"text\",\"parameter_name\":\"test_date\",\"text\":\"" + escapeJson(testDate) + "\"},"
+                + "{\"type\":\"text\",\"parameter_name\":\"class\",\"text\":\"" + escapeJson(className) + "\"},"
+                + "{\"type\":\"text\",\"parameter_name\":\"topic_name\",\"text\":\"" + escapeJson(topicName) + "\"},"
+                + "{\"type\":\"text\",\"parameter_name\":\"batch\",\"text\":\"" + escapeJson(batch) + "\"}"
+                + "]}"
+                + "]}}";
+        return postMessage(json);
+    }
+
     /** Posts a message and returns the WhatsApp message ID from the response. */
     private String postMessage(String json) throws IOException, InterruptedException {
         return executeWithRetry(() -> {

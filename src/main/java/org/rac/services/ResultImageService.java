@@ -95,6 +95,49 @@ public class ResultImageService {
         }
     }
 
+    public File generateAbsentImage(List<String> absentNames, String date, String studentClass,
+            String batch, String topic, File templateFile, File htmlDirs, File pngDirs) throws IOException {
+        logger.info("Generating absent notice image for {} students", absentNames.size());
+        String templateContent = new String(Files.readAllBytes(templateFile.toPath()));
+
+        StringBuilder studentRows = new StringBuilder();
+        int sno = 1;
+        for (String name : absentNames) {
+            studentRows.append("<div class='student-row'>")
+                    .append("<div class='sno'>").append(sno++).append("</div>")
+                    .append("<span class='student-name'>").append(name).append("</span>")
+                    .append("<span class='absent-badge'>ABSENT</span>")
+                    .append("</div>");
+        }
+
+        String populatedContent = templateContent
+                .replace("DATE_INPUT", date)
+                .replace("CLASS_INPUT", studentClass.toUpperCase())
+                .replace("BATCH_INPUT", batch)
+                .replace("TOPIC_INPUT", topic.toUpperCase())
+                .replace("STUDENT_ROWS_INPUT", studentRows.toString())
+                .replace("LOGO_IMAGE", ImageUtils.getBase64EncodedImage("/app_icon.png"))
+                .replace("WATERMARK_IMAGE", ImageUtils.getBase64EncodedImage("/watermark.png"));
+
+        File fileHTML = new File(htmlDirs, "absent_notice.html");
+        try (java.io.FileWriter fw = new java.io.FileWriter(fileHTML)) {
+            fw.write(populatedContent);
+        }
+
+        File pngFile = new File(pngDirs, "Absent_Notice.png");
+        try (Playwright playwright = Playwright.create()) {
+            Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(true));
+            Page page = browser.newPage();
+            page.navigate(fileHTML.toURI().toString());
+            page.locator(".container").screenshot(
+                    new Locator.ScreenshotOptions().setPath(Paths.get(pngFile.getAbsolutePath())));
+            browser.close();
+        } catch (Exception e) {
+            logger.error("Error during playwright absent image generation", e);
+        }
+        return pngFile;
+    }
+
     public File generateImage(Student student, String date, String studentClass, String topic, String heading, String totalMarks, File templateFile, int index, File htmlDirs, File pngDirs) throws IOException {
         logger.info("Generating result image for student: {} , template path: {}", student.getName(), templateFile.toPath());
         String templateContent = new String(Files.readAllBytes(templateFile.toPath()));

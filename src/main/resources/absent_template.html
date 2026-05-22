@@ -1,10 +1,200 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Absentee Notice</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 10px;
+        }
+
+        .container {
+            width: 520px;
+            margin: auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            padding: 15px 18px 18px 18px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.04;
+            width: 280px;
+            pointer-events: none;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 10px;
+        }
+
+        .logo { width: 50px; flex-shrink: 0; }
+
+        .header-text .org-name {
+            font-size: 18px;
+            color: #cc0000;
+            font-weight: bold;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .header-text .subtitle {
+            font-size: 11px;
+            color: #555;
+            margin: 3px 0 0 0;
+        }
+
+        .divider {
+            border: none;
+            border-top: 2px solid #cc0000;
+            margin: 0 0 10px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 13px;
+            font-weight: bold;
+            color: #222;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .meta-top {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+
+        .meta-batch { font-size: 12px; font-weight: bold; margin-bottom: 8px; }
+
+        .label { color: #cc0000; font-weight: bold; }
+
+        .topic-box {
+            border: 1.5px solid #cc0000;
+            border-radius: 6px;
+            text-align: center;
+            padding: 6px 10px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #222;
+        }
+
+        .student-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px 10px;
+            margin-bottom: 12px;
+        }
+
+        .student-row {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .sno {
+            background-color: #cc0000;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            min-width: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .student-name {
+            flex: 1;
+            font-size: 12px;
+            color: #222;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .absent-badge {
+            background-color: #cc0000;
+            color: white;
+            border-radius: 10px;
+            padding: 2px 5px;
+            font-size: 8px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .footer {
+            text-align: center;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+            font-size: 11px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .footer .brand {
+            color: #cc0000;
+            font-weight: bold;
+            font-style: normal;
+        }
+    </style>
 </head>
 <body>
+<div class="container">
 
+    <img class="watermark" src="WATERMARK_IMAGE" alt="">
+
+    <div class="header">
+        <img class="logo" src="LOGO_IMAGE" alt="Logo">
+        <div class="header-text">
+            <div class="org-name">RANK ACHIEVERS CLASSES</div>
+            <div class="subtitle">IX, X (Science) &amp; XI, XII (Chemistry)</div>
+        </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="section-title">TEST &mdash; ABSENTEE NOTICE</div>
+
+    <div class="meta-top">
+        <div><span class="label">TEST DATE :</span> DATE_INPUT</div>
+        <div><span class="label">CLASS :</span> CLASS_INPUT</div>
+    </div>
+    <div class="meta-batch">
+        <span class="label">BATCH :</span> BATCH_INPUT
+    </div>
+
+    <div class="topic-box">
+        <span class="label">TOPIC :</span> TOPIC_INPUT
+    </div>
+
+    <div class="student-grid">
+        STUDENT_ROWS_INPUT
+    </div>
+
+    <div class="footer">
+        Kindly ensure your ward is present for all scheduled tests.<br>
+        <span class="brand">Rank Achievers Classes</span>
+    </div>
+
+</div>
 </body>
 </html>

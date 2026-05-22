@@ -63,6 +63,7 @@ public class SendResultsViewController {
     private File excelFile;
     private File templateFile;
     private File topperTemplateFile;
+    private File absentTemplateFile;
     private boolean filenameMatchedPattern = false;
 
     private final ExcelReaderService excelReaderService = new ExcelReaderService();
@@ -79,6 +80,7 @@ public class SendResultsViewController {
         try {
             templateFile = loadTemplateFromResource("result_template_4.html", "result_template_4");
             topperTemplateFile = loadTemplateFromResource("topper_template.html", "topper_template");
+            absentTemplateFile = loadTemplateFromResource("absent_template.html", "absent_template");
         } catch (IOException e) {
             logger.error("Failed to load templates", e);
             showAlertDirect("Error", "Failed to load templates: " + e.getMessage());
@@ -315,7 +317,34 @@ public class SendResultsViewController {
                     }
                 }
 
-                // 5.5 Write run report to PNG directory
+                // 5.5 Absent notice image + template message (only for two-sheet files)
+                if (!isAborted && filenameMatchedPattern && !readResult.absentStudentNames.isEmpty()) {
+                    try {
+                        File absentImage = resultImageService.generateAbsentImage(
+                                readResult.absentStudentNames, formattedDate, className, batch, topic,
+                                absentTemplateFile, htmlDir, pngDir);
+                        logger.info("Absent notice image generated: {}", absentImage.getName());
+
+                        if (sendWA && !quotaExceeded[0]) {
+                            try {
+                                whatsAppApiService.sendAbsentSummary(whatsAppDate, className, topic, batch);
+                                deliveryRecords.add(new MessageDelivery("ADMIN – Absent Summary", "Nupur Madam", null));
+                                logger.info("Absent summary template sent to admin");
+                            } catch (WhatsAppApiService.QuotaExceededException e) {
+                                sendErrors.add("Quota exceeded — absent summary not sent to admin.");
+                                logger.error("Quota exceeded sending absent summary", e);
+                            } catch (Exception e) {
+                                sendErrors.add("Absent summary (admin): " + e.getMessage() + " — image still generated.");
+                                logger.error("Failed sending absent summary template (template may not be registered)", e);
+                            }
+                        }
+                    } catch (Exception e) {
+                        sendErrors.add("Absent notice image: " + e.getMessage());
+                        logger.error("Failed generating absent notice image", e);
+                    }
+                }
+
+                // 5.7 Write run report to PNG directory
                 File reportFile = new File(pngDir, "run_report.xlsx");
                 try {
                     excelWriterService.writeRunReport(runRecords, topperMsgId[0], summaryMsgId[0], reportFile);

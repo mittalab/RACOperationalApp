@@ -22,11 +22,13 @@ public class ExcelReaderService {
         public final List<Student> students;
         public final List<String> validationErrors;
         public final boolean success;
+        public final List<String> absentStudentNames;
 
-        ExcelReadResult(List<Student> students, List<String> validationErrors) {
+        ExcelReadResult(List<Student> students, List<String> validationErrors, List<String> absentStudentNames) {
             this.students = students;
             this.validationErrors = validationErrors;
             this.success = validationErrors.isEmpty();
+            this.absentStudentNames = Collections.unmodifiableList(absentStudentNames);
         }
     }
 
@@ -38,23 +40,24 @@ public class ExcelReaderService {
         logger.info("Reading Excel file: {} (useContactSheet={})", file.getAbsolutePath(), useContactSheet);
         List<String> errors = new ArrayList<>();
         List<Student> students = new ArrayList<>();
+        List<String> absentNames = new ArrayList<>();
 
         try (FileInputStream fis = new FileInputStream(file);
              Workbook workbook = new XSSFWorkbook(fis)) {
 
             if (useContactSheet) {
-                readTwoSheetFormat(workbook, students, errors);
+                readTwoSheetFormat(workbook, students, errors, absentNames);
             } else {
                 readSingleSheetFormat(workbook, students, errors);
             }
 
-            logger.info("Read {} students, {} validation errors", students.size(), errors.size());
+            logger.info("Read {} students, {} validation errors, {} absent", students.size(), errors.size(), absentNames.size());
         }
 
-        return new ExcelReadResult(students, errors);
+        return new ExcelReadResult(students, errors, absentNames);
     }
 
-    private void readTwoSheetFormat(Workbook workbook, List<Student> students, List<String> errors) {
+    private void readTwoSheetFormat(Workbook workbook, List<Student> students, List<String> errors, List<String> absentNames) {
         Sheet resultSheet = workbook.getSheet("Result");
         if (resultSheet == null) {
             logger.warn("Sheet 'Result' not found, falling back to sheet index 0");
@@ -70,6 +73,7 @@ public class ExcelReaderService {
         // Build contact lookup: name → phone (unique names only), rollNo → phone
         Map<String, String> nameToPhone = new LinkedHashMap<>();
         Map<String, String> rollNoToPhone = new LinkedHashMap<>();
+        Map<String, String> upperToOriginal = new LinkedHashMap<>(); // uppercase key → original-case display name
         Set<String> duplicateNames = new HashSet<>();
 
         Iterator<Row> contactRows = contactSheet.iterator();
@@ -77,7 +81,8 @@ public class ExcelReaderService {
 
         while (contactRows.hasNext()) {
             Row row = contactRows.next();
-            String name = getCellStringValue(row.getCell(0)).trim().toUpperCase();
+            String rawName = getCellStringValue(row.getCell(0)).trim();
+            String name = rawName.toUpperCase();
             String phone = getCellStringValue(row.getCell(1)).trim();
             String rollNo = getCellStringValue(row.getCell(2)).trim();
 
@@ -86,8 +91,10 @@ public class ExcelReaderService {
             if (nameToPhone.containsKey(name)) {
                 duplicateNames.add(name);
                 nameToPhone.remove(name);
+                upperToOriginal.remove(name);
             } else if (!duplicateNames.contains(name)) {
                 nameToPhone.put(name, phone);
+                upperToOriginal.put(name, rawName);
             }
 
             if (!rollNo.isEmpty()) rollNoToPhone.put(rollNo, phone);
@@ -131,6 +138,16 @@ public class ExcelReaderService {
                 errors.add("Row " + rowNum + ": could not be read (" + e.getMessage() + ")");
             }
         }
+
+        // Compute absent: in Contact but not in Result sheet
+        Set<String> resultUpperNames = new HashSet<>();
+        for (Student s : students) resultUpperNames.add(s.getName().toUpperCase());
+        for (String upperName : nameToPhone.keySet()) {
+            if (!resultUpperNames.contains(upperName)) {
+                absentNames.add(upperToOriginal.getOrDefault(upperName, upperName));
+            }
+        }
+        logger.debug("Absent students: {}", absentNames.size());
     }
 
     private void readSingleSheetFormat(Workbook workbook, List<Student> students, List<String> errors) {

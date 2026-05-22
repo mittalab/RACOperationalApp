@@ -5,9 +5,8 @@ rmdir /s /q RACOperationalApp 2>nul
 
 
 ## Build Latest JAR
+### It should generate the output ``target\RACOperationalApp-1.0.0.jar``
 mvn clean package
-
--- It should generate the output ``target\RACOperationalApp-1.0.0.jar``
 
 ## Make destination directory
 mkdir dist
@@ -19,7 +18,11 @@ xcopy "C:\Users\29abh\AppData\Local\ms-playwright" "dist\ms-playwright" /E /I /Y
 copy src\main\resources\app_icon.ico dist\app_icon.ico
 
 ## Build Executable
-`jpackage --name RACOperationalApp --input dist --main-jar app.jar --main-class org.rac.NewMain --type app-image --icon dist\app_icon.ico --app-version 1.0 --vendor "Rank Achievers Classes"`
+jpackage --name RACOperationalApp --input dist --main-jar app.jar --main-class org.rac.NewMain --type app-image --icon dist\app_icon.ico --app-version 1.0 --vendor "Rank Achievers Classes"
 
-
-copy input_student_data.xlsx RACOperationalApp\input_student_data.xlsx
+## Copying the studnets data files
+copy file_IX_Monday_student_data.xlsx RACOperationalApp\file_IX_Monday_student_data.xlsx
+copy file_IX_Tuesday_student_data.xlsx RACOperationalApp\file_IX_Tuesday_student_data.xlsx
+copy file_X_Monday_student_data.xlsx RACOperationalApp\file_X_Monday_student_data.xlsx
+copy file_X_Tuesday_6_7_student_data.xlsx RACOperationalApp\file_X_Tuesday_6_7_student_data.xlsx
+copy file_X_Tuesday_7_8_student_data.xlsx RACOperationalApp\file_X_Tuesday_7_8_student_data.xlsx
