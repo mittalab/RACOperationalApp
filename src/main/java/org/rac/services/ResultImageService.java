@@ -113,7 +113,7 @@ public class ResultImageService {
         String populatedContent = templateContent
                 .replace("DATE_INPUT", date)
                 .replace("CLASS_INPUT", studentClass.toUpperCase())
-                .replace("BATCH_INPUT", batch)
+                .replace("BATCH_INPUT", batch.toUpperCase())
                 .replace("TOPIC_INPUT", topic.toUpperCase())
                 .replace("STUDENT_ROWS_INPUT", studentRows.toString())
                 .replace("LOGO_IMAGE", ImageUtils.getBase64EncodedImage("/app_icon.png"))

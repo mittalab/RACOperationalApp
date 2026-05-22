@@ -124,13 +124,11 @@
                       visible="false" managed="false">
                     <Label fx:id="customBatchLabel"
                            text="Custom Batch:"
-                           styleClass="form-label"
-                           visible="false" managed="false"/>
+                           styleClass="form-label"/>
                     <TextField fx:id="customBatchField"
                                styleClass="form-text-field"
                                promptText="Enter batch name"
-                               prefWidth="260"
-                               visible="false" managed="false"/>
+                               prefWidth="260"/>
                 </HBox>
 
                 <!-- Topic -->

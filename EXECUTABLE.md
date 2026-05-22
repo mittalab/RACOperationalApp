@@ -20,7 +20,7 @@ copy src\main\resources\app_icon.ico dist\app_icon.ico
 ## Build Executable
 jpackage --name RACOperationalApp --input dist --main-jar app.jar --main-class org.rac.NewMain --type app-image --icon dist\app_icon.ico --app-version 1.0 --vendor "Rank Achievers Classes"
 
-## Copying the studnets data files
+## Copying the studnets data files - DONT DO IT LATER , as these FILES might be changed LOCALLY BY NISHA and MEENA
 copy file_IX_Monday_student_data.xlsx RACOperationalApp\file_IX_Monday_student_data.xlsx
 copy file_IX_Tuesday_student_data.xlsx RACOperationalApp\file_IX_Tuesday_student_data.xlsx
 copy file_X_Monday_student_data.xlsx RACOperationalApp\file_X_Monday_student_data.xlsx
