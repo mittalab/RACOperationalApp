@@ -3,6 +3,8 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+
+
 ### IntelliJ IDEA ###
 .idea/
 .idea/modules.xml
@@ -26,6 +28,7 @@ target/
 /nbproject/private/
 /nbbuild/
 /dist/
+/RACOperationalApp/
 /nbdist/
 /.nb-gradle/
 build/
