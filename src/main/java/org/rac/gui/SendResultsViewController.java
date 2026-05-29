@@ -12,6 +12,7 @@ import org.rac.model.RunRecord;
 import org.rac.model.Student;
 import org.rac.services.ExcelReaderService;
 import org.rac.services.ExcelWriterService;
+import org.rac.services.GoogleDriveService;
 import org.rac.services.ResultImageService;
 import org.rac.services.WhatsAppApiService;
 import org.slf4j.Logger;
@@ -70,9 +71,19 @@ public class SendResultsViewController {
     private final ResultImageService resultImageService = new ResultImageService();
     private final WhatsAppApiService whatsAppApiService = new WhatsAppApiService();
     private final ExcelWriterService excelWriterService = new ExcelWriterService();
+    private final GoogleDriveService googleDriveService = new GoogleDriveService();
+
+    private static final String MASTER_SPREADSHEET_ID = "16kElua-wgKkFJRkW8dzOPv9wzadYmKV9P_ydbr3BPFk";
 
     private volatile boolean isAborted = false;
     private final List<Student> sentStudents = Collections.synchronizedList(new ArrayList<>());
+
+    private File syncWithCloud(File runDir) throws Exception {
+        logger.info("Starting cloud sync with spreadsheet ID: {}", MASTER_SPREADSHEET_ID);
+        File cloudFile = new File(runDir, "cloud_contacts.xlsx");
+        googleDriveService.downloadSpreadsheetAsExcel(MASTER_SPREADSHEET_ID, cloudFile);
+        return cloudFile;
+    }
 
     @FXML
     public void initialize() {
@@ -157,12 +168,34 @@ public class SendResultsViewController {
 
         // Capture UI state on FX thread before background thread starts
         final boolean sendWA = sendWhatsAppCheckbox.isSelected();
+        final String classNameStr = classField.getText();
+        final String batchStr = getBatchValue();
+
         new Thread(() -> {
             File pngDir = null;
             try {
-                // 1. Validate
+                // 1. Setup Dirs early for Cloud Sync
+                String uuid = UUID.randomUUID().toString();
+                File htmlDir = new File(uuid + "_html");
+                pngDir = new File(uuid + "_png");
+                htmlDir.mkdirs();
+                pngDir.mkdirs();
+
+                // 2. Cloud Sync
+                updateProgress("Syncing with Google Cloud...", 0.05);
+                File cloudContactsFile = null;
+                try {
+                    cloudContactsFile = syncWithCloud(pngDir);
+                    logger.info("Cloud sync successful: {}", cloudContactsFile.getAbsolutePath());
+                } catch (Exception e) {
+                    logger.error("Cloud sync failed", e);
+                    Platform.runLater(() -> showAlertDirect("Cloud Sync Warning", 
+                        "Failed to download latest contacts from Google Sheets. Using local data if available.\nError: " + e.getMessage()));
+                }
+
+                // 3. Validate
                 updateProgress("Validation in progress...", -1);
-                ExcelReaderService.ExcelReadResult readResult = excelReaderService.readAndValidate(excelFile, filenameMatchedPattern);
+                ExcelReaderService.ExcelReadResult readResult = excelReaderService.readAndValidate(excelFile, cloudContactsFile, classNameStr, batchStr);
 
                 if (!readResult.success) {
                     updateProgress("Validation failed.", 0);
@@ -194,18 +227,11 @@ public class SendResultsViewController {
                 latch.await();
                 if (!proceed[0]) { updateProgress("", 0); return; }
 
-                // 3. Temp dirs
-                String uuid = UUID.randomUUID().toString();
-                File htmlDir = new File(uuid + "_html");
-                pngDir = new File(uuid + "_png");
-                htmlDir.mkdirs();
-                pngDir.mkdirs();
-
                 // Capture form values (read on FX thread, but fields are only written on FX so safe to read here)
                 String formattedDate = datePicker.getValue().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
                 String whatsAppDate  = datePicker.getValue().format(DateTimeFormatter.ofPattern("dd-MMM"));
-                String className   = classField.getText();
-                String batch       = getBatchValue();
+                String className   = classNameStr;
+                String batch       = batchStr;
                 String topic       = topicField.getText();
                 String heading     = headingField.getText();
                 String totalMarks  = totalMarksField.getText();

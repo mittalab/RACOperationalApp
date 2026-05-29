@@ -51,7 +51,8 @@ The project follows a standard MVC-inspired architecture for JavaFX.
 ## Key Features
 
 1.  **Test Result Delivery:** Automates sending personalized result cards to parents via WhatsApp and Email.
-2.  **Delivery Tracking:** Provides a real-time "Delivery Tracker" view showing the status (Sent, Delivered, Read, Failed) of each message.
+2.  **Centralized Contact Sync:** Automatically fetches the latest student phone numbers from a master Google Spreadsheet (via `GoogleDriveService`). This ensures all app installations use the same updated data.
+3.  **Delivery Tracking:** Provides a real-time "Delivery Tracker" view.
 3.  **Topper & Absent Lists:** Generates visual summaries for toppers and absent students from the test data.
 4.  **WAMID Management:** Allows tracking and manual status checking of WhatsApp message IDs (WAMIDs).
 5.  **Excel Reporting:** Generates "Run Reports" and "Abort Reports" in Excel format to document the outcome of delivery batches.

@@ -36,25 +36,154 @@ public class ExcelReaderService {
      * @param useContactSheet true for standard two-sheet files (Result + Contact);
      *                        false for single-sheet files where col 3 holds the phone number.
      */
-    public ExcelReadResult readAndValidate(File file, boolean useContactSheet) throws IOException {
-        logger.info("Reading Excel file: {} (useContactSheet={})", file.getAbsolutePath(), useContactSheet);
+    public ExcelReadResult readAndValidate(File marksFile, File cloudContactsFile, String className, String batch) throws IOException {
+        logger.info("Reading Marks file: {}, Cloud Contacts file: {}, Class: {}, Batch: {}", 
+                marksFile.getAbsolutePath(), cloudContactsFile != null ? cloudContactsFile.getAbsolutePath() : "None",
+                className, batch);
+        
         List<String> errors = new ArrayList<>();
         List<Student> students = new ArrayList<>();
         List<String> absentNames = new ArrayList<>();
 
-        try (FileInputStream fis = new FileInputStream(file);
-             Workbook workbook = new XSSFWorkbook(fis)) {
+        try (FileInputStream fisMarks = new FileInputStream(marksFile);
+             Workbook workbookMarks = new XSSFWorkbook(fisMarks)) {
 
-            if (useContactSheet) {
-                readTwoSheetFormat(workbook, students, errors, absentNames);
+            Sheet resultSheet = workbookMarks.getSheet("Result");
+            if (resultSheet == null) {
+                logger.warn("Sheet 'Result' not found in marks file, falling back to sheet index 0");
+                resultSheet = workbookMarks.getSheetAt(0);
+            }
+
+            if (cloudContactsFile != null) {
+                try (FileInputStream fisCloud = new FileInputStream(cloudContactsFile);
+                     Workbook workbookCloud = new XSSFWorkbook(fisCloud)) {
+                    readWithExternalContacts(resultSheet, workbookCloud, students, errors, absentNames, className, batch);
+                }
             } else {
-                readSingleSheetFormat(workbook, students, errors);
+                // Fallback to legacy behavior: check if Contact sheet exists in same file
+                Sheet contactSheet = workbookMarks.getSheet("Contact");
+                if (contactSheet != null) {
+                    readTwoSheetFormat(workbookMarks, students, errors, absentNames);
+                } else {
+                    readSingleSheetFormat(workbookMarks, students, errors);
+                }
             }
 
             logger.info("Read {} students, {} validation errors, {} absent", students.size(), errors.size(), absentNames.size());
         }
 
         return new ExcelReadResult(students, errors, absentNames);
+    }
+
+    private void readWithExternalContacts(Sheet resultSheet, Workbook contactWorkbook, 
+                                        List<Student> students, List<String> errors, List<String> absentNames,
+                                        String className, String batch) {
+        // Build contact lookup from matched sheets
+        Map<String, String> nameToPhone = new LinkedHashMap<>();
+        Map<String, String> rollNoToPhone = new LinkedHashMap<>();
+        Map<String, String> upperToOriginal = new LinkedHashMap<>();
+        Set<String> duplicateNames = new HashSet<>();
+
+        String targetSheetName = findTargetSheetName(className, batch);
+        logger.info("Targeting sheet: '{}' for class '{}' and batch '{}'", targetSheetName, className, batch);
+
+        boolean sheetFound = false;
+        for (int i = 0; i < contactWorkbook.getNumberOfSheets(); i++) {
+            Sheet sheet = contactWorkbook.getSheetAt(i);
+            String currentSheetName = sheet.getSheetName().trim();
+            
+            // Static predefined mapping logic
+            if (!isSheetMatch(currentSheetName, targetSheetName, className, batch)) {
+                continue;
+            }
+            
+            sheetFound = true;
+            logger.debug("Processing matched contact sheet: {}", sheet.getSheetName());
+            
+            Iterator<Row> rows = sheet.iterator();
+            if (rows.hasNext()) rows.next(); // skip header line
+
+            while (rows.hasNext()) {
+                Row row = rows.next();
+                String rawName = getCellStringValue(row.getCell(2)).trim(); // Column C: Student Name
+                String name = rawName.toUpperCase();
+                String phone = getCellStringValue(row.getCell(3)).trim();  // Column D: Phone Number
+                String rollNo = getCellStringValue(row.getCell(4)).trim(); // Column E: Roll Number
+
+                if (name.isEmpty()) continue;
+
+                if (nameToPhone.containsKey(name)) {
+                    if (!nameToPhone.get(name).equals(phone)) {
+                        duplicateNames.add(name);
+                    }
+                } else {
+                    nameToPhone.put(name, phone);
+                    upperToOriginal.put(name, rawName);
+                }
+
+                if (!rollNo.isEmpty()) rollNoToPhone.put(rollNo, phone);
+            }
+        }
+
+        if (!sheetFound) {
+            errors.add("Could not find a matching contact sheet in Google Sheets for Class: " + className + ", Batch: " + batch);
+            return;
+        }
+
+        logger.info("Aggregated contacts: {} unique names from matched sheets", nameToPhone.size());
+
+        // Now process results and lookup
+        Iterator<Row> resultRows = resultSheet.iterator();
+        if (resultRows.hasNext()) resultRows.next(); // skip header
+
+        int rowNum = 1;
+        while (resultRows.hasNext()) {
+            Row row = resultRows.next();
+            rowNum++;
+            try {
+                String name = getCellStringValue(row.getCell(0)).trim();
+                if (name.isEmpty()) continue;
+
+                Cell marksCell = row.getCell(1);
+                if (marksCell == null) {
+                    errors.add(name + ": missing marks (row " + rowNum + ")");
+                    continue;
+                }
+                double marks = marksCell.getNumericCellValue();
+                String additionalDetails = getCellStringValue(row.getCell(2));
+                String rollNo = getCellStringValue(row.getCell(3)).trim();
+
+                String upperName = name.toUpperCase();
+                String phone = resolvePhone(upperName, rollNo, nameToPhone, rollNoToPhone, duplicateNames, errors);
+
+                if (phone != null) {
+                    String e = validatePhone(upperName, phone);
+                    if (e != null) { errors.add(e); phone = null; }
+                }
+
+                students.add(new Student(name, marks, additionalDetails, phone != null ? phone : "", rollNo));
+            } catch (Exception e) {
+                logger.error("Error reading row {}", rowNum, e);
+                errors.add("Row " + rowNum + ": " + e.getMessage());
+            }
+        }
+
+        // Absent logic: Only check if student exists in ANY of the contact sheets but not in Result
+        Set<String> resultUpperNames = new HashSet<>();
+        for (Student s : students) resultUpperNames.add(s.getName().toUpperCase());
+        for (String upperName : nameToPhone.keySet()) {
+            if (!resultUpperNames.contains(upperName)) {
+                absentNames.add(upperToOriginal.getOrDefault(upperName, upperName));
+            }
+        }
+    }
+
+    /**
+     * @deprecated Use {@link #readAndValidate(File, File, String, String)}
+     */
+    @Deprecated
+    public ExcelReadResult readAndValidate(File file, boolean useContactSheet) throws IOException {
+        return readAndValidate(file, null, "", "");
     }
 
     private void readTwoSheetFormat(Workbook workbook, List<Student> students, List<String> errors, List<String> absentNames) {
@@ -189,6 +318,37 @@ public class ExcelReaderService {
                 errors.add("Row " + rowNum + ": could not be read (" + e.getMessage() + ")");
             }
         }
+    }
+
+    private String findTargetSheetName(String className, String batch) {
+        // This is the static predefined mapping
+        if (className.equalsIgnoreCase("X")) {
+            if (batch.contains("Monday")) return "RAC Monday(Science) X, 26";
+            if (batch.contains("6-7")) return "RAC X Science ,6-7pm (2026)";
+            if (batch.contains("7-8")) return "RAC X Science,7-8 (2026)";
+        } else if (className.equalsIgnoreCase("IX")) {
+            if (batch.contains("Monday")) return "RAC IX Science Monday, 2026";
+            if (batch.contains("Tuesday")) return "RAC IX Science, Tuesday 2026";
+        }
+        return null;
+    }
+
+    private boolean isSheetMatch(String sheetName, String targetName, String className, String batch) {
+        if (targetName != null && sheetName.equalsIgnoreCase(targetName)) return true;
+        
+        // Fallback fuzzy match
+        String s = sheetName.toUpperCase();
+        String c = className.toUpperCase();
+        String b = batch.toUpperCase();
+        
+        if (s.contains(c)) {
+            if (b.contains("6-7") && s.contains("6-7")) return true;
+            if (b.contains("7-8") && s.contains("7-8")) return true;
+            if (b.contains("MONDAY") && s.contains("MONDAY")) return true;
+            if (b.contains("TUESDAY") && s.contains("TUESDAY") && !s.contains("6-7") && !s.contains("7-8")) return true;
+        }
+        
+        return false;
     }
 
     private String resolvePhone(String upperName, String rollNo,
