@@ -4,16 +4,17 @@ This document provides context and instructions for AI agents working on the RAC
 
 ## Project Overview
 
-The **RAC Operational App** is a JavaFX-based desktop application designed to automate operational tasks for a coaching center. Its primary current feature is automating the delivery of student test results to parents via WhatsApp (using Selenium) and Email (using JavaMail).
+The **RAC Operational App** is a JavaFX-based desktop application designed to automate operational tasks for a coaching center. Its primary features include automating the delivery of student test results and tracking message delivery statuses.
 
 ### Core Technologies
-- **Language:** Java 25 (Targeting JDK 25)
-- **UI Framework:** JavaFX 25 (with FXML)
-- **Automation:** 
-    - **Selenium:** Used for WhatsApp Web automation (message delivery).
-    - **Playwright:** Used for rendering HTML templates into high-quality PNG result images.
-- **Data Handling:** Apache POI for reading/writing Excel files (`.xlsx`).
-- **Rendering:** Uses HTML/CSS templates for result cards.
+- **Language:** Java 25
+- **UI Framework:** JavaFX 25.0.1 (with FXML)
+- **Automation & APIs:**
+    - **Meta WhatsApp Cloud API:** Primary method for WhatsApp message delivery (replacing legacy Selenium automation).
+    - **Custom Status Webhook:** Tracks real-time delivery status (Sent, Delivered, Read, Failed).
+    - **Playwright:** Used for rendering HTML templates into high-quality PNG result images, topper lists, and absent notices.
+    - **JavaMail (Jakarta Mail):** Fallback/complementary method for Email delivery.
+- **Data Handling:** Apache POI (5.2.2) for reading/writing Excel files (`.xlsx`).
 - **Logging:** SLF4J with Logback.
 
 ---
@@ -25,18 +26,35 @@ The project follows a standard MVC-inspired architecture for JavaFX.
 - `src/main/java/org/rac/`
     - `NewMain.java`: Main entry point (workaround for JavaFX/JAR issues).
     - `Main.java`: JavaFX Application class, handles stage and scene transitions.
-    - `gui/`: FXML Controllers (e.g., `MainViewController`, `SendResultsViewController`).
-    - `model/`: Data objects (e.g., `Student`) and activity abstractions.
+    - `gui/`: FXML Controllers.
+        - `MainViewController`: Sidebar and navigation management.
+        - `SendResultsViewController`: Handles the result delivery workflow.
+        - `DeliveryTrackerViewController`: Real-time tracking of message statuses.
+        - `CheckWamidStatusViewController`: Manual WAMID status lookup.
+    - `model/`: Data objects and activity abstractions.
+        - `Student`, `RunRecord`, `MessageDelivery`.
+        - `Activity` hierarchy for sidebar navigation.
     - `services/`: Business logic.
-        - `WhatsAppService`: Selenium automation for WhatsApp.
-        - `ResultImageService`: Playwright rendering logic.
-        - `ExcelReaderService`: Apache POI Excel parsing.
+        - `WhatsAppApiService`: Meta Cloud API integration with retry logic and media upload.
+        - `WamidStatusService`: Batch checking of message statuses via custom webhook.
+        - `ResultImageService`: Playwright rendering logic for various templates.
+        - `ExcelReaderService`: Multi-format Excel parsing.
         - `EmailService`: JavaMail implementation.
     - `utils/`: Common helpers (e.g., `ImageUtils` for Base64 encoding).
 - `src/main/resources/`
     - FXML files for UI layouts.
-    - HTML templates for result images (`result_template.html`).
+    - HTML templates for result cards (`result_template.html`), toppers (`topper_template.html`), and absent notices (`absent_template.html`).
     - Static assets (icons, signatures, headers).
+
+---
+
+## Key Features
+
+1.  **Test Result Delivery:** Automates sending personalized result cards to parents via WhatsApp and Email.
+2.  **Delivery Tracking:** Provides a real-time "Delivery Tracker" view showing the status (Sent, Delivered, Read, Failed) of each message.
+3.  **Topper & Absent Lists:** Generates visual summaries for toppers and absent students from the test data.
+4.  **WAMID Management:** Allows tracking and manual status checking of WhatsApp message IDs (WAMIDs).
+5.  **Excel Reporting:** Generates "Run Reports" and "Abort Reports" in Excel format to document the outcome of delivery batches.
 
 ---
 
@@ -57,43 +75,39 @@ mvn javafx:run
 java -jar target/RACOperationalApp-1.0.0.jar
 ```
 
-### Creating a Windows Executable (jpackage)
-```bash
-jpackage --name RACOperationalApp --input target --main-jar RACOperationalApp-1.0.0.jar --main-class org.rac.NewMain
-```
-
 ---
 
 ## Critical Configurations & Setup
 
-### 1. WhatsApp Automation (Selenium)
-The application requires a local `chromedriver.exe` and a Chrome User Profile to bypass WhatsApp QR login after the first session.
-- **File:** `src/main/java/org/rac/services/WhatsAppService.java`
-- **Settings:** `webdriver.chrome.driver` and `user-data-dir` arguments. 
-- **User Hint:** These are currently hardcoded to specific local paths and must be updated for different environments.
+### 1. WhatsApp Cloud API
+Configuration is currently managed in `WhatsAppApiService.java`.
+- `PHONE_ID`: The Meta Phone Number ID.
+- `BEARER_TOKEN`: Permanent access token for the WhatsApp Cloud API.
 
-### 2. Image Rendering (Playwright)
-Playwright is used for "headless" rendering of result cards.
-- **Storage:** It expects browsers in the `ms-playwright` directory (configured in `Main.java`).
-- **Template:** Placeholders in `result_template.html` (e.g., `NAME_INPUT`, `MARKS_INPUT`) are replaced dynamically.
+### 2. Status Webhook
+- `BATCH_URL`: Endpoint for checking WAMID statuses (currently `https://webhook.rankachieversclasses.in/status/batch`).
 
-### 3. Email Fallback
+### 3. Image Rendering (Playwright)
+- **Environment:** `PLAYWRIGHT_BROWSERS_PATH` is set to `ms-playwright` in `Main.java`.
+- **Initialization:** Playwright is initialized at startup.
+
+### 4. Email Configuration
 - **File:** `EmailService.java`
-- **Requirement:** Requires a valid Gmail address and an App-specific Password.
+- **Requirement:** Requires valid SMTP credentials (Gmail App Password).
 
 ---
 
 ## Development Conventions
 
-- **UI:** Prefer FXML for layouts. All controllers should reside in the `gui` package.
-- **Threading:** Heavy operations (sending messages, rendering images) **must** run on a background thread (e.g., using `Task` or `Thread`) to avoid freezing the JavaFX UI.
-- **Logging:** Use `logger.info()`, `logger.debug()`, and `logger.error()` consistently. Logs are written to `rac-operational-app.log`.
-- **Validation:** Always validate student data (phone numbers, marks) before starting a batch process.
+- **Threading:** Heavy operations (API calls, rendering) **must** run on a background thread to keep the JavaFX UI responsive. Use the `Task` pattern.
+- **UI:** Prefer FXML and CSS (`rac-styles.css`). Sidebar navigation is managed via `ActivityService`.
+- **Logging:** All major actions and errors must be logged using SLF4J.
+- **Excel Handling:** Support both `Result` + `Contact` two-sheet format and single-sheet format.
 
 ---
 
 ## TODOs & Future Improvements
-- [ ] Make ChromeDriver and Chrome Profile paths configurable via a "Settings" screen.
-- [ ] Move hardcoded credentials to a secure local configuration file or environment variables.
-- [ ] Implement automated tests for Excel parsing and image generation logic.
-- [ ] Optimize Playwright browser management (check for existence before initializing).
+- [ ] Move API credentials and URLs to a secure local configuration file (`config.properties` or `.env`).
+- [ ] Implement a "Settings" screen for dynamic configuration.
+- [ ] Improve error handling for network-related failures in `WamidStatusService`.
+- [ ] Add unit tests for `ExcelReaderService` and `WhatsAppApiService` logic.
