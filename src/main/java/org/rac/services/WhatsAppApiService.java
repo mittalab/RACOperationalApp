@@ -345,6 +345,31 @@ public class WhatsAppApiService {
     }
 
     /**
+     * Sends the no_absent template to the admin number.
+     * Returns the WhatsApp message ID.
+     */
+    public String sendNoAbsentSummary(String testDate, String className, String topicName, String batch)
+            throws IOException, InterruptedException {
+        logger.info("Sending no_absent summary to admin");
+        String json = "{"
+                + "\"messaging_product\":\"whatsapp\","
+                + "\"to\":\"" + ADMIN_PHONE + "\","
+                + "\"type\":\"template\","
+                + "\"template\":{"
+                + "\"name\":\"no_absent\","
+                + "\"language\":{\"code\":\"en\"},"
+                + "\"components\":["
+                + "{\"type\":\"body\",\"parameters\":["
+                + "{\"type\":\"text\",\"parameter_name\":\"test_date\",\"text\":\"" + escapeJson(testDate) + "\"},"
+                + "{\"type\":\"text\",\"parameter_name\":\"class\",\"text\":\"" + escapeJson(className) + "\"},"
+                + "{\"type\":\"text\",\"parameter_name\":\"topic_name\",\"text\":\"" + escapeJson(topicName) + "\"},"
+                + "{\"type\":\"text\",\"parameter_name\":\"batch\",\"text\":\"" + escapeJson(batch) + "\"}"
+                + "]}"
+                + "]}}";
+        return postMessage(json);
+    }
+
+    /**
      * Extracts the WhatsApp error code from {"error": {"code": N, ...}}.
      * Returns -1 if not found.
      */

@@ -344,29 +344,46 @@ public class SendResultsViewController {
                 }
 
                 // 5.5 Absent notice image + template message (only for two-sheet files)
-                if (!isAborted && filenameMatchedPattern && !readResult.absentStudentNames.isEmpty()) {
-                    try {
-                        File absentImage = resultImageService.generateAbsentImage(
-                                readResult.absentStudentNames, formattedDate, className, batch, topic,
-                                absentTemplateFile, htmlDir, pngDir);
-                        logger.info("Absent notice image generated: {}", absentImage.getName());
+                if (!isAborted && filenameMatchedPattern) {
+                    if (!readResult.absentStudentNames.isEmpty()) {
+                        try {
+                            File absentImage = resultImageService.generateAbsentImage(
+                                    readResult.absentStudentNames, formattedDate, className, batch, topic,
+                                    absentTemplateFile, htmlDir, pngDir);
+                            logger.info("Absent notice image generated: {}", absentImage.getName());
 
+                            if (sendWA && !quotaExceeded[0]) {
+                                try {
+                                    whatsAppApiService.sendAbsentSummary(whatsAppDate, className, topic, batch);
+                                    deliveryRecords.add(new MessageDelivery("ADMIN – Absent Summary", "Nupur Madam", null));
+                                    logger.info("Absent summary template sent to admin");
+                                } catch (WhatsAppApiService.QuotaExceededException e) {
+                                    sendErrors.add("Quota exceeded — absent summary not sent to admin.");
+                                    logger.error("Quota exceeded sending absent summary", e);
+                                } catch (Exception e) {
+                                    sendErrors.add("Absent summary (admin): " + e.getMessage() + " — image still generated.");
+                                    logger.error("Failed sending absent summary template (template may not be registered)", e);
+                                }
+                            }
+                        } catch (Exception e) {
+                            sendErrors.add("Absent notice image: " + e.getMessage());
+                            logger.error("Failed generating absent notice image", e);
+                        }
+                    } else {
+                        // NO absentees - send no_absent template
                         if (sendWA && !quotaExceeded[0]) {
                             try {
-                                whatsAppApiService.sendAbsentSummary(whatsAppDate, className, topic, batch);
-                                deliveryRecords.add(new MessageDelivery("ADMIN – Absent Summary", "Nupur Madam", null));
-                                logger.info("Absent summary template sent to admin");
+                                whatsAppApiService.sendNoAbsentSummary(whatsAppDate, className, topic, batch);
+                                deliveryRecords.add(new MessageDelivery("ADMIN – No Absent Summary", "Nupur Madam", null));
+                                logger.info("No Absent summary template sent to admin");
                             } catch (WhatsAppApiService.QuotaExceededException e) {
-                                sendErrors.add("Quota exceeded — absent summary not sent to admin.");
-                                logger.error("Quota exceeded sending absent summary", e);
+                                sendErrors.add("Quota exceeded — no_absent summary not sent to admin.");
+                                logger.error("Quota exceeded sending no_absent summary", e);
                             } catch (Exception e) {
-                                sendErrors.add("Absent summary (admin): " + e.getMessage() + " — image still generated.");
-                                logger.error("Failed sending absent summary template (template may not be registered)", e);
+                                sendErrors.add("No Absent summary (admin): " + e.getMessage());
+                                logger.error("Failed sending no_absent summary template", e);
                             }
                         }
-                    } catch (Exception e) {
-                        sendErrors.add("Absent notice image: " + e.getMessage());
-                        logger.error("Failed generating absent notice image", e);
                     }
                 }
 
