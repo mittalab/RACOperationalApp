@@ -10,9 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
@@ -20,10 +20,14 @@ import java.util.Collections;
 public class GoogleDriveService {
     private static final Logger logger = LoggerFactory.getLogger(GoogleDriveService.class);
     private static final String APPLICATION_NAME = "RAC Operational App";
-    private static final String CREDENTIALS_FILE_PATH = "google-credentials.json";
+    private static final String CREDENTIALS_RESOURCE_PATH = "/credentials/google-credentials.json";
 
     private Drive getDriveService() throws IOException, GeneralSecurityException {
-        GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(CREDENTIALS_FILE_PATH))
+        InputStream in = GoogleDriveService.class.getResourceAsStream(CREDENTIALS_RESOURCE_PATH);
+        if (in == null) {
+            throw new IOException("Resource not found: " + CREDENTIALS_RESOURCE_PATH);
+        }
+        GoogleCredentials credentials = GoogleCredentials.fromStream(in)
                 .createScoped(Collections.singleton(DriveScopes.DRIVE_READONLY));
 
         return new Drive.Builder(
@@ -40,13 +44,12 @@ public class GoogleDriveService {
         Drive service = getDriveService();
         
         // Export the Google Sheet as an .xlsx file
-        OutputStream outputStream = new FileOutputStream(targetFile);
-        service.files().export(spreadsheetId, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-                .executeMediaAndDownloadTo(outputStream);
+        try (OutputStream outputStream = new FileOutputStream(targetFile)) {
+            service.files().export(spreadsheetId, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                    .executeMediaAndDownloadTo(outputStream);
+            outputStream.flush();
+        }
         
-        outputStream.flush();
-        outputStream.close();
-        
-        logger.info("Successfully downloaded spreadsheet to {}", targetFile.length());
+        logger.info("Successfully downloaded spreadsheet, size: {} bytes", targetFile.length());
     }
 }

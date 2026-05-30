@@ -224,10 +224,10 @@ public class WhatsAppApiService {
     }
 
     /**
-     * Sends the absent_summary template to the admin number.
-     * Returns the WhatsApp message ID, or null if the template is not registered (fault-tolerant).
+     * Sends the absent_summary template to the admin number with an image header.
+     * Returns the WhatsApp message ID.
      */
-    public String sendAbsentSummary(String testDate, String className, String topicName, String batch)
+    public String sendAbsentSummary(String mediaId, String testDate, String className, String topicName, String batch)
             throws IOException, InterruptedException {
         logger.info("Sending absent summary to admin");
         String json = "{"
@@ -238,6 +238,9 @@ public class WhatsAppApiService {
                 + "\"name\":\"absent_summary\","
                 + "\"language\":{\"code\":\"en\"},"
                 + "\"components\":["
+                + "{\"type\":\"header\",\"parameters\":["
+                + "{\"type\":\"image\",\"image\":{\"id\":\"" + mediaId + "\"}}"
+                + "]},"
                 + "{\"type\":\"body\",\"parameters\":["
                 + "{\"type\":\"text\",\"parameter_name\":\"test_date\",\"text\":\"" + escapeJson(testDate) + "\"},"
                 + "{\"type\":\"text\",\"parameter_name\":\"class\",\"text\":\"" + escapeJson(className) + "\"},"
@@ -250,6 +253,7 @@ public class WhatsAppApiService {
 
     /** Posts a message and returns the WhatsApp message ID from the response. */
     private String postMessage(String json) throws IOException, InterruptedException {
+        logger.info("Sending JSON to WhatsApp API: {}", json);
         return executeWithRetry(() -> {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(BASE_URL + PHONE_ID + "/messages"))

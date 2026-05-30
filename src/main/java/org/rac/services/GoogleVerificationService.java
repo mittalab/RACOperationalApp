@@ -51,7 +51,8 @@ public class GoogleVerificationService {
     }
 
     public static void main(String[] args) {
-        String spreadsheetId = "16kElua-wgKkFJRkW8dzOPv9wzadYmKV9P_ydbr3BPFk";
+        //String spreadsheetId = "16kElua-wgKkFJRkW8dzOPv9wzadYmKV9P_ydbr3BPFk";
+        String spreadsheetId = "1WzK6Le_v9jPXcKous50Pjs3smnhC3tWIoDiyhmUXulI";
         try {
             GoogleVerificationService service = new GoogleVerificationService();
             List<String> names = service.getSheetNames(spreadsheetId);

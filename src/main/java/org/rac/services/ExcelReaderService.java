@@ -23,6 +23,7 @@ public class ExcelReaderService {
         public final List<String> validationErrors;
         public final boolean success;
         public final List<String> absentStudentNames;
+        public String targetSheetName; // New field
 
         ExcelReadResult(List<Student> students, List<String> validationErrors, List<String> absentStudentNames) {
             this.students = students;
@@ -72,7 +73,11 @@ public class ExcelReaderService {
             logger.info("Read {} students, {} validation errors, {} absent", students.size(), errors.size(), absentNames.size());
         }
 
-        return new ExcelReadResult(students, errors, absentNames);
+        ExcelReadResult finalResult = new ExcelReadResult(students, errors, absentNames);
+        if (cloudContactsFile != null) {
+            finalResult.targetSheetName = findTargetSheetName(className, batch);
+        }
+        return finalResult;
     }
 
     private void readWithExternalContacts(Sheet resultSheet, Workbook contactWorkbook, 
@@ -92,8 +97,8 @@ public class ExcelReaderService {
             Sheet sheet = contactWorkbook.getSheetAt(i);
             String currentSheetName = sheet.getSheetName().trim();
             
-            // Static predefined mapping logic
-            if (!isSheetMatch(currentSheetName, targetSheetName, className, batch)) {
+            // Hard mapping: only exact match allowed
+            if (targetSheetName == null || !currentSheetName.equalsIgnoreCase(targetSheetName)) {
                 continue;
             }
             
@@ -321,34 +326,19 @@ public class ExcelReaderService {
     }
 
     private String findTargetSheetName(String className, String batch) {
-        // This is the static predefined mapping
-        if (className.equalsIgnoreCase("X")) {
-            if (batch.contains("Monday")) return "RAC Monday(Science) X, 26";
-            if (batch.contains("6-7")) return "RAC X Science ,6-7pm (2026)";
-            if (batch.contains("7-8")) return "RAC X Science,7-8 (2026)";
-        } else if (className.equalsIgnoreCase("IX")) {
-            if (batch.contains("Monday")) return "RAC IX Science Monday, 2026";
-            if (batch.contains("Tuesday")) return "RAC IX Science, Tuesday 2026";
+        // Strict hard mapping: maps Class + UI Batch to EXACT Google Sheet Name
+        String c = className.trim().toUpperCase();
+        String b = batch.trim().toUpperCase();
+
+        if (c.equals("X")) {
+            if (b.contains("MONDAY")) return "RAC Monday(Science) X, 26";
+            if (b.contains("6-7"))  return "RAC X Science ,6-7pm (2026)";
+            if (b.contains("7-8"))  return "RAC X Science,7-8 (2026)";
+        } else if (c.equals("IX")) {
+            if (b.contains("MONDAY"))  return "RAC IX Science Monday, 2026";
+            if (b.contains("TUESDAY")) return "RAC IX Science, Tuesday 2026";
         }
         return null;
-    }
-
-    private boolean isSheetMatch(String sheetName, String targetName, String className, String batch) {
-        if (targetName != null && sheetName.equalsIgnoreCase(targetName)) return true;
-        
-        // Fallback fuzzy match
-        String s = sheetName.toUpperCase();
-        String c = className.toUpperCase();
-        String b = batch.toUpperCase();
-        
-        if (s.contains(c)) {
-            if (b.contains("6-7") && s.contains("6-7")) return true;
-            if (b.contains("7-8") && s.contains("7-8")) return true;
-            if (b.contains("MONDAY") && s.contains("MONDAY")) return true;
-            if (b.contains("TUESDAY") && s.contains("TUESDAY") && !s.contains("6-7") && !s.contains("7-8")) return true;
-        }
-        
-        return false;
     }
 
     private String resolvePhone(String upperName, String rollNo,

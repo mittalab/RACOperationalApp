@@ -13255,3 +13255,374 @@ org.rac.services.WhatsAppApiService$WhatsAppApiException: WhatsApp API error 404
 2026-05-22 12:52:34 [JavaFX Application Thread] INFO  org.rac.Main - Stopping RAC Operational App
 2026-05-29 18:29:16 [org.rac.services.GoogleVerificationService.main()] INFO  o.r.s.GoogleVerificationService - Connecting to Google Sheets for spreadsheet: 16kElua-wgKkFJRkW8dzOPv9wzadYmKV9P_ydbr3BPFk
 2026-05-29 18:29:19 [org.rac.services.GoogleVerificationService.main()] INFO  o.r.s.GoogleVerificationService - Successfully retrieved 5 sheet names
+2026-05-30 08:59:16 [JavaFX Application Thread] INFO  org.rac.Main - Starting RAC Operational App
+2026-05-30 08:59:17 [JavaFX Application Thread] INFO  org.rac.Main - Showing Main View
+2026-05-30 08:59:18 [JavaFX Application Thread] INFO  org.rac.gui.MainViewController - Initializing MainViewController
+2026-05-30 08:59:18 [JavaFX Application Thread] INFO  org.rac.gui.MainViewController - Loaded 2 activities in sidebar
+2026-05-30 08:59:23 [JavaFX Application Thread] INFO  org.rac.gui.MainViewController - Navigating to activity: Send Results to Parents
+2026-05-30 08:59:23 [JavaFX Application Thread] INFO  org.rac.Main - Showing Activity View: /org/rac/gui/SendResultsView.fxml
+2026-05-30 08:59:23 [JavaFX Application Thread] INFO  o.rac.gui.SendResultsViewController - Initializing SendResultsViewController
+2026-05-30 09:00:06 [JavaFX Application Thread] INFO  o.rac.gui.SendResultsViewController - Excel file selected: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\file_X_Monday_student_data.xlsx
+2026-05-30 09:00:06 [JavaFX Application Thread] INFO  o.rac.gui.SendResultsViewController - Auto-populated: class='X', batch='Monday Batch', standardFormat=true
+2026-05-30 09:00:20 [JavaFX Application Thread] INFO  o.rac.gui.SendResultsViewController - handleProceed clicked
+2026-05-30 09:00:20 [Thread-5] INFO  o.rac.gui.SendResultsViewController - Starting cloud sync with spreadsheet ID: 1WzK6Le_v9jPXcKous50Pjs3smnhC3tWIoDiyhmUXulI
+2026-05-30 09:00:20 [Thread-5] INFO  org.rac.services.GoogleDriveService - Downloading Google Spreadsheet 1WzK6Le_v9jPXcKous50Pjs3smnhC3tWIoDiyhmUXulI as Excel to C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\717cc678-07c4-45ac-8804-581970e7da9c_png\cloud_contacts.xlsx
+2026-05-30 09:00:20 [Thread-5] ERROR o.rac.gui.SendResultsViewController - Cloud sync failed
+java.io.FileNotFoundException: google-credentials.json (The system cannot find the file specified)
+	at java.base/java.io.FileInputStream.open0(Native Method)
+	at java.base/java.io.FileInputStream.open(FileInputStream.java:185)
+	at java.base/java.io.FileInputStream.<init>(FileInputStream.java:139)
+	at java.base/java.io.FileInputStream.<init>(FileInputStream.java:109)
+	at org.rac.services.GoogleDriveService.getDriveService(GoogleDriveService.java:26)
+	at org.rac.services.GoogleDriveService.downloadSpreadsheetAsExcel(GoogleDriveService.java:40)
+	at org.rac.gui.SendResultsViewController.syncWithCloud(SendResultsViewController.java:85)
+	at org.rac.gui.SendResultsViewController.lambda$handleProceed$0(SendResultsViewController.java:189)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+2026-05-30 09:00:20 [Thread-5] INFO  org.rac.services.ExcelReaderService - Reading Marks file: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\file_X_Monday_student_data.xlsx, Cloud Contacts file: None, Class: X, Batch: Monday Batch
+2026-05-30 09:00:21 [Thread-5] INFO  org.rac.services.ExcelReaderService - Read 1 students, 1 validation errors, 0 absent
+2026-05-30 09:05:46 [JavaFX Application Thread] INFO  org.rac.Main - Starting RAC Operational App
+2026-05-30 09:05:46 [JavaFX Application Thread] INFO  org.rac.Main - Showing Main View
+2026-05-30 09:05:47 [JavaFX Application Thread] INFO  org.rac.gui.MainViewController - Initializing MainViewController
+2026-05-30 09:05:47 [JavaFX Application Thread] INFO  org.rac.gui.MainViewController - Loaded 2 activities in sidebar
+2026-05-30 09:06:35 [JavaFX Application Thread] INFO  org.rac.gui.MainViewController - Navigating to activity: Send Results to Parents
+2026-05-30 09:06:35 [JavaFX Application Thread] INFO  org.rac.Main - Showing Activity View: /org/rac/gui/SendResultsView.fxml
+2026-05-30 09:06:36 [JavaFX Application Thread] INFO  o.rac.gui.SendResultsViewController - Initializing SendResultsViewController
+2026-05-30 09:06:45 [JavaFX Application Thread] INFO  o.rac.gui.SendResultsViewController - Excel file selected: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\file_X_Monday_student_data.xlsx
+2026-05-30 09:06:45 [JavaFX Application Thread] INFO  o.rac.gui.SendResultsViewController - Auto-populated: class='X', batch='Monday Batch', standardFormat=true
+2026-05-30 09:06:56 [JavaFX Application Thread] INFO  o.rac.gui.SendResultsViewController - handleProceed clicked
+2026-05-30 09:06:56 [Thread-5] INFO  o.rac.gui.SendResultsViewController - Starting cloud sync with spreadsheet ID: 1WzK6Le_v9jPXcKous50Pjs3smnhC3tWIoDiyhmUXulI
+2026-05-30 09:06:56 [Thread-5] INFO  org.rac.services.GoogleDriveService - Downloading Google Spreadsheet 1WzK6Le_v9jPXcKous50Pjs3smnhC3tWIoDiyhmUXulI as Excel to C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\68c85b73-1326-4bf9-9c19-1dfb6d155195_png\cloud_contacts.xlsx
+2026-05-30 09:06:58 [Thread-5] INFO  org.rac.services.GoogleDriveService - Successfully downloaded spreadsheet to 17547
+2026-05-30 09:06:58 [Thread-5] INFO  o.rac.gui.SendResultsViewController - Cloud sync successful: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\68c85b73-1326-4bf9-9c19-1dfb6d155195_png\cloud_contacts.xlsx
+2026-05-30 09:06:58 [Thread-5] INFO  org.rac.services.ExcelReaderService - Reading Marks file: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\file_X_Monday_student_data.xlsx, Cloud Contacts file: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\68c85b73-1326-4bf9-9c19-1dfb6d155195_png\cloud_contacts.xlsx, Class: X, Batch: Monday Batch
+2026-05-30 09:06:59 [Thread-5] INFO  org.rac.services.ExcelReaderService - Targeting sheet: 'RAC Monday(Science) X, 26' for class 'X' and batch 'Monday Batch'
+2026-05-30 09:06:59 [Thread-5] INFO  org.rac.services.ExcelReaderService - Aggregated contacts: 4 unique names from matched sheets
+2026-05-30 09:06:59 [Thread-5] INFO  org.rac.services.ExcelReaderService - Read 1 students, 0 validation errors, 3 absent
+2026-05-30 09:07:12 [Thread-5] INFO  org.rac.services.ResultImageService - Generating result image for student: B , template path: C:\Users\29abh\AppData\Local\Temp\result_template_45703754325769084814.html
+2026-05-30 09:07:12 [Thread-5] INFO  org.rac.services.ResultImageService - Read HTML template content
+2026-05-30 09:07:12 [Thread-5] INFO  org.rac.services.ResultImageService - Populated HTML template with student data
+2026-05-30 09:07:12 [Thread-5] INFO  org.rac.services.ResultImageService - 40
+2026-05-30 09:07:12 [Thread-5] INFO  org.rac.services.ResultImageService - Generated HTML content written for debugging: result_B_919811658385_0.html
+2026-05-30 09:07:17 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Uploading media: result_B_919811658385_0.png
+2026-05-30 09:07:19 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Media uploaded successfully, id=27125036040483207
+2026-05-30 09:07:19 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Sending student result to 919811658385
+2026-05-30 09:07:20 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Message sent, id=wamid.HBgMOTE5ODExNjU4Mzg1FQIAERgSMDIxMTIzOTJBMzM5MTJFMzRCAA==
+2026-05-30 09:07:20 [Thread-5] INFO  o.rac.gui.SendResultsViewController - WhatsApp sent: B → 919811658385
+2026-05-30 09:07:20 [Thread-5] INFO  org.rac.services.ResultImageService - Generating topper list image for 1 toppers
+2026-05-30 09:07:21 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Uploading media: Toppers_List.png
+2026-05-30 09:07:22 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Media uploaded successfully, id=4365560930376887
+2026-05-30 09:07:22 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Sending topper result to admin
+2026-05-30 09:07:23 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Message sent, id=wamid.HBgMOTE4NTI3OTQwMDkxFQIAERgSNzIyMUMwODVERTMzMjZBMEVFAA==
+2026-05-30 09:07:23 [Thread-5] INFO  o.rac.gui.SendResultsViewController - Topper result sent to admin, wamid=wamid.HBgMOTE4NTI3OTQwMDkxFQIAERgSNzIyMUMwODVERTMzMjZBMEVFAA==
+2026-05-30 09:07:23 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Sending result summary to admin
+2026-05-30 09:07:24 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Message sent, id=wamid.HBgMOTE4NTI3OTQwMDkxFQIAERgSMEM0QjIzMjVFNTM1REIxQzUxAA==
+2026-05-30 09:07:24 [Thread-5] INFO  o.rac.gui.SendResultsViewController - Result summary sent to admin, wamid=wamid.HBgMOTE4NTI3OTQwMDkxFQIAERgSMEM0QjIzMjVFNTM1REIxQzUxAA==
+2026-05-30 09:07:24 [Thread-5] INFO  org.rac.services.ResultImageService - Generating absent notice image for 3 students
+2026-05-30 09:07:25 [Thread-5] INFO  o.rac.gui.SendResultsViewController - Absent notice image generated: Absent_Notice.png
+2026-05-30 09:07:25 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Sending absent summary to admin
+2026-05-30 09:07:26 [Thread-5] ERROR o.rac.gui.SendResultsViewController - Failed sending absent summary template (template may not be registered)
+org.rac.services.WhatsAppApiService$WhatsAppApiException: WhatsApp API error 400: {"error":{"message":"(#132012) Parameter format does not match format in the created template","code":132012,"type":"OAuthException","error_data":{"messaging_product":"whatsapp","details":"header: Format mismatch, expected IMAGE, received UNKNOWN"},"fbtrace_id":"Al5DVmnSpPiq7U-fM20qW26"}}
+	at org.rac.services.WhatsAppApiService.lambda$postMessage$0(WhatsAppApiService.java:265)
+	at org.rac.services.WhatsAppApiService.executeWithRetry(WhatsAppApiService.java:61)
+	at org.rac.services.WhatsAppApiService.postMessage(WhatsAppApiService.java:253)
+	at org.rac.services.WhatsAppApiService.sendAbsentSummary(WhatsAppApiService.java:248)
+	at org.rac.gui.SendResultsViewController.lambda$handleProceed$0(SendResultsViewController.java:374)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+2026-05-30 09:07:26 [Thread-5] INFO  org.rac.services.ExcelWriterService - Writing run report to: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\68c85b73-1326-4bf9-9c19-1dfb6d155195_png\run_report.xlsx
+2026-05-30 09:07:26 [Thread-5] INFO  org.rac.services.ExcelWriterService - Run report written with 1 student rows
+2026-05-30 09:37:27 [JavaFX Application Thread] INFO  org.rac.Main - Showing Main View
+2026-05-30 09:37:27 [JavaFX Application Thread] INFO  org.rac.gui.MainViewController - Initializing MainViewController
+2026-05-30 09:37:27 [JavaFX Application Thread] INFO  org.rac.gui.MainViewController - Loaded 2 activities in sidebar
+2026-05-30 09:37:29 [JavaFX Application Thread] INFO  org.rac.gui.MainViewController - Navigating to activity: Check WhatsApp Status
+2026-05-30 09:37:29 [JavaFX Application Thread] INFO  org.rac.Main - Showing Activity View: /org/rac/gui/CheckWamidStatusView.fxml
+2026-05-30 09:37:31 [JavaFX Application Thread] INFO  org.rac.Main - Showing Main View
+2026-05-30 09:37:31 [JavaFX Application Thread] INFO  org.rac.gui.MainViewController - Initializing MainViewController
+2026-05-30 09:37:31 [JavaFX Application Thread] INFO  org.rac.gui.MainViewController - Loaded 2 activities in sidebar
+2026-05-30 09:37:32 [JavaFX Application Thread] INFO  org.rac.gui.MainViewController - Navigating to activity: Send Results to Parents
+2026-05-30 09:37:32 [JavaFX Application Thread] INFO  org.rac.Main - Showing Activity View: /org/rac/gui/SendResultsView.fxml
+2026-05-30 09:37:32 [JavaFX Application Thread] INFO  o.rac.gui.SendResultsViewController - Initializing SendResultsViewController
+2026-05-30 09:37:34 [JavaFX Application Thread] INFO  org.rac.Main - Stopping RAC Operational App
+2026-05-30 09:43:08 [JavaFX Application Thread] INFO  org.rac.Main - Starting RAC Operational App
+2026-05-30 09:43:08 [JavaFX Application Thread] INFO  org.rac.Main - Showing Main View
+2026-05-30 09:43:09 [JavaFX Application Thread] INFO  org.rac.gui.MainViewController - Initializing MainViewController
+2026-05-30 09:43:09 [JavaFX Application Thread] INFO  org.rac.gui.MainViewController - Loaded 2 activities in sidebar
+2026-05-30 09:43:11 [JavaFX Application Thread] INFO  org.rac.gui.MainViewController - Navigating to activity: Send Results to Parents
+2026-05-30 09:43:11 [JavaFX Application Thread] INFO  org.rac.Main - Showing Activity View: /org/rac/gui/SendResultsView.fxml
+2026-05-30 09:43:11 [JavaFX Application Thread] INFO  o.rac.gui.SendResultsViewController - Initializing SendResultsViewController
+2026-05-30 09:43:24 [JavaFX Application Thread] INFO  o.rac.gui.SendResultsViewController - Excel file selected: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\file_X_Monday_student_data.xlsx
+2026-05-30 09:43:24 [JavaFX Application Thread] INFO  o.rac.gui.SendResultsViewController - Auto-populated: class='X', batch='Monday Batch', standardFormat=true
+2026-05-30 09:43:33 [JavaFX Application Thread] INFO  o.rac.gui.SendResultsViewController - handleProceed clicked
+2026-05-30 09:43:33 [Thread-5] INFO  o.rac.gui.SendResultsViewController - Starting cloud sync with spreadsheet ID: 1WzK6Le_v9jPXcKous50Pjs3smnhC3tWIoDiyhmUXulI
+2026-05-30 09:43:33 [Thread-5] INFO  org.rac.services.GoogleDriveService - Downloading Google Spreadsheet 1WzK6Le_v9jPXcKous50Pjs3smnhC3tWIoDiyhmUXulI as Excel to C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\243f6eb7-6096-417c-be5a-77de06428ec3_png\cloud_contacts.xlsx
+2026-05-30 09:43:36 [Thread-5] INFO  org.rac.services.GoogleDriveService - Successfully downloaded spreadsheet, size: 17547 bytes
+2026-05-30 09:43:36 [Thread-5] INFO  o.rac.gui.SendResultsViewController - Cloud sync successful: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\243f6eb7-6096-417c-be5a-77de06428ec3_png\cloud_contacts.xlsx
+2026-05-30 09:43:36 [Thread-5] INFO  org.rac.services.ExcelReaderService - Reading Marks file: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\file_X_Monday_student_data.xlsx, Cloud Contacts file: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\243f6eb7-6096-417c-be5a-77de06428ec3_png\cloud_contacts.xlsx, Class: X, Batch: Monday Batch
+2026-05-30 09:43:36 [Thread-5] INFO  org.rac.services.ExcelReaderService - Targeting sheet: 'RAC Monday(Science) X, 26' for class 'X' and batch 'Monday Batch'
+2026-05-30 09:43:36 [Thread-5] INFO  org.rac.services.ExcelReaderService - Aggregated contacts: 2 unique names from matched sheets
+2026-05-30 09:43:36 [Thread-5] INFO  org.rac.services.ExcelReaderService - Read 1 students, 0 validation errors, 1 absent
+2026-05-30 09:43:41 [Thread-5] INFO  org.rac.services.ResultImageService - Generating result image for student: B , template path: C:\Users\29abh\AppData\Local\Temp\result_template_411976352006293216105.html
+2026-05-30 09:43:41 [Thread-5] INFO  org.rac.services.ResultImageService - Read HTML template content
+2026-05-30 09:43:41 [Thread-5] INFO  org.rac.services.ResultImageService - Populated HTML template with student data
+2026-05-30 09:43:41 [Thread-5] INFO  org.rac.services.ResultImageService - 40
+2026-05-30 09:43:41 [Thread-5] INFO  org.rac.services.ResultImageService - Generated HTML content written for debugging: result_B_919811658385_0.html
+2026-05-30 09:43:42 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Uploading media: result_B_919811658385_0.png
+2026-05-30 09:43:44 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Media uploaded successfully, id=1470702291764151
+2026-05-30 09:43:44 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Sending student result to 919811658385
+2026-05-30 09:43:44 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Message sent, id=wamid.HBgMOTE5ODExNjU4Mzg1FQIAERgSQjE0NjQyNzUyMzBBREU0NTMxAA==
+2026-05-30 09:43:44 [Thread-5] INFO  o.rac.gui.SendResultsViewController - WhatsApp sent: B → 919811658385
+2026-05-30 09:43:44 [Thread-5] INFO  org.rac.services.ResultImageService - Generating topper list image for 1 toppers
+2026-05-30 09:43:45 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Uploading media: Toppers_List.png
+2026-05-30 09:43:46 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Media uploaded successfully, id=2075274059870034
+2026-05-30 09:43:46 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Sending topper result to admin
+2026-05-30 09:43:47 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Message sent, id=wamid.HBgMOTE4NTI3OTQwMDkxFQIAERgSMjZCQTc1RUI5RUUwMDM0MUFCAA==
+2026-05-30 09:43:47 [Thread-5] INFO  o.rac.gui.SendResultsViewController - Topper result sent to admin, wamid=wamid.HBgMOTE4NTI3OTQwMDkxFQIAERgSMjZCQTc1RUI5RUUwMDM0MUFCAA==
+2026-05-30 09:43:47 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Sending result summary to admin
+2026-05-30 09:43:48 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Message sent, id=wamid.HBgMOTE4NTI3OTQwMDkxFQIAERgSRDlEOEQyRDBFMTdFRjIyRkJDAA==
+2026-05-30 09:43:48 [Thread-5] INFO  o.rac.gui.SendResultsViewController - Result summary sent to admin, wamid=wamid.HBgMOTE4NTI3OTQwMDkxFQIAERgSRDlEOEQyRDBFMTdFRjIyRkJDAA==
+2026-05-30 09:43:48 [Thread-5] INFO  org.rac.services.ResultImageService - Generating absent notice image for 1 students
+2026-05-30 09:43:49 [Thread-5] INFO  o.rac.gui.SendResultsViewController - Absent notice image generated: Absent_Notice.png
+2026-05-30 09:43:49 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Uploading media: Absent_Notice.png
+2026-05-30 09:43:50 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Media uploaded successfully, id=1729037564920803
+2026-05-30 09:43:50 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Sending absent summary to admin
+2026-05-30 09:43:51 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Message sent, id=wamid.HBgMOTE4NTI3OTQwMDkxFQIAERgSRUUyQkRDMEU1NkE1OTFDOEE2AA==
+2026-05-30 09:43:51 [Thread-5] INFO  o.rac.gui.SendResultsViewController - Absent summary template sent to admin
+2026-05-30 09:43:51 [Thread-5] INFO  org.rac.services.ExcelWriterService - Writing run report to: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\243f6eb7-6096-417c-be5a-77de06428ec3_png\run_report.xlsx
+2026-05-30 09:43:51 [Thread-5] INFO  org.rac.services.ExcelWriterService - Run report written with 1 student rows
+2026-05-30 09:44:45 [JavaFX Application Thread] INFO  o.rac.gui.SendResultsViewController - Excel file selected: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\file_X_Monday_student_data.xlsx
+2026-05-30 09:44:45 [JavaFX Application Thread] INFO  o.rac.gui.SendResultsViewController - Auto-populated: class='X', batch='Monday Batch', standardFormat=true
+2026-05-30 09:44:47 [JavaFX Application Thread] INFO  o.rac.gui.SendResultsViewController - handleProceed clicked
+2026-05-30 09:44:47 [Thread-12] INFO  o.rac.gui.SendResultsViewController - Starting cloud sync with spreadsheet ID: 1WzK6Le_v9jPXcKous50Pjs3smnhC3tWIoDiyhmUXulI
+2026-05-30 09:44:47 [Thread-12] INFO  org.rac.services.GoogleDriveService - Downloading Google Spreadsheet 1WzK6Le_v9jPXcKous50Pjs3smnhC3tWIoDiyhmUXulI as Excel to C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\7ce9f8ce-f1fb-42f6-b48d-e5ba5bacccb3_png\cloud_contacts.xlsx
+2026-05-30 09:44:48 [Thread-12] INFO  org.rac.services.GoogleDriveService - Successfully downloaded spreadsheet, size: 17547 bytes
+2026-05-30 09:44:48 [Thread-12] INFO  o.rac.gui.SendResultsViewController - Cloud sync successful: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\7ce9f8ce-f1fb-42f6-b48d-e5ba5bacccb3_png\cloud_contacts.xlsx
+2026-05-30 09:44:48 [Thread-12] INFO  org.rac.services.ExcelReaderService - Reading Marks file: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\file_X_Monday_student_data.xlsx, Cloud Contacts file: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\7ce9f8ce-f1fb-42f6-b48d-e5ba5bacccb3_png\cloud_contacts.xlsx, Class: X, Batch: Monday Batch
+2026-05-30 09:44:48 [Thread-12] INFO  org.rac.services.ExcelReaderService - Targeting sheet: 'RAC Monday(Science) X, 26' for class 'X' and batch 'Monday Batch'
+2026-05-30 09:44:48 [Thread-12] INFO  org.rac.services.ExcelReaderService - Aggregated contacts: 2 unique names from matched sheets
+2026-05-30 09:44:48 [Thread-12] INFO  org.rac.services.ExcelReaderService - Read 1 students, 1 validation errors, 2 absent
+2026-05-30 09:45:03 [JavaFX Application Thread] INFO  org.rac.Main - Stopping RAC Operational App
+2026-05-30 09:45:40 [JavaFX Application Thread] INFO  org.rac.Main - Starting RAC Operational App
+2026-05-30 09:45:40 [JavaFX Application Thread] INFO  org.rac.Main - Showing Main View
+2026-05-30 09:45:41 [JavaFX Application Thread] INFO  org.rac.gui.MainViewController - Initializing MainViewController
+2026-05-30 09:45:41 [JavaFX Application Thread] INFO  org.rac.gui.MainViewController - Loaded 2 activities in sidebar
+2026-05-30 09:46:40 [JavaFX Application Thread] INFO  org.rac.gui.MainViewController - Navigating to activity: Send Results to Parents
+2026-05-30 09:46:40 [JavaFX Application Thread] INFO  org.rac.Main - Showing Activity View: /org/rac/gui/SendResultsView.fxml
+2026-05-30 09:46:40 [JavaFX Application Thread] INFO  o.rac.gui.SendResultsViewController - Initializing SendResultsViewController
+2026-05-30 09:46:47 [JavaFX Application Thread] INFO  o.rac.gui.SendResultsViewController - Excel file selected: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\file_X_Tuesday_6_7_student_data.xlsx
+2026-05-30 09:46:47 [JavaFX Application Thread] INFO  o.rac.gui.SendResultsViewController - Auto-populated: class='X', batch='Tuesday Batch (6-7 PM)', standardFormat=true
+2026-05-30 09:47:26 [JavaFX Application Thread] INFO  o.rac.gui.SendResultsViewController - handleProceed clicked
+2026-05-30 09:47:26 [Thread-5] INFO  o.rac.gui.SendResultsViewController - Starting cloud sync with spreadsheet ID: 1WzK6Le_v9jPXcKous50Pjs3smnhC3tWIoDiyhmUXulI
+2026-05-30 09:47:26 [Thread-5] INFO  org.rac.services.GoogleDriveService - Downloading Google Spreadsheet 1WzK6Le_v9jPXcKous50Pjs3smnhC3tWIoDiyhmUXulI as Excel to C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\02abeabf-8505-4014-9d14-37e2029b360a_png\cloud_contacts.xlsx
+2026-05-30 09:47:28 [Thread-5] INFO  org.rac.services.GoogleDriveService - Successfully downloaded spreadsheet, size: 17547 bytes
+2026-05-30 09:47:28 [Thread-5] INFO  o.rac.gui.SendResultsViewController - Cloud sync successful: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\02abeabf-8505-4014-9d14-37e2029b360a_png\cloud_contacts.xlsx
+2026-05-30 09:47:28 [Thread-5] INFO  org.rac.services.ExcelReaderService - Reading Marks file: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\file_X_Tuesday_6_7_student_data.xlsx, Cloud Contacts file: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\02abeabf-8505-4014-9d14-37e2029b360a_png\cloud_contacts.xlsx, Class: X, Batch: Tuesday Batch (6-7 PM)
+2026-05-30 09:47:29 [Thread-5] INFO  org.rac.services.ExcelReaderService - Targeting sheet: 'RAC X Science ,6-7pm (2026)' for class 'X' and batch 'Tuesday Batch (6-7 PM)'
+2026-05-30 09:47:29 [Thread-5] INFO  org.rac.services.ExcelReaderService - Aggregated contacts: 2 unique names from matched sheets
+2026-05-30 09:47:29 [Thread-5] INFO  org.rac.services.ExcelReaderService - Read 1 students, 0 validation errors, 1 absent
+2026-05-30 09:47:33 [Thread-5] INFO  org.rac.services.ResultImageService - Generating result image for student: C , template path: C:\Users\29abh\AppData\Local\Temp\result_template_44594221485679836447.html
+2026-05-30 09:47:33 [Thread-5] INFO  org.rac.services.ResultImageService - Read HTML template content
+2026-05-30 09:47:33 [Thread-5] INFO  org.rac.services.ResultImageService - Populated HTML template with student data
+2026-05-30 09:47:33 [Thread-5] INFO  org.rac.services.ResultImageService - 40
+2026-05-30 09:47:33 [Thread-5] INFO  org.rac.services.ResultImageService - Generated HTML content written for debugging: result_C_919811658385_0.html
+2026-05-30 09:47:34 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Uploading media: result_C_919811658385_0.png
+2026-05-30 09:47:36 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Media uploaded successfully, id=1781695666134362
+2026-05-30 09:47:36 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Sending student result to 919811658385
+2026-05-30 09:47:37 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Message sent, id=wamid.HBgMOTE5ODExNjU4Mzg1FQIAERgSQTY5NzY1OEQ0NUVBNjRFQTJFAA==
+2026-05-30 09:47:37 [Thread-5] INFO  o.rac.gui.SendResultsViewController - WhatsApp sent: C → 919811658385
+2026-05-30 09:47:37 [Thread-5] INFO  org.rac.services.ResultImageService - Generating topper list image for 1 toppers
+2026-05-30 09:47:38 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Uploading media: Toppers_List.png
+2026-05-30 09:47:39 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Media uploaded successfully, id=1526504175843548
+2026-05-30 09:47:39 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Sending topper result to admin
+2026-05-30 09:47:40 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Message sent, id=wamid.HBgMOTE4NTI3OTQwMDkxFQIAERgSOEZBODFFRjAzMjBCMjQxMzNCAA==
+2026-05-30 09:47:40 [Thread-5] INFO  o.rac.gui.SendResultsViewController - Topper result sent to admin, wamid=wamid.HBgMOTE4NTI3OTQwMDkxFQIAERgSOEZBODFFRjAzMjBCMjQxMzNCAA==
+2026-05-30 09:47:40 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Sending result summary to admin
+2026-05-30 09:47:40 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Message sent, id=wamid.HBgMOTE4NTI3OTQwMDkxFQIAERgSRDQwM0RBRTRCMkJENzdENzc4AA==
+2026-05-30 09:47:40 [Thread-5] INFO  o.rac.gui.SendResultsViewController - Result summary sent to admin, wamid=wamid.HBgMOTE4NTI3OTQwMDkxFQIAERgSRDQwM0RBRTRCMkJENzdENzc4AA==
+2026-05-30 09:47:40 [Thread-5] INFO  org.rac.services.ResultImageService - Generating absent notice image for 1 students
+2026-05-30 09:47:41 [Thread-5] INFO  o.rac.gui.SendResultsViewController - Absent notice image generated: Absent_Notice.png
+2026-05-30 09:47:41 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Uploading media: Absent_Notice.png
+2026-05-30 09:47:43 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Media uploaded successfully, id=2791366481196416
+2026-05-30 09:47:43 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Sending absent summary to admin
+2026-05-30 09:47:43 [Thread-5] INFO  org.rac.services.WhatsAppApiService - Message sent, id=wamid.HBgMOTE4NTI3OTQwMDkxFQIAERgSNzlCRDk2NTlFMEM0RDE4MTlBAA==
+2026-05-30 09:47:43 [Thread-5] INFO  o.rac.gui.SendResultsViewController - Absent summary template sent to admin
+2026-05-30 09:47:43 [Thread-5] INFO  org.rac.services.ExcelWriterService - Writing run report to: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\02abeabf-8505-4014-9d14-37e2029b360a_png\run_report.xlsx
+2026-05-30 09:47:43 [Thread-5] INFO  org.rac.services.ExcelWriterService - Run report written with 1 student rows
+2026-05-30 09:48:15 [JavaFX Application Thread] INFO  o.rac.gui.SendResultsViewController - Excel file selected: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\file_X_Tuesday_7_8_student_data.xlsx
+2026-05-30 09:48:15 [JavaFX Application Thread] INFO  o.rac.gui.SendResultsViewController - Auto-populated: class='X', batch='Tuesday Batch (7-8 PM)', standardFormat=true
+2026-05-30 09:48:21 [JavaFX Application Thread] INFO  o.rac.gui.SendResultsViewController - handleProceed clicked
+2026-05-30 09:48:21 [Thread-12] INFO  o.rac.gui.SendResultsViewController - Starting cloud sync with spreadsheet ID: 1WzK6Le_v9jPXcKous50Pjs3smnhC3tWIoDiyhmUXulI
+2026-05-30 09:48:21 [Thread-12] INFO  org.rac.services.GoogleDriveService - Downloading Google Spreadsheet 1WzK6Le_v9jPXcKous50Pjs3smnhC3tWIoDiyhmUXulI as Excel to C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\bb71d649-553b-43b0-a043-26c76bb5c0b1_png\cloud_contacts.xlsx
+2026-05-30 09:48:23 [Thread-12] INFO  org.rac.services.GoogleDriveService - Successfully downloaded spreadsheet, size: 17547 bytes
+2026-05-30 09:48:23 [Thread-12] INFO  o.rac.gui.SendResultsViewController - Cloud sync successful: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\bb71d649-553b-43b0-a043-26c76bb5c0b1_png\cloud_contacts.xlsx
+2026-05-30 09:48:23 [Thread-12] INFO  org.rac.services.ExcelReaderService - Reading Marks file: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\file_X_Tuesday_7_8_student_data.xlsx, Cloud Contacts file: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\bb71d649-553b-43b0-a043-26c76bb5c0b1_png\cloud_contacts.xlsx, Class: X, Batch: Tuesday Batch (7-8 PM)
+2026-05-30 09:48:23 [Thread-12] INFO  org.rac.services.ExcelReaderService - Targeting sheet: 'RAC X Science,7-8 (2026)' for class 'X' and batch 'Tuesday Batch (7-8 PM)'
+2026-05-30 09:48:23 [Thread-12] INFO  org.rac.services.ExcelReaderService - Aggregated contacts: 2 unique names from matched sheets
+2026-05-30 09:48:23 [Thread-12] INFO  org.rac.services.ExcelReaderService - Read 1 students, 0 validation errors, 1 absent
+2026-05-30 09:48:29 [Thread-12] INFO  org.rac.services.ResultImageService - Generating result image for student: E , template path: C:\Users\29abh\AppData\Local\Temp\result_template_44594221485679836447.html
+2026-05-30 09:48:29 [Thread-12] INFO  org.rac.services.ResultImageService - Read HTML template content
+2026-05-30 09:48:29 [Thread-12] INFO  org.rac.services.ResultImageService - Populated HTML template with student data
+2026-05-30 09:48:29 [Thread-12] INFO  org.rac.services.ResultImageService - 40
+2026-05-30 09:48:29 [Thread-12] INFO  org.rac.services.ResultImageService - Generated HTML content written for debugging: result_E_919811658385_0.html
+2026-05-30 09:48:30 [Thread-12] INFO  org.rac.services.WhatsAppApiService - Uploading media: result_E_919811658385_0.png
+2026-05-30 09:48:31 [Thread-12] INFO  org.rac.services.WhatsAppApiService - Media uploaded successfully, id=983218887898269
+2026-05-30 09:48:31 [Thread-12] INFO  org.rac.services.WhatsAppApiService - Sending student result to 919811658385
+2026-05-30 09:48:32 [Thread-12] INFO  org.rac.services.WhatsAppApiService - Message sent, id=wamid.HBgMOTE5ODExNjU4Mzg1FQIAERgSMDU2NkM0OEVFQzVEODI5QTk2AA==
+2026-05-30 09:48:32 [Thread-12] INFO  o.rac.gui.SendResultsViewController - WhatsApp sent: E → 919811658385
+2026-05-30 09:48:32 [Thread-12] INFO  org.rac.services.ResultImageService - Generating topper list image for 1 toppers
+2026-05-30 09:48:33 [Thread-12] INFO  org.rac.services.WhatsAppApiService - Uploading media: Toppers_List.png
+2026-05-30 09:48:34 [Thread-12] INFO  org.rac.services.WhatsAppApiService - Media uploaded successfully, id=871975778574193
+2026-05-30 09:48:34 [Thread-12] INFO  org.rac.services.WhatsAppApiService - Sending topper result to admin
+2026-05-30 09:48:35 [Thread-12] INFO  org.rac.services.WhatsAppApiService - Message sent, id=wamid.HBgMOTE4NTI3OTQwMDkxFQIAERgSRTI2MDdFQUIwQjMyRkVFNzM3AA==
+2026-05-30 09:48:35 [Thread-12] INFO  o.rac.gui.SendResultsViewController - Topper result sent to admin, wamid=wamid.HBgMOTE4NTI3OTQwMDkxFQIAERgSRTI2MDdFQUIwQjMyRkVFNzM3AA==
+2026-05-30 09:48:35 [Thread-12] INFO  org.rac.services.WhatsAppApiService - Sending result summary to admin
+2026-05-30 09:48:36 [Thread-12] INFO  org.rac.services.WhatsAppApiService - Message sent, id=wamid.HBgMOTE4NTI3OTQwMDkxFQIAERgSNDExRDU1QzgzOTJEMDY0RjBDAA==
+2026-05-30 09:48:36 [Thread-12] INFO  o.rac.gui.SendResultsViewController - Result summary sent to admin, wamid=wamid.HBgMOTE4NTI3OTQwMDkxFQIAERgSNDExRDU1QzgzOTJEMDY0RjBDAA==
+2026-05-30 09:48:36 [Thread-12] INFO  org.rac.services.ResultImageService - Generating absent notice image for 1 students
+2026-05-30 09:48:36 [Thread-12] INFO  o.rac.gui.SendResultsViewController - Absent notice image generated: Absent_Notice.png
+2026-05-30 09:48:36 [Thread-12] INFO  org.rac.services.WhatsAppApiService - Uploading media: Absent_Notice.png
+2026-05-30 09:48:38 [Thread-12] INFO  org.rac.services.WhatsAppApiService - Media uploaded successfully, id=1536101021558578
+2026-05-30 09:48:38 [Thread-12] INFO  org.rac.services.WhatsAppApiService - Sending absent summary to admin
+2026-05-30 09:48:38 [Thread-12] INFO  org.rac.services.WhatsAppApiService - Message sent, id=wamid.HBgMOTE4NTI3OTQwMDkxFQIAERgSQ0MwMENFRUREODQ0Nzk4RkMyAA==
+2026-05-30 09:48:38 [Thread-12] INFO  o.rac.gui.SendResultsViewController - Absent summary template sent to admin
+2026-05-30 09:48:38 [Thread-12] INFO  org.rac.services.ExcelWriterService - Writing run report to: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\bb71d649-553b-43b0-a043-26c76bb5c0b1_png\run_report.xlsx
+2026-05-30 09:48:38 [Thread-12] INFO  org.rac.services.ExcelWriterService - Run report written with 1 student rows
+2026-05-30 09:51:09 [JavaFX Application Thread] INFO  o.rac.gui.SendResultsViewController - Excel file selected: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\file_IX_Monday_student_data.xlsx
+2026-05-30 09:51:09 [JavaFX Application Thread] INFO  o.rac.gui.SendResultsViewController - Auto-populated: class='IX', batch='Monday Batch', standardFormat=true
+2026-05-30 09:51:12 [JavaFX Application Thread] INFO  o.rac.gui.SendResultsViewController - handleProceed clicked
+2026-05-30 09:51:12 [Thread-19] INFO  o.rac.gui.SendResultsViewController - Starting cloud sync with spreadsheet ID: 1WzK6Le_v9jPXcKous50Pjs3smnhC3tWIoDiyhmUXulI
+2026-05-30 09:51:12 [Thread-19] INFO  org.rac.services.GoogleDriveService - Downloading Google Spreadsheet 1WzK6Le_v9jPXcKous50Pjs3smnhC3tWIoDiyhmUXulI as Excel to C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\7ed64b44-8ef7-4870-a24e-e7a48361d6a2_png\cloud_contacts.xlsx
+2026-05-30 09:51:13 [Thread-19] INFO  org.rac.services.GoogleDriveService - Successfully downloaded spreadsheet, size: 17547 bytes
+2026-05-30 09:51:13 [Thread-19] INFO  o.rac.gui.SendResultsViewController - Cloud sync successful: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\7ed64b44-8ef7-4870-a24e-e7a48361d6a2_png\cloud_contacts.xlsx
+2026-05-30 09:51:13 [Thread-19] INFO  org.rac.services.ExcelReaderService - Reading Marks file: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\file_IX_Monday_student_data.xlsx, Cloud Contacts file: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\7ed64b44-8ef7-4870-a24e-e7a48361d6a2_png\cloud_contacts.xlsx, Class: IX, Batch: Monday Batch
+2026-05-30 09:51:13 [Thread-19] INFO  org.rac.services.ExcelReaderService - Targeting sheet: 'RAC IX Science Monday, 2026' for class 'IX' and batch 'Monday Batch'
+2026-05-30 09:51:13 [Thread-19] INFO  org.rac.services.ExcelReaderService - Aggregated contacts: 2 unique names from matched sheets
+2026-05-30 09:51:13 [Thread-19] INFO  org.rac.services.ExcelReaderService - Read 1 students, 0 validation errors, 1 absent
+2026-05-30 09:51:16 [Thread-19] INFO  org.rac.services.ResultImageService - Generating result image for student: G , template path: C:\Users\29abh\AppData\Local\Temp\result_template_44594221485679836447.html
+2026-05-30 09:51:16 [Thread-19] INFO  org.rac.services.ResultImageService - Read HTML template content
+2026-05-30 09:51:16 [Thread-19] INFO  org.rac.services.ResultImageService - Populated HTML template with student data
+2026-05-30 09:51:16 [Thread-19] INFO  org.rac.services.ResultImageService - 40
+2026-05-30 09:51:16 [Thread-19] INFO  org.rac.services.ResultImageService - Generated HTML content written for debugging: result_G_919811658385_0.html
+2026-05-30 09:51:17 [Thread-19] INFO  org.rac.services.WhatsAppApiService - Uploading media: result_G_919811658385_0.png
+2026-05-30 09:51:19 [Thread-19] INFO  org.rac.services.WhatsAppApiService - Media uploaded successfully, id=1504554304647708
+2026-05-30 09:51:19 [Thread-19] INFO  org.rac.services.WhatsAppApiService - Sending student result to 919811658385
+2026-05-30 09:51:20 [Thread-19] INFO  org.rac.services.WhatsAppApiService - Message sent, id=wamid.HBgMOTE5ODExNjU4Mzg1FQIAERgSRERDRUVFN0NDNUNFODVGRjdGAA==
+2026-05-30 09:51:20 [Thread-19] INFO  o.rac.gui.SendResultsViewController - WhatsApp sent: G → 919811658385
+2026-05-30 09:51:20 [Thread-19] INFO  org.rac.services.ResultImageService - Generating topper list image for 1 toppers
+2026-05-30 09:51:21 [Thread-19] INFO  org.rac.services.WhatsAppApiService - Uploading media: Toppers_List.png
+2026-05-30 09:51:22 [Thread-19] INFO  org.rac.services.WhatsAppApiService - Media uploaded successfully, id=1528348045303836
+2026-05-30 09:51:22 [Thread-19] INFO  org.rac.services.WhatsAppApiService - Sending topper result to admin
+2026-05-30 09:51:23 [Thread-19] INFO  org.rac.services.WhatsAppApiService - Message sent, id=wamid.HBgMOTE4NTI3OTQwMDkxFQIAERgSMEQ1RjVBQkRBMzc0NUQ1N0I1AA==
+2026-05-30 09:51:23 [Thread-19] INFO  o.rac.gui.SendResultsViewController - Topper result sent to admin, wamid=wamid.HBgMOTE4NTI3OTQwMDkxFQIAERgSMEQ1RjVBQkRBMzc0NUQ1N0I1AA==
+2026-05-30 09:51:23 [Thread-19] INFO  org.rac.services.WhatsAppApiService - Sending result summary to admin
+2026-05-30 09:51:24 [Thread-19] INFO  org.rac.services.WhatsAppApiService - Message sent, id=wamid.HBgMOTE4NTI3OTQwMDkxFQIAERgSOTZFQTQxQzQxQTUyQzFBQjEzAA==
+2026-05-30 09:51:24 [Thread-19] INFO  o.rac.gui.SendResultsViewController - Result summary sent to admin, wamid=wamid.HBgMOTE4NTI3OTQwMDkxFQIAERgSOTZFQTQxQzQxQTUyQzFBQjEzAA==
+2026-05-30 09:51:24 [Thread-19] INFO  org.rac.services.ResultImageService - Generating absent notice image for 1 students
+2026-05-30 09:51:25 [Thread-19] INFO  o.rac.gui.SendResultsViewController - Absent notice image generated: Absent_Notice.png
+2026-05-30 09:51:25 [Thread-19] INFO  org.rac.services.WhatsAppApiService - Uploading media: Absent_Notice.png
+2026-05-30 09:51:26 [Thread-19] INFO  org.rac.services.WhatsAppApiService - Media uploaded successfully, id=868825482256669
+2026-05-30 09:51:26 [Thread-19] INFO  org.rac.services.WhatsAppApiService - Sending absent summary to admin
+2026-05-30 09:51:27 [Thread-19] INFO  org.rac.services.WhatsAppApiService - Message sent, id=wamid.HBgMOTE4NTI3OTQwMDkxFQIAERgSQUQ3MzRFMzgzQjlFNzU5QUM4AA==
+2026-05-30 09:51:27 [Thread-19] INFO  o.rac.gui.SendResultsViewController - Absent summary template sent to admin
+2026-05-30 09:51:27 [Thread-19] INFO  org.rac.services.ExcelWriterService - Writing run report to: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\7ed64b44-8ef7-4870-a24e-e7a48361d6a2_png\run_report.xlsx
+2026-05-30 09:51:27 [Thread-19] INFO  org.rac.services.ExcelWriterService - Run report written with 1 student rows
+2026-05-30 09:51:46 [JavaFX Application Thread] INFO  o.rac.gui.SendResultsViewController - Excel file selected: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\file_IX_Tuesday_student_data.xlsx
+2026-05-30 09:51:46 [JavaFX Application Thread] INFO  o.rac.gui.SendResultsViewController - Auto-populated: class='IX', batch='Tuesday Batch', standardFormat=true
+2026-05-30 09:51:48 [JavaFX Application Thread] INFO  o.rac.gui.SendResultsViewController - handleProceed clicked
+2026-05-30 09:51:48 [Thread-26] INFO  o.rac.gui.SendResultsViewController - Starting cloud sync with spreadsheet ID: 1WzK6Le_v9jPXcKous50Pjs3smnhC3tWIoDiyhmUXulI
+2026-05-30 09:51:48 [Thread-26] INFO  org.rac.services.GoogleDriveService - Downloading Google Spreadsheet 1WzK6Le_v9jPXcKous50Pjs3smnhC3tWIoDiyhmUXulI as Excel to C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\a19a7e78-1730-4eed-bb54-301456ce8420_png\cloud_contacts.xlsx
+2026-05-30 09:51:49 [Thread-26] INFO  org.rac.services.GoogleDriveService - Successfully downloaded spreadsheet, size: 17547 bytes
+2026-05-30 09:51:49 [Thread-26] INFO  o.rac.gui.SendResultsViewController - Cloud sync successful: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\a19a7e78-1730-4eed-bb54-301456ce8420_png\cloud_contacts.xlsx
+2026-05-30 09:51:49 [Thread-26] INFO  org.rac.services.ExcelReaderService - Reading Marks file: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\file_IX_Tuesday_student_data.xlsx, Cloud Contacts file: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\a19a7e78-1730-4eed-bb54-301456ce8420_png\cloud_contacts.xlsx, Class: IX, Batch: Tuesday Batch
+2026-05-30 09:51:49 [Thread-26] INFO  org.rac.services.ExcelReaderService - Targeting sheet: 'RAC IX Science, Tuesday 2026' for class 'IX' and batch 'Tuesday Batch'
+2026-05-30 09:51:49 [Thread-26] INFO  org.rac.services.ExcelReaderService - Aggregated contacts: 2 unique names from matched sheets
+2026-05-30 09:51:49 [Thread-26] INFO  org.rac.services.ExcelReaderService - Read 1 students, 0 validation errors, 1 absent
+2026-05-30 09:51:52 [Thread-26] INFO  org.rac.services.ResultImageService - Generating result image for student: I , template path: C:\Users\29abh\AppData\Local\Temp\result_template_44594221485679836447.html
+2026-05-30 09:51:52 [Thread-26] INFO  org.rac.services.ResultImageService - Read HTML template content
+2026-05-30 09:51:52 [Thread-26] INFO  org.rac.services.ResultImageService - Populated HTML template with student data
+2026-05-30 09:51:52 [Thread-26] INFO  org.rac.services.ResultImageService - 40
+2026-05-30 09:51:52 [Thread-26] INFO  org.rac.services.ResultImageService - Generated HTML content written for debugging: result_I_919811658385_0.html
+2026-05-30 09:51:53 [Thread-26] INFO  org.rac.services.WhatsAppApiService - Uploading media: result_I_919811658385_0.png
+2026-05-30 09:51:55 [Thread-26] INFO  org.rac.services.WhatsAppApiService - Media uploaded successfully, id=1551116680011389
+2026-05-30 09:51:55 [Thread-26] INFO  org.rac.services.WhatsAppApiService - Sending student result to 919811658385
+2026-05-30 09:51:55 [Thread-26] INFO  org.rac.services.WhatsAppApiService - Message sent, id=wamid.HBgMOTE5ODExNjU4Mzg1FQIAERgSRkU2RjIyMzNBNTNFNzVENzFCAA==
+2026-05-30 09:51:55 [Thread-26] INFO  o.rac.gui.SendResultsViewController - WhatsApp sent: I → 919811658385
+2026-05-30 09:51:55 [Thread-26] INFO  org.rac.services.ResultImageService - Generating topper list image for 1 toppers
+2026-05-30 09:51:56 [Thread-26] INFO  org.rac.services.WhatsAppApiService - Uploading media: Toppers_List.png
+2026-05-30 09:51:58 [Thread-26] INFO  org.rac.services.WhatsAppApiService - Media uploaded successfully, id=771861685922129
+2026-05-30 09:51:58 [Thread-26] INFO  org.rac.services.WhatsAppApiService - Sending topper result to admin
+2026-05-30 09:51:59 [Thread-26] INFO  org.rac.services.WhatsAppApiService - Message sent, id=wamid.HBgMOTE4NTI3OTQwMDkxFQIAERgSM0NENTQwN0YwMUNFQzFBRTM2AA==
+2026-05-30 09:51:59 [Thread-26] INFO  o.rac.gui.SendResultsViewController - Topper result sent to admin, wamid=wamid.HBgMOTE4NTI3OTQwMDkxFQIAERgSM0NENTQwN0YwMUNFQzFBRTM2AA==
+2026-05-30 09:51:59 [Thread-26] INFO  org.rac.services.WhatsAppApiService - Sending result summary to admin
+2026-05-30 09:51:59 [Thread-26] INFO  org.rac.services.WhatsAppApiService - Message sent, id=wamid.HBgMOTE4NTI3OTQwMDkxFQIAERgSQjMwQzExRTc4RjEyOTdCOTlBAA==
+2026-05-30 09:51:59 [Thread-26] INFO  o.rac.gui.SendResultsViewController - Result summary sent to admin, wamid=wamid.HBgMOTE4NTI3OTQwMDkxFQIAERgSQjMwQzExRTc4RjEyOTdCOTlBAA==
+2026-05-30 09:51:59 [Thread-26] INFO  org.rac.services.ResultImageService - Generating absent notice image for 1 students
+2026-05-30 09:52:00 [Thread-26] INFO  o.rac.gui.SendResultsViewController - Absent notice image generated: Absent_Notice.png
+2026-05-30 09:52:00 [Thread-26] INFO  org.rac.services.WhatsAppApiService - Uploading media: Absent_Notice.png
+2026-05-30 09:52:02 [Thread-26] INFO  org.rac.services.WhatsAppApiService - Media uploaded successfully, id=1268530365063410
+2026-05-30 09:52:02 [Thread-26] INFO  org.rac.services.WhatsAppApiService - Sending absent summary to admin
+2026-05-30 09:52:02 [Thread-26] INFO  org.rac.services.WhatsAppApiService - Message sent, id=wamid.HBgMOTE4NTI3OTQwMDkxFQIAERgSMDE1N0Q5MjAyNDYyODU2RjkzAA==
+2026-05-30 09:52:02 [Thread-26] INFO  o.rac.gui.SendResultsViewController - Absent summary template sent to admin
+2026-05-30 09:52:02 [Thread-26] INFO  org.rac.services.ExcelWriterService - Writing run report to: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\a19a7e78-1730-4eed-bb54-301456ce8420_png\run_report.xlsx
+2026-05-30 09:52:02 [Thread-26] INFO  org.rac.services.ExcelWriterService - Run report written with 1 student rows
+2026-05-30 09:52:15 [JavaFX Application Thread] INFO  org.rac.Main - Stopping RAC Operational App
+2026-05-30 09:54:25 [JavaFX Application Thread] INFO  org.rac.Main - Starting RAC Operational App
+2026-05-30 09:54:25 [JavaFX Application Thread] INFO  org.rac.Main - Showing Main View
+2026-05-30 09:54:26 [JavaFX Application Thread] INFO  org.rac.gui.MainViewController - Initializing MainViewController
+2026-05-30 09:54:26 [JavaFX Application Thread] INFO  org.rac.gui.MainViewController - Loaded 2 activities in sidebar
+2026-05-30 09:58:36 [JavaFX Application Thread] INFO  org.rac.gui.MainViewController - Navigating to activity: Send Results to Parents
+2026-05-30 09:58:36 [JavaFX Application Thread] INFO  org.rac.Main - Showing Activity View: /org/rac/gui/SendResultsView.fxml
+2026-05-30 09:58:36 [JavaFX Application Thread] INFO  o.rac.gui.SendResultsViewController - Initializing SendResultsViewController
+2026-05-30 09:58:42 [JavaFX Application Thread] INFO  o.rac.gui.SendResultsViewController - Excel file selected: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\file_X_Monday_student_data.xlsx
+2026-05-30 09:58:42 [JavaFX Application Thread] INFO  o.rac.gui.SendResultsViewController - Auto-populated: class='X', batch='Monday Batch', standardFormat=true
+2026-05-30 09:58:53 [JavaFX Application Thread] INFO  o.rac.gui.SendResultsViewController - handleProceed clicked
+2026-05-30 09:58:53 [Thread-5] INFO  o.rac.gui.SendResultsViewController - Starting cloud sync with spreadsheet ID: 1WzK6Le_v9jPXcKous50Pjs3smnhC3tWIoDiyhmUXulI
+2026-05-30 09:58:53 [Thread-5] INFO  org.rac.services.GoogleDriveService - Downloading Google Spreadsheet 1WzK6Le_v9jPXcKous50Pjs3smnhC3tWIoDiyhmUXulI as Excel to C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\3eedae43-fc92-461b-a537-4ce38a898b90_png\cloud_contacts.xlsx
+2026-05-30 09:58:55 [Thread-5] INFO  org.rac.services.GoogleDriveService - Successfully downloaded spreadsheet, size: 17547 bytes
+2026-05-30 09:58:55 [Thread-5] INFO  o.rac.gui.SendResultsViewController - Cloud sync successful: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\3eedae43-fc92-461b-a537-4ce38a898b90_png\cloud_contacts.xlsx
+2026-05-30 09:58:55 [Thread-5] INFO  org.rac.services.ExcelReaderService - Reading Marks file: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\file_X_Monday_student_data.xlsx, Cloud Contacts file: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\3eedae43-fc92-461b-a537-4ce38a898b90_png\cloud_contacts.xlsx, Class: X, Batch: Monday Batch
+2026-05-30 09:58:56 [Thread-5] INFO  org.rac.services.ExcelReaderService - Targeting sheet: 'RAC Monday(Science) X, 26' for class 'X' and batch 'Monday Batch'
+2026-05-30 09:58:56 [Thread-5] INFO  org.rac.services.ExcelReaderService - Aggregated contacts: 2 unique names from matched sheets
+2026-05-30 09:58:56 [Thread-5] INFO  org.rac.services.ExcelReaderService - Read 1 students, 1 validation errors, 2 absent
+2026-05-30 09:59:09 [JavaFX Application Thread] INFO  o.rac.gui.SendResultsViewController - Excel file selected: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\file_IX_Monday_student_data.xlsx
+2026-05-30 09:59:09 [JavaFX Application Thread] INFO  o.rac.gui.SendResultsViewController - Auto-populated: class='IX', batch='Monday Batch', standardFormat=true
+2026-05-30 09:59:11 [JavaFX Application Thread] INFO  o.rac.gui.SendResultsViewController - handleProceed clicked
+2026-05-30 09:59:11 [Thread-6] INFO  o.rac.gui.SendResultsViewController - Starting cloud sync with spreadsheet ID: 1WzK6Le_v9jPXcKous50Pjs3smnhC3tWIoDiyhmUXulI
+2026-05-30 09:59:11 [Thread-6] INFO  org.rac.services.GoogleDriveService - Downloading Google Spreadsheet 1WzK6Le_v9jPXcKous50Pjs3smnhC3tWIoDiyhmUXulI as Excel to C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\f3443912-515b-4075-a9f3-4dbb96e3c0b1_png\cloud_contacts.xlsx
+2026-05-30 09:59:15 [Thread-6] INFO  org.rac.services.GoogleDriveService - Successfully downloaded spreadsheet, size: 17547 bytes
+2026-05-30 09:59:15 [Thread-6] INFO  o.rac.gui.SendResultsViewController - Cloud sync successful: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\f3443912-515b-4075-a9f3-4dbb96e3c0b1_png\cloud_contacts.xlsx
+2026-05-30 09:59:15 [Thread-6] INFO  org.rac.services.ExcelReaderService - Reading Marks file: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\file_IX_Monday_student_data.xlsx, Cloud Contacts file: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\f3443912-515b-4075-a9f3-4dbb96e3c0b1_png\cloud_contacts.xlsx, Class: IX, Batch: Monday Batch
+2026-05-30 09:59:15 [Thread-6] INFO  org.rac.services.ExcelReaderService - Targeting sheet: 'RAC IX Science Monday, 2026' for class 'IX' and batch 'Monday Batch'
+2026-05-30 09:59:15 [Thread-6] INFO  org.rac.services.ExcelReaderService - Aggregated contacts: 2 unique names from matched sheets
+2026-05-30 09:59:15 [Thread-6] INFO  org.rac.services.ExcelReaderService - Read 1 students, 0 validation errors, 1 absent
+2026-05-30 09:59:25 [Thread-6] INFO  org.rac.services.ResultImageService - Generating result image for student: G , template path: C:\Users\29abh\AppData\Local\Temp\result_template_412919152581644790394.html
+2026-05-30 09:59:25 [Thread-6] INFO  org.rac.services.ResultImageService - Read HTML template content
+2026-05-30 09:59:25 [Thread-6] INFO  org.rac.services.ResultImageService - Populated HTML template with student data
+2026-05-30 09:59:25 [Thread-6] INFO  org.rac.services.ResultImageService - 40
+2026-05-30 09:59:25 [Thread-6] INFO  org.rac.services.ResultImageService - Generated HTML content written for debugging: result_G_919811658385_0.html
+2026-05-30 09:59:26 [Thread-6] INFO  org.rac.services.WhatsAppApiService - Uploading media: result_G_919811658385_0.png
+2026-05-30 09:59:28 [Thread-6] INFO  org.rac.services.WhatsAppApiService - Media uploaded successfully, id=1342988521018776
+2026-05-30 09:59:28 [Thread-6] INFO  org.rac.services.WhatsAppApiService - Sending student result to 919811658385
+2026-05-30 09:59:28 [Thread-6] INFO  org.rac.services.WhatsAppApiService - Sending JSON to WhatsApp API: {"messaging_product":"whatsapp","to":"919811658385","type":"template","template":{"name":"sending_student_result","language":{"code":"en"},"components":[{"type":"header","parameters":[{"type":"image","image":{"id":"1342988521018776"}}]},{"type":"body","parameters":[{"type":"text","parameter_name":"student_name","text":"G"},{"type":"text","parameter_name":"test_date","text":"28-Apr"}]}]}}
+2026-05-30 09:59:29 [Thread-6] INFO  org.rac.services.WhatsAppApiService - Message sent, id=wamid.HBgMOTE5ODExNjU4Mzg1FQIAERgSODlFMUExRkFCN0VGM0ExODkzAA==
+2026-05-30 09:59:29 [Thread-6] INFO  o.rac.gui.SendResultsViewController - WhatsApp sent: G → 919811658385
+2026-05-30 09:59:29 [Thread-6] INFO  org.rac.services.ResultImageService - Generating topper list image for 1 toppers
+2026-05-30 09:59:30 [Thread-6] INFO  org.rac.services.WhatsAppApiService - Uploading media: Toppers_List.png
+2026-05-30 09:59:31 [Thread-6] INFO  org.rac.services.WhatsAppApiService - Media uploaded successfully, id=2160466407828085
+2026-05-30 09:59:31 [Thread-6] INFO  org.rac.services.WhatsAppApiService - Sending topper result to admin
+2026-05-30 09:59:31 [Thread-6] INFO  org.rac.services.WhatsAppApiService - Sending JSON to WhatsApp API: {"messaging_product":"whatsapp","to":"918527940091","type":"template","template":{"name":"topper_result_template","language":{"code":"en"},"components":[{"type":"header","parameters":[{"type":"image","image":{"id":"2160466407828085"}}]},{"type":"body","parameters":[{"type":"text","parameter_name":"test_name","text":"weekly test"},{"type":"text","parameter_name":"test_date","text":"28-Apr"},{"type":"text","parameter_name":"class","text":"IX"},{"type":"text","parameter_name":"topic_name","text":"cells"}]}]}}
+2026-05-30 09:59:32 [Thread-6] INFO  org.rac.services.WhatsAppApiService - Message sent, id=wamid.HBgMOTE4NTI3OTQwMDkxFQIAERgSM0E5QTg0RTMyRkJBRTBDOTYwAA==
+2026-05-30 09:59:32 [Thread-6] INFO  o.rac.gui.SendResultsViewController - Topper result sent to admin, wamid=wamid.HBgMOTE4NTI3OTQwMDkxFQIAERgSM0E5QTg0RTMyRkJBRTBDOTYwAA==
+2026-05-30 09:59:32 [Thread-6] INFO  org.rac.services.WhatsAppApiService - Sending result summary to admin
+2026-05-30 09:59:32 [Thread-6] INFO  org.rac.services.WhatsAppApiService - Sending JSON to WhatsApp API: {"messaging_product":"whatsapp","to":"918527940091","type":"template","template":{"name":"result_summary","language":{"code":"en"},"components":[{"type":"body","parameters":[{"type":"text","parameter_name":"test_name","text":"weekly test"},{"type":"text","parameter_name":"test_date","text":"28-Apr"},{"type":"text","parameter_name":"class","text":"IX"},{"type":"text","parameter_name":"topic_name","text":"cells"},{"type":"text","parameter_name":"count","text":"1"}]}]}}
+2026-05-30 09:59:33 [Thread-6] INFO  org.rac.services.WhatsAppApiService - Message sent, id=wamid.HBgMOTE4NTI3OTQwMDkxFQIAERgSMEZFRjdBNDkyQkU1MTA5QzU1AA==
+2026-05-30 09:59:33 [Thread-6] INFO  o.rac.gui.SendResultsViewController - Result summary sent to admin, wamid=wamid.HBgMOTE4NTI3OTQwMDkxFQIAERgSMEZFRjdBNDkyQkU1MTA5QzU1AA==
+2026-05-30 09:59:33 [Thread-6] INFO  org.rac.services.ResultImageService - Generating absent notice image for 1 students
+2026-05-30 09:59:34 [Thread-6] INFO  o.rac.gui.SendResultsViewController - Absent notice image generated: Absent_Notice.png
+2026-05-30 09:59:34 [Thread-6] INFO  org.rac.services.WhatsAppApiService - Uploading media: Absent_Notice.png
+2026-05-30 09:59:35 [Thread-6] INFO  org.rac.services.WhatsAppApiService - Media uploaded successfully, id=802227552973348
+2026-05-30 09:59:35 [Thread-6] INFO  org.rac.services.WhatsAppApiService - Sending absent summary to admin
+2026-05-30 09:59:35 [Thread-6] INFO  org.rac.services.WhatsAppApiService - Sending JSON to WhatsApp API: {"messaging_product":"whatsapp","to":"918527940091","type":"template","template":{"name":"absent_summary","language":{"code":"en"},"components":[{"type":"header","parameters":[{"type":"image","image":{"id":"802227552973348"}}]},{"type":"body","parameters":[{"type":"text","parameter_name":"test_date","text":"28-Apr"},{"type":"text","parameter_name":"class","text":"IX"},{"type":"text","parameter_name":"topic_name","text":"cells"},{"type":"text","parameter_name":"batch","text":"Monday Batch"}]}]}}
+2026-05-30 09:59:36 [Thread-6] INFO  org.rac.services.WhatsAppApiService - Message sent, id=wamid.HBgMOTE4NTI3OTQwMDkxFQIAERgSQTA4NTQ5MDJFRUVGRUM0NDNGAA==
+2026-05-30 09:59:36 [Thread-6] INFO  o.rac.gui.SendResultsViewController - Absent summary template sent to admin, wamid=wamid.HBgMOTE4NTI3OTQwMDkxFQIAERgSQTA4NTQ5MDJFRUVGRUM0NDNGAA==
+2026-05-30 09:59:36 [Thread-6] INFO  org.rac.services.ExcelWriterService - Writing run report to: C:\Users\29abh\Projects\RAC_Projects\RACOperationalApp\f3443912-515b-4075-a9f3-4dbb96e3c0b1_png\run_report.xlsx
+2026-05-30 09:59:36 [Thread-6] INFO  org.rac.services.ExcelWriterService - Run report written with 1 student rows
+2026-05-30 10:00:27 [JavaFX Application Thread] INFO  org.rac.Main - Stopping RAC Operational App

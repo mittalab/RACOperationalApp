@@ -73,7 +73,8 @@ public class SendResultsViewController {
     private final ExcelWriterService excelWriterService = new ExcelWriterService();
     private final GoogleDriveService googleDriveService = new GoogleDriveService();
 
-    private static final String MASTER_SPREADSHEET_ID = "16kElua-wgKkFJRkW8dzOPv9wzadYmKV9P_ydbr3BPFk";
+    //private static final String MASTER_SPREADSHEET_ID = "16kElua-wgKkFJRkW8dzOPv9wzadYmKV9P_ydbr3BPFk";
+    private static final String MASTER_SPREADSHEET_ID = "1WzK6Le_v9jPXcKous50Pjs3smnhC3tWIoDiyhmUXulI";
 
     private volatile boolean isAborted = false;
     private final List<Student> sentStudents = Collections.synchronizedList(new ArrayList<>());
@@ -203,6 +204,22 @@ public class SendResultsViewController {
                     for (String err : readResult.validationErrors) {
                         msg.append("• ").append(err).append("\n");
                     }
+                    
+                    if (cloudContactsFile != null) {
+                        msg.append("\nTIP: Please check student names in the downloaded contact file:\n");
+                        msg.append("File: ").append(cloudContactsFile.getName()).append("\n");
+                        if (readResult.targetSheetName != null) {
+                            msg.append("Sheet: ").append(readResult.targetSheetName).append("\n");
+                        }
+                        
+                        // Automatically open the cloud contacts file for the user
+                        File finalCloudFile = cloudContactsFile;
+                        Platform.runLater(() -> {
+                            try { Desktop.getDesktop().open(finalCloudFile); }
+                            catch (Exception e) { logger.error("Failed to open cloud contacts file", e); }
+                        });
+                    }
+                    
                     showAlert("Validation Error", msg.toString());
                     return;
                 }
@@ -354,9 +371,10 @@ public class SendResultsViewController {
 
                             if (sendWA && !quotaExceeded[0]) {
                                 try {
-                                    whatsAppApiService.sendAbsentSummary(whatsAppDate, className, topic, batch);
-                                    deliveryRecords.add(new MessageDelivery("ADMIN – Absent Summary", "Nupur Madam", null));
-                                    logger.info("Absent summary template sent to admin");
+                                    String absentMediaId = whatsAppApiService.uploadMedia(absentImage);
+                                    String absentWamid = whatsAppApiService.sendAbsentSummary(absentMediaId, whatsAppDate, className, topic, batch);
+                                    deliveryRecords.add(new MessageDelivery("ADMIN – Absent Summary", "Nupur Madam", absentWamid));
+                                    logger.info("Absent summary template sent to admin, wamid={}", absentWamid);
                                 } catch (WhatsAppApiService.QuotaExceededException e) {
                                     sendErrors.add("Quota exceeded — absent summary not sent to admin.");
                                     logger.error("Quota exceeded sending absent summary", e);
@@ -373,9 +391,9 @@ public class SendResultsViewController {
                         // NO absentees - send no_absent template
                         if (sendWA && !quotaExceeded[0]) {
                             try {
-                                whatsAppApiService.sendNoAbsentSummary(whatsAppDate, className, topic, batch);
-                                deliveryRecords.add(new MessageDelivery("ADMIN – No Absent Summary", "Nupur Madam", null));
-                                logger.info("No Absent summary template sent to admin");
+                                String noAbsentWamid = whatsAppApiService.sendNoAbsentSummary(whatsAppDate, className, topic, batch);
+                                deliveryRecords.add(new MessageDelivery("ADMIN – No Absent Summary", "Nupur Madam", noAbsentWamid));
+                                logger.info("No Absent summary template sent to admin, wamid={}", noAbsentWamid);
                             } catch (WhatsAppApiService.QuotaExceededException e) {
                                 sendErrors.add("Quota exceeded — no_absent summary not sent to admin.");
                                 logger.error("Quota exceeded sending no_absent summary", e);
