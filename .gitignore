@@ -23,6 +23,7 @@ target/
 .settings
 .springBeans
 .sts4-cache
+google-credentials.json
 
 ### NetBeans ###
 /nbproject/private/
