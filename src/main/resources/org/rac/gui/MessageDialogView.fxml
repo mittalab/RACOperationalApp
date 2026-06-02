@@ -28,10 +28,13 @@
     <VBox styleClass="dialog-content" spacing="14">
 
         <VBox styleClass="dialog-info-card" spacing="6">
-            <Label fx:id="messageLabel"
-                   styleClass="dialog-info-label"
-                   wrapText="true"
-                   maxWidth="460"/>
+            <TextArea fx:id="messageArea"
+                      styleClass="dialog-text-area"
+                      wrapText="true"
+                      editable="false"
+                      prefHeight="120"
+                      prefWidth="460"
+                      maxWidth="460"/>
         </VBox>
 
         <HBox alignment="CENTER_RIGHT" spacing="10">
