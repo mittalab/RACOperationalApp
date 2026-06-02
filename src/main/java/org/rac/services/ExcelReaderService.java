@@ -376,8 +376,25 @@ public class ExcelReaderService {
     private String getCellStringValue(Cell cell) {
         if (cell == null) return "";
         switch (cell.getCellType()) {
-            case STRING: return cell.getStringCellValue();
+            case STRING: {
+                String val = cell.getStringCellValue().trim();
+                // Handle numbers stored as strings in scientific notation (e.g., "9.87654321E9")
+                try {
+                    double d = Double.parseDouble(val);
+                    if (!Double.isInfinite(d) && !Double.isNaN(d)) {
+                        return String.valueOf((long) d);
+                    }
+                } catch (NumberFormatException ignored) {}
+                return val;
+            }
             case NUMERIC: return String.valueOf((long) cell.getNumericCellValue());
+            case FORMULA: {
+                try {
+                    return String.valueOf((long) cell.getNumericCellValue());
+                } catch (Exception e) {
+                    return cell.getStringCellValue();
+                }
+            }
             default: return "";
         }
     }
