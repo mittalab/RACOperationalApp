@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -17,14 +18,14 @@ public class MessageDialogViewController {
     @FXML private Label iconLabel;
     @FXML private Label titleLabel;
     @FXML private Label subtitleLabel;
-    @FXML private Label messageLabel;
+    @FXML private TextArea messageArea;
 
     private Stage stage;
 
     void setup(Stage stage, String title, String message, Type type) {
         this.stage = stage;
         titleLabel.setText(title);
-        messageLabel.setText(message);
+        messageArea.setText(message);
         switch (type) {
             case ERROR -> {
                 headerBar.getStyleClass().setAll("dialog-header-error");
