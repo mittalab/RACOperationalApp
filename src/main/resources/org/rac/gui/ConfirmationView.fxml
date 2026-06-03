@@ -66,10 +66,16 @@
                     expanded="false"
                     maxWidth="Infinity"
                     style="-fx-font-size: 12px; -fx-text-fill: #1a3355;">
-            <ListView fx:id="studentListView"
-                      prefHeight="300"
-                      maxWidth="Infinity"
-                      style="-fx-font-size: 12px;"/>
+            <TableView fx:id="studentTableView"
+                       prefHeight="300"
+                       maxWidth="Infinity"
+                       style="-fx-font-size: 12px;">
+                <columns>
+                    <TableColumn fx:id="colIndex" text="#" maxWidth="40" minWidth="40" sortable="false"/>
+                    <TableColumn fx:id="colName" text="Name" sortable="false"/>
+                    <TableColumn fx:id="colPhone" text="WhatsApp Number" prefWidth="150" sortable="false"/>
+                </columns>
+            </TableView>
         </TitledPane>
 
         <!-- Button row -->

@@ -1,11 +1,13 @@
 package org.rac.gui;
 
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TitledPane;
 import javafx.collections.FXCollections;
 import javafx.scene.layout.HBox;
@@ -23,7 +25,10 @@ public class ConfirmationViewController {
     @FXML private Label studentCountLabel;
     @FXML private Label whatsAppLabel;
     @FXML private TitledPane studentListPane;
-    @FXML private ListView<String> studentListView;
+    @FXML private TableView<Student> studentTableView;
+    @FXML private TableColumn<Student, String> colIndex;
+    @FXML private TableColumn<Student, String> colName;
+    @FXML private TableColumn<Student, String> colPhone;
     @FXML private HBox adminMessagesRow;
     @FXML private VBox adminMessagesList;
 
@@ -38,11 +43,23 @@ public class ConfirmationViewController {
 
         if (showStudentSection) {
             studentCountLabel.setText(students.size() + " student(s) will be processed.");
-            List<String> names = new java.util.ArrayList<>();
-            for (int i = 0; i < students.size(); i++) {
-                names.add((i + 1) + ".  " + students.get(i).getName());
-            }
-            studentListView.setItems(FXCollections.observableArrayList(names));
+
+            studentTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
+
+            colIndex.setCellValueFactory(cell -> {
+                int idx = studentTableView.getItems().indexOf(cell.getValue()) + 1;
+                return new ReadOnlyStringWrapper(String.valueOf(idx));
+            });
+            colName.setCellValueFactory(cell -> new ReadOnlyStringWrapper(cell.getValue().getName()));
+            colPhone.setCellValueFactory(cell -> {
+                String phone = cell.getValue().getPhone();
+                if (!sendWA || phone == null || phone.isBlank()) return new ReadOnlyStringWrapper("—");
+                return new ReadOnlyStringWrapper(phone);
+            });
+
+            colPhone.setVisible(sendWA);
+
+            studentTableView.setItems(FXCollections.observableArrayList(students));
             studentListPane.setText("Show " + students.size() + " students");
         } else {
             studentCountRow.setVisible(false);
