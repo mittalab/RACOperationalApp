@@ -80,7 +80,11 @@ public class ExcelReaderService {
         return finalResult;
     }
 
-    private void readWithExternalContacts(Sheet resultSheet, Workbook contactWorkbook, 
+    private static String normalizeName(String name) {
+        return name.trim().replaceAll("\\s+", " ");
+    }
+
+    private void readWithExternalContacts(Sheet resultSheet, Workbook contactWorkbook,
                                         List<Student> students, List<String> errors, List<String> absentNames,
                                         String className, String batch) {
         // Build contact lookup from matched sheets
@@ -110,7 +114,7 @@ public class ExcelReaderService {
 
             while (rows.hasNext()) {
                 Row row = rows.next();
-                String rawName = getCellStringValue(row.getCell(2)).trim(); // Column C: Student Name
+                String rawName = normalizeName(getCellStringValue(row.getCell(2))); // Column C: Student Name
                 String name = rawName.toUpperCase();
                 String phone = getCellStringValue(row.getCell(3)).trim();  // Column D: Phone Number
                 String rollNo = getCellStringValue(row.getCell(4)).trim(); // Column E: Roll Number
@@ -146,7 +150,7 @@ public class ExcelReaderService {
             Row row = resultRows.next();
             rowNum++;
             try {
-                String name = getCellStringValue(row.getCell(0)).trim();
+                String name = normalizeName(getCellStringValue(row.getCell(0)));
                 if (name.isEmpty()) continue;
 
                 Cell marksCell = row.getCell(1);
@@ -215,7 +219,7 @@ public class ExcelReaderService {
 
         while (contactRows.hasNext()) {
             Row row = contactRows.next();
-            String rawName = getCellStringValue(row.getCell(0)).trim();
+            String rawName = normalizeName(getCellStringValue(row.getCell(0)));
             String name = rawName.toUpperCase();
             String phone = getCellStringValue(row.getCell(1)).trim();
             String rollNo = getCellStringValue(row.getCell(2)).trim();
@@ -245,7 +249,7 @@ public class ExcelReaderService {
             Row row = resultRows.next();
             rowNum++;
             try {
-                String name = getCellStringValue(row.getCell(0)).trim();
+                String name = normalizeName(getCellStringValue(row.getCell(0)));
                 if (name.isEmpty()) continue;
 
                 Cell marksCell = row.getCell(1);
@@ -295,7 +299,7 @@ public class ExcelReaderService {
             Row row = rows.next();
             rowNum++;
             try {
-                String name = getCellStringValue(row.getCell(0)).trim();
+                String name = normalizeName(getCellStringValue(row.getCell(0)));
                 if (name.isEmpty()) continue;
 
                 Cell marksCell = row.getCell(1);

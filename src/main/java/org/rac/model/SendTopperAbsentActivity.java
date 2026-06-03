@@ -1,19 +1,19 @@
 package org.rac.model;
 
-public class SendResultsActivity implements Activity {
+public class SendTopperAbsentActivity implements Activity {
 
     @Override
     public String getName() {
-        return "Send Results to Parents";
+        return "Send Topper & Absent List";
     }
 
     @Override
     public String getFxmlPath() {
-        return "/org/rac/gui/SendResultsView.fxml";
+        return "/org/rac/gui/SendAdminNotificationsView.fxml";
     }
 
     @Override
-    public String getIcon() { return "↑"; }
+    public String getIcon() { return "★"; }
 
     @Override
     public String toString() {

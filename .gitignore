@@ -41,3 +41,13 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### RAC App — generated output ###
+*_png/
+*_html/
+*.xlsx
+rac-operational-app.log
+
+### Tools ###
+.claude/
+.git-rewrite/

@@ -15,7 +15,7 @@
       fx:controller="org.rac.gui.ConfirmationViewController"
       stylesheets="@rac-styles.css"
       styleClass="dialog-root"
-      minWidth="400" maxWidth="480"
+      minWidth="520" prefWidth="580"
       spacing="0">
 
     <!-- ── Header bar ───────────────────────────────────────── -->
@@ -31,12 +31,12 @@
     </HBox>
 
     <!-- ── Content ──────────────────────────────────────────── -->
-    <VBox styleClass="dialog-content" spacing="14">
+    <VBox styleClass="dialog-content" spacing="14" fillWidth="true">
 
         <!-- Info card -->
         <VBox styleClass="dialog-info-card" spacing="10">
 
-            <HBox spacing="8" alignment="CENTER_LEFT">
+            <HBox fx:id="studentCountRow" spacing="8" alignment="CENTER_LEFT">
                 <Label text="Students:"
                        style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-min-width: 130px;"/>
                 <Label fx:id="studentCountLabel" styleClass="dialog-highlight-label"/>
@@ -50,7 +50,27 @@
                 <Label fx:id="whatsAppLabel" styleClass="dialog-wa-yes-label"/>
             </HBox>
 
+            <!-- Admin messages row — hidden when no admin messages -->
+            <HBox fx:id="adminMessagesRow" spacing="8" alignment="TOP_LEFT"
+                  visible="false" managed="false">
+                <Label text="Admin messages:"
+                       style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-min-width: 130px;"/>
+                <VBox fx:id="adminMessagesList" spacing="3"/>
+            </HBox>
+
         </VBox>
+
+        <!-- Expandable student list -->
+        <TitledPane fx:id="studentListPane"
+                    text="Show students"
+                    expanded="false"
+                    maxWidth="Infinity"
+                    style="-fx-font-size: 12px; -fx-text-fill: #1a3355;">
+            <ListView fx:id="studentListView"
+                      prefHeight="300"
+                      maxWidth="Infinity"
+                      style="-fx-font-size: 12px;"/>
+        </TitledPane>
 
         <!-- Button row -->
         <HBox styleClass="dialog-button-row">

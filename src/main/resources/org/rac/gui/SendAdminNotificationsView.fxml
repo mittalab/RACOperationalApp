@@ -4,47 +4,31 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<!--
-    RAC Operational App — SendResultsView (Redesigned)
-    CSS: place rac-styles.css in the same resources folder as this FXML.
-    Controller: org.rac.gui.SendResultsViewController  (unchanged)
-
-    All fx:id values PRESERVED:
-        filePathLabel, datePicker, classField, batchComboBox,
-        customBatchLabel, customBatchField, topicField, headingField,
-        totalMarksField, sendWhatsAppCheckbox, progressBar, progressLabel
-
-    All onAction handlers PRESERVED:
-        #handleChooseFile, #handleProceed, #handleAbort, #handleBackToHome
--->
 <VBox xmlns="http://javafx.com/javafx/17"
       xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="org.rac.gui.SendResultsViewController"
+      fx:controller="org.rac.gui.SendAdminNotificationsViewController"
       stylesheets="@rac-styles.css"
       prefWidth="1100"
       prefHeight="800">
 
     <!-- ══════════════════════════════════════════
-         HEADER BAR  (gradient blue)
+         HEADER BAR
          ══════════════════════════════════════════ -->
     <HBox styleClass="send-header-bar"
           alignment="CENTER_LEFT"
           spacing="14">
 
-        <!-- Icon pill -->
         <StackPane styleClass="send-header-icon-box">
-            <Label text="↑"
+            <Label text="★"
                    style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;"/>
         </StackPane>
 
-        <!-- Title + sub-title -->
         <VBox spacing="3" HBox.hgrow="ALWAYS">
-            <Label text="Send Results to Parents" styleClass="send-header-title"/>
+            <Label text="Send Topper &amp; Absent List" styleClass="send-header-title"/>
             <Label text="Fill in the details below and click Proceed"
                    styleClass="send-header-subtitle"/>
         </VBox>
 
-        <!-- Back button (right-aligned) -->
         <Button text="← Back to Home"
                 styleClass="back-button"
                 onAction="#handleBackToHome"/>
@@ -66,7 +50,6 @@
 
                 <Label text="DATA SOURCE" styleClass="form-card-header"/>
 
-                <!-- Excel file row -->
                 <HBox spacing="12" alignment="CENTER_LEFT">
                     <Label text="Excel File:" styleClass="form-label"/>
                     <Button text="⊞ Choose File"
@@ -78,10 +61,9 @@
                            wrapText="true"/>
                 </HBox>
 
-                <!-- HTML template (info only) -->
                 <HBox spacing="12" alignment="CENTER_LEFT">
                     <Label text="HTML Template:" styleClass="form-label"/>
-                    <Label text="✓  result_template.html  (from resources)"
+                    <Label text="✓  topper_template.html + absent_template.html  (from resources)"
                            styleClass="template-info-label"/>
                 </HBox>
 
@@ -94,7 +76,6 @@
 
                 <Label text="TEST DETAILS" styleClass="form-card-header"/>
 
-                <!-- Date -->
                 <HBox spacing="12" alignment="CENTER_LEFT">
                     <Label text="Test Conducted Date:" styleClass="form-label"/>
                     <DatePicker fx:id="datePicker"
@@ -102,7 +83,6 @@
                                 prefWidth="200"/>
                 </HBox>
 
-                <!-- Class -->
                 <HBox spacing="12" alignment="CENTER_LEFT">
                     <Label text="Class:" styleClass="form-label"/>
                     <TextField fx:id="classField"
@@ -111,7 +91,6 @@
                                prefWidth="260"/>
                 </HBox>
 
-                <!-- Batch -->
                 <HBox spacing="12" alignment="CENTER_LEFT">
                     <Label text="Batch:" styleClass="form-label"/>
                     <ComboBox fx:id="batchComboBox"
@@ -119,7 +98,6 @@
                               prefWidth="260"/>
                 </HBox>
 
-                <!-- Custom Batch (shown dynamically by controller) -->
                 <HBox fx:id="customBatchRow" spacing="12" alignment="CENTER_LEFT"
                       visible="false" managed="false">
                     <Label fx:id="customBatchLabel"
@@ -131,7 +109,6 @@
                                prefWidth="260"/>
                 </HBox>
 
-                <!-- Topic -->
                 <HBox spacing="12" alignment="CENTER_LEFT">
                     <Label text="Topic:" styleClass="form-label"/>
                     <TextField fx:id="topicField"
@@ -140,7 +117,6 @@
                                prefWidth="260"/>
                 </HBox>
 
-                <!-- Result Heading -->
                 <HBox spacing="12" alignment="CENTER_LEFT">
                     <Label text="Result Heading:" styleClass="form-label"/>
                     <TextField fx:id="headingField"
@@ -150,7 +126,6 @@
                                prefWidth="360"/>
                 </HBox>
 
-                <!-- Total Marks -->
                 <HBox spacing="12" alignment="CENTER_LEFT">
                     <Label text="Total Marks:" styleClass="form-label"/>
                     <TextField fx:id="totalMarksField"
@@ -162,39 +137,12 @@
             </VBox>
 
             <!-- ─────────────────────────────────────────
-                 WHATSAPP SEND ROW
-                 ───────────────────────────────────────── -->
-            <HBox styleClass="wa-card" spacing="10" alignment="CENTER_LEFT">
-                <CheckBox fx:id="sendWhatsAppCheckbox"
-                          text="Send results on WhatsApp"
-                          styleClass="wa-checkbox"
-                          selected="true"/>
-                <Label text="Messages will be delivered to parent contacts via WhatsApp."
-                       style="-fx-text-fill: #4ade80; -fx-font-size: 11px;"/>
-            </HBox>
-
-            <!-- ─────────────────────────────────────────
-                 ADMIN NOTIFICATIONS ROW
-                 ───────────────────────────────────────── -->
-            <HBox styleClass="wa-card" spacing="10" alignment="CENTER_LEFT">
-                <CheckBox fx:id="sendAdminNotificationsCheckbox"
-                          text="Send topper &amp; absent list to admin"
-                          styleClass="wa-checkbox"
-                          selected="false"/>
-                <Label text="Topper list and absent list will be sent to admin via WhatsApp."
-                       style="-fx-text-fill: #60a5fa; -fx-font-size: 11px;"/>
-            </HBox>
-
-            <!-- ─────────────────────────────────────────
                  ACTION BUTTONS
                  ───────────────────────────────────────── -->
             <HBox styleClass="action-row" spacing="10" alignment="CENTER_LEFT">
                 <Button text="▶  Proceed"
                         styleClass="proceed-button"
                         onAction="#handleProceed"/>
-                <Button text="✕  Abort"
-                        styleClass="abort-button"
-                        onAction="#handleAbort"/>
             </HBox>
 
             <!-- ─────────────────────────────────────────

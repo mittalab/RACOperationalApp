@@ -29,23 +29,29 @@ public class CompletionSummaryViewController {
     private Stage stage;
     private List<MessageDelivery> deliveryRecords;
 
-    void setup(Stage stage, int successCount, int total, boolean waEnabled,
+    void setup(Stage stage, int parentSuccess, int parentTotal, boolean waEnabled,
+               int adminSuccess,
                boolean quotaExceeded, String quotaStudentName,
                List<String> errors, List<MessageDelivery> deliveryRecords) {
         this.stage = stage;
         this.deliveryRecords = deliveryRecords;
 
         StringBuilder summary = new StringBuilder();
-        if (waEnabled) {
-            summary.append("Messages sent: ").append(successCount).append(" / ").append(total);
+        if (waEnabled && parentTotal > 0) {
+            summary.append("Parents: ").append(parentSuccess).append(" / ").append(parentTotal)
+                   .append(" messages sent");
             if (quotaExceeded) {
                 summary.append("\n\nWhatsApp sending stopped at student '")
                        .append(quotaStudentName)
                        .append("' due to daily/tier quota exceeded.")
                        .append("\nImages for all students saved in the output folder.");
             }
-        } else {
-            summary.append("Images generated for ").append(total).append(" students.");
+        } else if (!waEnabled) {
+            summary.append("Images generated for ").append(parentTotal).append(" students.");
+        }
+        if (adminSuccess > 0) {
+            if (summary.length() > 0) summary.append("\n");
+            summary.append("Admin: ").append(adminSuccess).append(" message(s) sent");
         }
         summaryLabel.setText(summary.toString());
 
@@ -57,7 +63,7 @@ public class CompletionSummaryViewController {
             errorsHeading.setManaged(true);
         }
 
-        boolean showTracker = waEnabled && deliveryRecords != null && !deliveryRecords.isEmpty();
+        boolean showTracker = deliveryRecords != null && !deliveryRecords.isEmpty();
         trackDeliveryButton.setVisible(showTracker);
         trackDeliveryButton.setManaged(showTracker);
     }
@@ -76,7 +82,8 @@ public class CompletionSummaryViewController {
         stage.close();
     }
 
-    public static void show(int successCount, int total, boolean waEnabled,
+    public static void show(int parentSuccess, int parentTotal, boolean waEnabled,
+                            int adminSuccess,
                             boolean quotaExceeded, String quotaStudentName,
                             List<String> errors, List<MessageDelivery> deliveryRecords) throws IOException {
         FXMLLoader loader = new FXMLLoader(
@@ -91,7 +98,7 @@ public class CompletionSummaryViewController {
         stage.setResizable(true);
         stage.setScene(new Scene(root));
 
-        controller.setup(stage, successCount, total, waEnabled,
+        controller.setup(stage, parentSuccess, parentTotal, waEnabled, adminSuccess,
                 quotaExceeded, quotaStudentName, errors, deliveryRecords);
         stage.showAndWait();
     }

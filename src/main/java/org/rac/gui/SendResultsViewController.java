@@ -57,6 +57,7 @@ public class SendResultsViewController {
     @FXML private TextField totalMarksField;
     @FXML private Label filePathLabel;
     @FXML private CheckBox sendWhatsAppCheckbox;
+    @FXML private CheckBox sendAdminNotificationsCheckbox;
     @FXML private ProgressBar progressBar;
     @FXML private Label progressLabel;
     @FXML private HBox customBatchRow;
@@ -169,6 +170,7 @@ public class SendResultsViewController {
 
         // Capture UI state on FX thread before background thread starts
         final boolean sendWA = sendWhatsAppCheckbox.isSelected();
+        final boolean sendAdminNotifications = sendAdminNotificationsCheckbox.isSelected();
         final String classNameStr = classField.getText();
         final String batchStr = getBatchValue();
 
@@ -181,6 +183,10 @@ public class SendResultsViewController {
                 pngDir = new File(uuid + "_png");
                 htmlDir.mkdirs();
                 pngDir.mkdirs();
+
+                // Copy input Excel to output dir for reference
+                Files.copy(excelFile.toPath(), new File(pngDir, excelFile.getName()).toPath(),
+                        StandardCopyOption.REPLACE_EXISTING);
 
                 // 2. Cloud Sync
                 updateProgress("Syncing with Google Cloud...", 0.05);
@@ -230,11 +236,29 @@ public class SendResultsViewController {
                 boolean[] proceed = {false};
                 Double[] cutOff = {null};
                 CountDownLatch latch = new CountDownLatch(1);
+                List<String> adminMsgs = new ArrayList<>();
+                if (sendWA) {
+                    adminMsgs.add("Result summary");
+                    if (sendAdminNotifications) {
+                        adminMsgs.add("Topper list");
+                        if (filenameMatchedPattern) {
+                            adminMsgs.add(readResult.absentStudentNames.isEmpty()
+                                    ? "No absent summary (all present)"
+                                    : "Absent list");
+                        }
+                    }
+                }
+                final List<String> finalAdminMsgs = adminMsgs;
+
                 Platform.runLater(() -> {
                     try {
-                        if (!ConfirmationViewController.show(students.size(), sendWA)) return;
-                        cutOff[0] = CutOffViewController.show(students);
-                        if (cutOff[0] != null) proceed[0] = true;
+                        if (!ConfirmationViewController.show(students, sendWA, true, finalAdminMsgs)) return;
+                        if (sendAdminNotifications) {
+                            cutOff[0] = CutOffViewController.show(students);
+                            if (cutOff[0] != null) proceed[0] = true;
+                        } else {
+                            proceed[0] = true;
+                        }
                     } catch (IOException e) {
                         logger.error("Failed to load dialog", e);
                     } finally {
@@ -255,6 +279,7 @@ public class SendResultsViewController {
 
                 int total = students.size();
                 int successCount = 0;
+                int adminSuccessCount = 0;
                 List<String> sendErrors = new ArrayList<>();
                 List<MessageDelivery> deliveryRecords = new ArrayList<>();
                 List<RunRecord> runRecords = new ArrayList<>();
@@ -321,23 +346,26 @@ public class SendResultsViewController {
                 // 5. Topper image + admin messages
                 String[] topperMsgId = {null};
                 String[] summaryMsgId = {null};
-                if (!isAborted) {
+                if (!isAborted && sendAdminNotifications) {
                     List<Student> toppers = new ArrayList<>();
                     for (Student s : students) {
                         if (s.getMarksObtained() >= cutOff[0]) toppers.add(s);
                     }
                     toppers.sort((a, b) -> Double.compare(b.getMarksObtained(), a.getMarksObtained()));
 
+                    updateProgress("Admin: Generating topper image...", -1);
                     resultImageService.generateTopperImage(
                             toppers, formattedDate, className, batch, topic,
                             totalMarks, topperTemplateFile, htmlDir, pngDir);
                     File topperImage = new File(pngDir, "Toppers_List.png");
 
                     if (sendWA && !quotaExceeded[0]) {
+                        updateProgress("Admin: Sending topper list...", -1);
                         try {
                             String topperMediaId = whatsAppApiService.uploadMedia(topperImage);
                             topperMsgId[0] = whatsAppApiService.sendTopperResult(topperMediaId, heading, whatsAppDate, className, topic);
                             deliveryRecords.add(new MessageDelivery("ADMIN – Topper List", "Nupur Madam", topperMsgId[0]));
+                            adminSuccessCount++;
                             logger.info("Topper result sent to admin, wamid={}", topperMsgId[0]);
                         } catch (WhatsAppApiService.QuotaExceededException e) {
                             sendErrors.add("Quota exceeded — topper image not sent to admin.");
@@ -346,23 +374,30 @@ public class SendResultsViewController {
                             sendErrors.add("Topper image (admin): " + e.getMessage());
                             logger.error("Failed sending topper result", e);
                         }
-                        try {
-                            summaryMsgId[0] = whatsAppApiService.sendResultSummary(heading, whatsAppDate, className, topic, successCount);
-                            deliveryRecords.add(new MessageDelivery("ADMIN – Summary", "Nupur Madam", summaryMsgId[0]));
-                            logger.info("Result summary sent to admin, wamid={}", summaryMsgId[0]);
-                        } catch (WhatsAppApiService.QuotaExceededException e) {
-                            sendErrors.add("Quota exceeded — result summary not sent to admin.");
-                            logger.error("Quota exceeded sending result summary", e);
-                        } catch (Exception e) {
-                            sendErrors.add("Result summary (admin): " + e.getMessage());
-                            logger.error("Failed sending result summary", e);
-                        }
                     }
                 }
 
-                // 5.5 Absent notice image + template message (only for two-sheet files)
-                if (!isAborted && filenameMatchedPattern) {
+                // 5.1 Result summary — always sent to admin when WA is enabled
+                if (!isAborted && sendWA && !quotaExceeded[0]) {
+                    updateProgress("Admin: Sending result summary...", -1);
+                    try {
+                        summaryMsgId[0] = whatsAppApiService.sendResultSummary(heading, whatsAppDate, className, topic, successCount);
+                        deliveryRecords.add(new MessageDelivery("ADMIN – Summary", "Nupur Madam", summaryMsgId[0]));
+                        adminSuccessCount++;
+                        logger.info("Result summary sent to admin, wamid={}", summaryMsgId[0]);
+                    } catch (WhatsAppApiService.QuotaExceededException e) {
+                        sendErrors.add("Quota exceeded — result summary not sent to admin.");
+                        logger.error("Quota exceeded sending result summary", e);
+                    } catch (Exception e) {
+                        sendErrors.add("Result summary (admin): " + e.getMessage());
+                        logger.error("Failed sending result summary", e);
+                    }
+                }
+
+                // 5.5 Absent notice image + template message
+                if (!isAborted && sendAdminNotifications && filenameMatchedPattern) {
                     if (!readResult.absentStudentNames.isEmpty()) {
+                        updateProgress("Admin: Generating absent image...", -1);
                         try {
                             File absentImage = resultImageService.generateAbsentImage(
                                     readResult.absentStudentNames, formattedDate, className, batch, topic,
@@ -370,10 +405,12 @@ public class SendResultsViewController {
                             logger.info("Absent notice image generated: {}", absentImage.getName());
 
                             if (sendWA && !quotaExceeded[0]) {
+                                updateProgress("Admin: Sending absent list...", -1);
                                 try {
                                     String absentMediaId = whatsAppApiService.uploadMedia(absentImage);
                                     String absentWamid = whatsAppApiService.sendAbsentSummary(absentMediaId, whatsAppDate, className, topic, batch);
                                     deliveryRecords.add(new MessageDelivery("ADMIN – Absent Summary", "Nupur Madam", absentWamid));
+                                    adminSuccessCount++;
                                     logger.info("Absent summary template sent to admin, wamid={}", absentWamid);
                                 } catch (WhatsAppApiService.QuotaExceededException e) {
                                     sendErrors.add("Quota exceeded — absent summary not sent to admin.");
@@ -390,9 +427,11 @@ public class SendResultsViewController {
                     } else {
                         // NO absentees - send no_absent template
                         if (sendWA && !quotaExceeded[0]) {
+                            updateProgress("Admin: Sending no-absent summary...", -1);
                             try {
                                 String noAbsentWamid = whatsAppApiService.sendNoAbsentSummary(whatsAppDate, className, topic, batch);
                                 deliveryRecords.add(new MessageDelivery("ADMIN – No Absent Summary", "Nupur Madam", noAbsentWamid));
+                                adminSuccessCount++;
                                 logger.info("No Absent summary template sent to admin, wamid={}", noAbsentWamid);
                             } catch (WhatsAppApiService.QuotaExceededException e) {
                                 sendErrors.add("Quota exceeded — no_absent summary not sent to admin.");
@@ -416,6 +455,7 @@ public class SendResultsViewController {
                 // 6. Completion summary
                 final int finalSuccess = successCount;
                 final int finalTotal = total;
+                final int finalAdminSuccess = adminSuccessCount;
                 final List<String> finalErrors = new ArrayList<>(sendErrors);
                 final List<MessageDelivery> finalDeliveryRecords = new ArrayList<>(deliveryRecords);
                 final boolean waEnabled = sendWA;
@@ -424,7 +464,7 @@ public class SendResultsViewController {
                 Platform.runLater(() -> {
                     try {
                         CompletionSummaryViewController.show(
-                                finalSuccess, finalTotal, waEnabled,
+                                finalSuccess, finalTotal, waEnabled, finalAdminSuccess,
                                 finalQuotaExceeded, finalQuotaStudentName, finalErrors,
                                 finalDeliveryRecords);
                     } catch (IOException e) {

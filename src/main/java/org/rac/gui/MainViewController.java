@@ -32,7 +32,7 @@ public class MainViewController {
         navVBox.getChildren().add(homeButton);
 
         for (Activity activity : activityService.getActivities()) {
-            Button btn = createNavButton("↑  " + activity.getName(), false);
+            Button btn = createNavButton(activity.getIcon() + "  " + activity.getName(), false);
             btn.setOnAction(e -> navigateTo(activity, btn));
             navVBox.getChildren().add(btn);
             navButtons.add(btn);

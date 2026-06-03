@@ -8,7 +8,7 @@ public class Student {
     private final String rollNo;
 
     public Student(String name, double marksObtained, String additionalDetails, String phone, String rollNo) {
-        this.name = name.toUpperCase();
+        this.name = name.trim().replaceAll("\\s+", " ").toUpperCase();
         this.marksObtained = marksObtained;
         this.additionalDetails = additionalDetails;
         this.phone = phone;

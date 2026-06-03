@@ -17,7 +17,7 @@
       fx:controller="org.rac.gui.MainViewController"
       stylesheets="@rac-styles.css"
       prefWidth="1100"
-      prefHeight="1000">
+      prefHeight="800">
 
     <!-- ══════════════════════════════════════════
          LEFT SIDEBAR
