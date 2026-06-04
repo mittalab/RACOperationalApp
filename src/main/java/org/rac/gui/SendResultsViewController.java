@@ -419,10 +419,13 @@ public class SendResultsViewController {
                     }
                 }
 
+                boolean isAbsent = false;
+                String adminAbsentWamid = null;
                 // 5.5 Absent notice image + template message
                 if (!isAborted && sendAdminNotifications && filenameMatchedPattern) {
                     adminTotal++;
                     if (!readResult.absentStudentNames.isEmpty()) {
+                        isAbsent = true;
                         updateProgress("Admin: Generating absent image...", -1);
                         try {
                             File absentImage = resultImageService.generateAbsentImage(
@@ -435,6 +438,7 @@ public class SendResultsViewController {
                                 try {
                                     String absentMediaId = whatsAppApiService.uploadMedia(absentImage);
                                     String absentWamid = whatsAppApiService.sendAbsentSummary(absentMediaId, whatsAppDate, className, topic, batch);
+                                    adminAbsentWamid = absentWamid;
                                     deliveryRecords.add(new MessageDelivery("ADMIN – Absent Summary", "Nupur Madam", absentWamid));
                                     adminSuccessCount++;
                                     logger.info("Absent summary template sent to admin, wamid={}", absentWamid);
@@ -460,6 +464,7 @@ public class SendResultsViewController {
                             try {
                                 String noAbsentWamid = whatsAppApiService.sendNoAbsentSummary(whatsAppDate, className, topic, batch);
                                 deliveryRecords.add(new MessageDelivery("ADMIN – No Absent Summary", "Nupur Madam", noAbsentWamid));
+                                adminAbsentWamid = noAbsentWamid;
                                 adminSuccessCount++;
                                 logger.info("No Absent summary template sent to admin, wamid={}", noAbsentWamid);
                             } catch (WhatsAppApiService.QuotaExceededException e) {
@@ -478,7 +483,7 @@ public class SendResultsViewController {
                 // 5.7 Write run report to PNG directory
                 File reportFile = new File(pngDir, "run_report.xlsx");
                 try {
-                    excelWriterService.writeRunReport(runRecords, topperMsgId[0], summaryMsgId[0], reportFile);
+                    excelWriterService.writeRunReport(runRecords, topperMsgId[0], summaryMsgId[0], adminAbsentWamid, isAbsent, reportFile);
                 } catch (Exception e) {
                     logger.error("Failed to write run report", e);
                 }
