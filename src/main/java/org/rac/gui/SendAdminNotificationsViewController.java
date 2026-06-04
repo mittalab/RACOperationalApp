@@ -259,10 +259,12 @@ public class SendAdminNotificationsViewController {
                     } catch (WhatsAppApiService.QuotaExceededException e) {
                         quotaExceeded[0] = true;
                         quotaStudentName[0] = "Topper List";
+                        deliveryRecords.add(new MessageDelivery("ADMIN – Topper List", "Nupur Madam", null, "Failed"));
                         sendErrors.add("Quota exceeded — topper image not sent to admin.");
                         logger.error("Quota exceeded sending topper result", e);
                     } catch (Exception e) {
                         sendErrors.add("Topper image (admin): " + e.getMessage());
+                        deliveryRecords.add(new MessageDelivery("ADMIN – Topper List", "Nupur Madam", null, "Failed"));
                         logger.error("Failed sending topper result", e);
                     }
                 }
@@ -286,15 +288,18 @@ public class SendAdminNotificationsViewController {
                             } catch (WhatsAppApiService.QuotaExceededException e) {
                                 quotaExceeded[0] = true;
                                 quotaStudentName[0] = "Absent List";
+                                deliveryRecords.add(new MessageDelivery("ADMIN – Absent Summary", "Nupur Madam", null, "Failed"));
                                 sendErrors.add("Quota exceeded — absent summary not sent to admin.");
                                 logger.error("Quota exceeded sending absent summary", e);
                             } catch (Exception e) {
                                 sendErrors.add("Absent summary (admin): " + e.getMessage());
+                                deliveryRecords.add(new MessageDelivery("ADMIN – Absent Summary", "Nupur Madam", null, "Failed"));
                                 logger.error("Failed sending absent summary", e);
                             }
                         }
                     } catch (Exception e) {
                         sendErrors.add("Absent notice image: " + e.getMessage());
+                        deliveryRecords.add(new MessageDelivery("ADMIN – Absent Summary", "Nupur Madam", null, "Failed"));
                         logger.error("Failed generating absent notice image", e);
                     }
                 } else {
@@ -307,10 +312,12 @@ public class SendAdminNotificationsViewController {
                         } catch (WhatsAppApiService.QuotaExceededException e) {
                             quotaExceeded[0] = true;
                             quotaStudentName[0] = "No Absent";
+                            deliveryRecords.add(new MessageDelivery("ADMIN – No Absent Summary", "Nupur Madam", null, "Failed"));
                             sendErrors.add("Quota exceeded — no_absent summary not sent to admin.");
                             logger.error("Quota exceeded sending no_absent summary", e);
                         } catch (Exception e) {
                             sendErrors.add("No Absent summary (admin): " + e.getMessage());
+                            deliveryRecords.add(new MessageDelivery("ADMIN – No Absent Summary", "Nupur Madam", null, "Failed"));
                             logger.error("Failed sending no_absent summary", e);
                         }
                     }
@@ -336,7 +343,7 @@ public class SendAdminNotificationsViewController {
                 logger.error("Unexpected error during processing", e);
                 showAlert("Error", "An error occurred: " + e.getMessage());
             } finally {
-                RunLogger.stop(runLogAppender);
+
                 if (pngDir != null) {
                     try {
                         googleDriveService.uploadRunFolder(pngDir, LocalDate.now(), MachineIdentifier.getUserName());
@@ -348,6 +355,7 @@ public class SendAdminNotificationsViewController {
                     catch (Exception e) { logger.warn("Could not open output folder", e); }
                 }
                 updateProgress("Processing complete.", 1.0);
+                if (runLogAppender != null) RunLogger.stop(runLogAppender);
             }
         }).start();
     }
