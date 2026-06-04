@@ -163,6 +163,8 @@ public class SendResultsViewController {
     @FXML
     public void handleProceed() {
         logger.info("handleProceed clicked");
+        logger.info("Checkbox state — sendWhatsApp: {}, sendAdminNotifications: {}",
+                sendWhatsAppCheckbox.isSelected(), sendAdminNotificationsCheckbox.isSelected());
         if (!validateInputs()) return;
 
         isAborted = false;
