@@ -101,7 +101,7 @@ public class WhatsAppApiService {
                     .build();
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            logger.debug("Media upload response {}: {}", response.statusCode(), response.body());
+            logger.info("Media upload response {}: {}", response.statusCode(), response.body());
 
             if (response.statusCode() < 200 || response.statusCode() >= 300) {
                 throw new WhatsAppApiException(response.statusCode(), response.body());
@@ -121,7 +121,7 @@ public class WhatsAppApiService {
      * Returns one of: accepted, sent, delivered, read, failed, or "unknown".
      */
     public String checkMessageStatus(String messageId) throws IOException, InterruptedException {
-        logger.debug("Checking status for message {}", messageId);
+        logger.info("Checking status for message {}", messageId);
         return executeWithRetry(() -> {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(BASE_URL + messageId))
@@ -130,7 +130,7 @@ public class WhatsAppApiService {
                     .build();
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            logger.debug("Status check response {}: {}", response.statusCode(), response.body());
+            logger.info("Status check response {}: {}", response.statusCode(), response.body());
 
             if (response.statusCode() < 200 || response.statusCode() >= 300) {
                 throw new WhatsAppApiException(response.statusCode(), response.body());
@@ -263,9 +263,10 @@ public class WhatsAppApiService {
                     .build();
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            logger.debug("Message send response {}: {}", response.statusCode(), response.body());
+            logger.info("Message send response {}: {}", response.statusCode(), response.body());
 
             if (response.statusCode() < 200 || response.statusCode() >= 300) {
+                logger.error("Error while sending JSON to WhatsApp API: {}, {}", response.statusCode(), response.body());
                 throw new WhatsAppApiException(response.statusCode(), response.body());
             }
             String msgId = extractMessageId(response.body());

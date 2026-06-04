@@ -10,6 +10,7 @@ import org.rac.Main;
 import org.rac.model.MessageDelivery;
 import org.rac.model.Student;
 import org.rac.services.ExcelReaderService;
+import org.rac.services.ExcelWriterService;
 import org.rac.services.GoogleDriveService;
 import org.rac.services.ResultImageService;
 import org.rac.services.WhatsAppApiService;
@@ -68,6 +69,7 @@ public class SendAdminNotificationsViewController {
     private File absentTemplateFile;
 
     private final ExcelReaderService excelReaderService = new ExcelReaderService();
+    private final ExcelWriterService excelWriterService = new ExcelWriterService();
     private final ResultImageService resultImageService = new ResultImageService();
     private final WhatsAppApiService whatsAppApiService = new WhatsAppApiService();
     private final GoogleDriveService googleDriveService = new GoogleDriveService();
@@ -247,12 +249,12 @@ public class SendAdminNotificationsViewController {
                         toppers, formattedDate, className, batch, topic,
                         totalMarks, topperTemplateFile, htmlDir, pngDir);
                 File topperImage = new File(pngDir, "Toppers_List.png");
-
+                String topperMsgId = null;
                 // Send topper image to admin
                 if (!quotaExceeded[0]) {
                     try {
                         String topperMediaId = whatsAppApiService.uploadMedia(topperImage);
-                        String topperMsgId = whatsAppApiService.sendTopperResult(topperMediaId, heading, whatsAppDate, className, topic);
+                        topperMsgId = whatsAppApiService.sendTopperResult(topperMediaId, heading, whatsAppDate, className, topic);
                         deliveryRecords.add(new MessageDelivery("ADMIN – Topper List", "Nupur Madam", topperMsgId));
                         successCount++;
                         logger.info("Topper result sent to admin, wamid={}", topperMsgId);
@@ -269,9 +271,12 @@ public class SendAdminNotificationsViewController {
                     }
                 }
 
+                String adminAbsentWamid = null;
+                boolean isAbsent = false;
                 // Generate and send absent image
                 updateProgress("Generating absent image...", 0.7);
                 if (!readResult.absentStudentNames.isEmpty()) {
+                    isAbsent = true;
                     try {
                         File absentImage = resultImageService.generateAbsentImage(
                                 readResult.absentStudentNames, formattedDate, className, batch, topic,
@@ -282,6 +287,7 @@ public class SendAdminNotificationsViewController {
                             try {
                                 String absentMediaId = whatsAppApiService.uploadMedia(absentImage);
                                 String absentWamid = whatsAppApiService.sendAbsentSummary(absentMediaId, whatsAppDate, className, topic, batch);
+                                adminAbsentWamid = absentWamid;
                                 deliveryRecords.add(new MessageDelivery("ADMIN – Absent Summary", "Nupur Madam", absentWamid));
                                 successCount++;
                                 logger.info("Absent summary sent to admin, wamid={}", absentWamid);
@@ -306,6 +312,7 @@ public class SendAdminNotificationsViewController {
                     if (!quotaExceeded[0]) {
                         try {
                             String noAbsentWamid = whatsAppApiService.sendNoAbsentSummary(whatsAppDate, className, topic, batch);
+                            adminAbsentWamid = noAbsentWamid;
                             deliveryRecords.add(new MessageDelivery("ADMIN – No Absent Summary", "Nupur Madam", noAbsentWamid));
                             successCount++;
                             logger.info("No Absent summary sent to admin, wamid={}", noAbsentWamid);
@@ -321,6 +328,14 @@ public class SendAdminNotificationsViewController {
                             logger.error("Failed sending no_absent summary", e);
                         }
                     }
+                }
+
+                // 5.7 Write run report to PNG directory
+                File reportFile = new File(pngDir, "run_report.xlsx");
+                try {
+                    excelWriterService.writeRunReport(new LinkedList<>(), topperMsgId, null, adminAbsentWamid, isAbsent, reportFile);
+                } catch (Exception e) {
+                    logger.error("Failed to write run report", e);
                 }
 
                 final int finalSuccess = successCount;

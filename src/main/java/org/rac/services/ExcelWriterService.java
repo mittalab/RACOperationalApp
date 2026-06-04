@@ -50,6 +50,8 @@ public class ExcelWriterService {
     public void writeRunReport(List<RunRecord> records,
                                String adminTopperWamid,
                                String adminSummaryWamid,
+                               String adminAbsentWamid,
+                               boolean isAbsent,
                                File file) throws IOException {
         logger.info("Writing run report to: {}", file.getAbsolutePath());
         try (Workbook workbook = new XSSFWorkbook();
@@ -77,11 +79,17 @@ public class ExcelWriterService {
             topperRow.createCell(2).setCellValue("Toppers_List.png");
             topperRow.createCell(3).setCellValue(adminTopperWamid != null ? adminTopperWamid : "");
 
-            Row summaryRow = sheet.createRow(rowNum);
+            Row summaryRow = sheet.createRow(rowNum++);
             summaryRow.createCell(0).setCellValue("ADMIN – Summary");
             summaryRow.createCell(1).setCellValue("918527940091");
             summaryRow.createCell(2).setCellValue("—");
             summaryRow.createCell(3).setCellValue(adminSummaryWamid != null ? adminSummaryWamid : "");
+
+            Row absentRow = sheet.createRow(rowNum);
+            absentRow.createCell(0).setCellValue(isAbsent ? "ADMIN – Summary");
+            absentRow.createCell(1).setCellValue("918527940091");
+            absentRow.createCell(2).setCellValue("—");
+            absentRow.createCell(3).setCellValue(adminAbsentWamid != null ? adminAbsentWamid : "");
 
             workbook.write(fileOut);
             logger.info("Run report written with {} student rows", records.size());
