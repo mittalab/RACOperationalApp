@@ -15,8 +15,12 @@ import org.rac.services.ExcelWriterService;
 import org.rac.services.GoogleDriveService;
 import org.rac.services.ResultImageService;
 import org.rac.services.WhatsAppApiService;
+import org.rac.utils.MachineIdentifier;
+import org.rac.utils.RunLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.FileAppender;
 
 import java.awt.Desktop;
 import java.io.File;
@@ -24,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
@@ -163,8 +168,6 @@ public class SendResultsViewController {
     @FXML
     public void handleProceed() {
         logger.info("handleProceed clicked");
-        logger.info("Checkbox state — sendWhatsApp: {}, sendAdminNotifications: {}",
-                sendWhatsAppCheckbox.isSelected(), sendAdminNotificationsCheckbox.isSelected());
         if (!validateInputs()) return;
 
         isAborted = false;
@@ -178,6 +181,7 @@ public class SendResultsViewController {
 
         new Thread(() -> {
             File pngDir = null;
+            FileAppender<ILoggingEvent> runLogAppender = null;
             try {
                 // 1. Setup Dirs early for Cloud Sync
                 String uuid = UUID.randomUUID().toString();
@@ -185,6 +189,9 @@ public class SendResultsViewController {
                 pngDir = new File(uuid + "_png");
                 htmlDir.mkdirs();
                 pngDir.mkdirs();
+                runLogAppender = RunLogger.start(pngDir);
+                logger.info("Checkbox state — sendWhatsApp: {}, sendAdminNotifications: {}", sendWA, sendAdminNotifications);
+                logger.info("Machine GUID: {}, User: {}", MachineIdentifier.getMachineGuid(), MachineIdentifier.getUserName());
 
                 // Copy input Excel to output dir for reference
                 Files.copy(excelFile.toPath(), new File(pngDir, excelFile.getName()).toPath(),
@@ -302,11 +309,11 @@ public class SendResultsViewController {
 
                     List<String> phones = parsePhones(student.getPhone());
                     String msgId = null;
+                    boolean anySuccess = false;
 
                     if (sendWA && !quotaExceeded[0]) {
                         try {
                             String mediaId = whatsAppApiService.uploadMedia(imageFile);
-                            boolean anySuccess = false;
                             for (String phone : phones) {
                                 if (quotaExceeded[0]) break;
                                 try {
@@ -340,6 +347,12 @@ public class SendResultsViewController {
                         }
                     }
 
+                    if (sendWA && !quotaExceeded[0] && !anySuccess) {
+                        msgId = "FAILED";
+                        MessageDelivery failedDelivery = new MessageDelivery(student.getName(), String.join(", ", phones), "");
+                        failedDelivery.setStatus("Failed ✗");
+                        deliveryRecords.add(failedDelivery);
+                    }
                     String joinedPhones = String.join(", ", phones);
                     runRecords.add(new RunRecord(student.getName(), joinedPhones, imageFile.getName(), msgId));
                     sentStudents.add(student);
@@ -487,7 +500,13 @@ public class SendResultsViewController {
                         showAlert("Error", "Error saving abort report: " + ex.getMessage());
                     }
                 }
+                RunLogger.stop(runLogAppender);
                 if (pngDir != null) {
+                    try {
+                        googleDriveService.uploadRunFolder(pngDir, LocalDate.now(), MachineIdentifier.getUserName());
+                    } catch (Exception e) {
+                        logger.error("Failed to upload run folder to Google Drive", e);
+                    }
                     File finalPngDir = pngDir;
                     try { Desktop.getDesktop().open(finalPngDir); }
                     catch (Exception e) { logger.warn("Could not open output folder", e); }

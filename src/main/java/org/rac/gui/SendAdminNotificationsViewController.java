@@ -13,8 +13,12 @@ import org.rac.services.ExcelReaderService;
 import org.rac.services.GoogleDriveService;
 import org.rac.services.ResultImageService;
 import org.rac.services.WhatsAppApiService;
+import org.rac.utils.MachineIdentifier;
+import org.rac.utils.RunLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.FileAppender;
 
 import java.awt.Desktop;
 import java.io.File;
@@ -22,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
@@ -139,12 +144,15 @@ public class SendAdminNotificationsViewController {
 
         new Thread(() -> {
             File pngDir = null;
+            FileAppender<ILoggingEvent> runLogAppender = null;
             try {
                 String uuid = UUID.randomUUID().toString();
                 File htmlDir = new File(uuid + "_html");
                 pngDir = new File(uuid + "_png");
                 htmlDir.mkdirs();
                 pngDir.mkdirs();
+                runLogAppender = RunLogger.start(pngDir);
+                logger.info("Machine GUID: {}, User: {}", MachineIdentifier.getMachineGuid(), MachineIdentifier.getUserName());
 
                 // Copy input Excel to output dir for reference
                 Files.copy(excelFile.toPath(), new File(pngDir, excelFile.getName()).toPath(),
@@ -328,7 +336,13 @@ public class SendAdminNotificationsViewController {
                 logger.error("Unexpected error during processing", e);
                 showAlert("Error", "An error occurred: " + e.getMessage());
             } finally {
+                RunLogger.stop(runLogAppender);
                 if (pngDir != null) {
+                    try {
+                        googleDriveService.uploadRunFolder(pngDir, LocalDate.now(), MachineIdentifier.getUserName());
+                    } catch (Exception e) {
+                        logger.error("Failed to upload run folder to Google Drive", e);
+                    }
                     File finalPngDir = pngDir;
                     try { Desktop.getDesktop().open(finalPngDir); }
                     catch (Exception e) { logger.warn("Could not open output folder", e); }

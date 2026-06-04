@@ -24,6 +24,7 @@ target/
 .springBeans
 .sts4-cache
 src/main/resources/credentials/google-credentials.json
+client_secrets.json
 
 ### NetBeans ###
 /nbproject/private/
@@ -47,6 +48,7 @@ build/
 *_html/
 *.xlsx
 rac-operational-app.log
+tokens/
 
 ### Tools ###
 .claude/
