@@ -111,7 +111,7 @@ public class DeliveryTrackerViewController {
                     setStyle("-fx-text-fill: #1d4ed8; -fx-font-weight: bold;");
                 } else if (lower.equals("sent") || lower.equals("accepted")) {
                     setStyle("-fx-text-fill: #92400e;");
-                } else if (lower.startsWith("failed")) {
+                } else if (lower.startsWith("failed") || lower.startsWith("no id")) {
                     setStyle("-fx-text-fill: #dc2626; -fx-font-weight: bold;");
                 } else {
                     setStyle("-fx-text-fill: #64748b;");
@@ -220,7 +220,7 @@ public class DeliveryTrackerViewController {
             total++;
             if (s.startsWith("read"))                          read++;
             else if (s.startsWith("deliv"))                    delivered++;
-            else if (s.startsWith("fail") || s.startsWith("Fail") || s.startsWith("No ID"))                     failed++;
+            else if (s.startsWith("fail") || s.startsWith("no id"))                     failed++;
             else if (s.equals("sent") || s.equals("accepted")) sent++;
             else if (s.equals("pending"))                      pending++;
         }

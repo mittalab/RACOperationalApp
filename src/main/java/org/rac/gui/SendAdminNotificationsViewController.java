@@ -333,7 +333,7 @@ public class SendAdminNotificationsViewController {
                 // 5.7 Write run report to PNG directory
                 File reportFile = new File(pngDir, "run_report.xlsx");
                 try {
-                    excelWriterService.writeRunReport(new LinkedList<>(), topperMsgId, null, adminAbsentWamid, isAbsent, reportFile);
+                    excelWriterService.writeRunReport(new LinkedList<>(), topperMsgId, null, adminAbsentWamid, isAbsent, false, true, reportFile);
                 } catch (Exception e) {
                     logger.error("Failed to write run report", e);
                 }

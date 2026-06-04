@@ -52,6 +52,8 @@ public class ExcelWriterService {
                                String adminSummaryWamid,
                                String adminAbsentWamid,
                                boolean isAbsent,
+                               boolean shouldSendSummary,
+                               boolean sendAdminNotifications,
                                File file) throws IOException {
         logger.info("Writing run report to: {}", file.getAbsolutePath());
         try (Workbook workbook = new XSSFWorkbook();
@@ -73,23 +75,29 @@ public class ExcelWriterService {
                 row.createCell(3).setCellValue(r.wamid() != null ? r.wamid() : "");
             }
 
-            Row topperRow = sheet.createRow(rowNum++);
-            topperRow.createCell(0).setCellValue("ADMIN – Topper List");
-            topperRow.createCell(1).setCellValue("918527940091");
-            topperRow.createCell(2).setCellValue("Toppers_List.png");
-            topperRow.createCell(3).setCellValue(adminTopperWamid != null ? adminTopperWamid : "");
+            if (sendAdminNotifications) {
+                Row topperRow = sheet.createRow(rowNum++);
+                topperRow.createCell(0).setCellValue("ADMIN – Topper List");
+                topperRow.createCell(1).setCellValue("918527940091");
+                topperRow.createCell(2).setCellValue("Toppers_List.png");
+                topperRow.createCell(3).setCellValue(adminTopperWamid != null ? adminTopperWamid : "");
+            }
 
-            Row summaryRow = sheet.createRow(rowNum++);
-            summaryRow.createCell(0).setCellValue("ADMIN – Summary");
-            summaryRow.createCell(1).setCellValue("918527940091");
-            summaryRow.createCell(2).setCellValue("—");
-            summaryRow.createCell(3).setCellValue(adminSummaryWamid != null ? adminSummaryWamid : "");
+            if (shouldSendSummary) {
+                Row summaryRow = sheet.createRow(rowNum++);
+                summaryRow.createCell(0).setCellValue("ADMIN – Summary");
+                summaryRow.createCell(1).setCellValue("918527940091");
+                summaryRow.createCell(2).setCellValue("—");
+                summaryRow.createCell(3).setCellValue(adminSummaryWamid != null ? adminSummaryWamid : "");
+            }
 
-            Row absentRow = sheet.createRow(rowNum);
-            absentRow.createCell(0).setCellValue(isAbsent ? "ADMIN – Summary");
-            absentRow.createCell(1).setCellValue("918527940091");
-            absentRow.createCell(2).setCellValue("—");
-            absentRow.createCell(3).setCellValue(adminAbsentWamid != null ? adminAbsentWamid : "");
+            if (sendAdminNotifications) {
+                Row absentRow = sheet.createRow(rowNum);
+                absentRow.createCell(0).setCellValue(isAbsent ? "ADMIN – Absent Summary" : "ADMIN – No Absent Summary");
+                absentRow.createCell(1).setCellValue("918527940091");
+                absentRow.createCell(2).setCellValue("—");
+                absentRow.createCell(3).setCellValue(adminAbsentWamid != null ? adminAbsentWamid : "");
+            }
 
             workbook.write(fileOut);
             logger.info("Run report written with {} student rows", records.size());

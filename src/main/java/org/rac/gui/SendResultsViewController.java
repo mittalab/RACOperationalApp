@@ -483,7 +483,7 @@ public class SendResultsViewController {
                 // 5.7 Write run report to PNG directory
                 File reportFile = new File(pngDir, "run_report.xlsx");
                 try {
-                    excelWriterService.writeRunReport(runRecords, topperMsgId[0], summaryMsgId[0], adminAbsentWamid, isAbsent, reportFile);
+                    excelWriterService.writeRunReport(runRecords, topperMsgId[0], summaryMsgId[0], adminAbsentWamid, isAbsent, true, sendAdminNotifications, reportFile);
                 } catch (Exception e) {
                     logger.error("Failed to write run report", e);
                 }
