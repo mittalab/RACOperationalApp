@@ -17,6 +17,13 @@ public class MessageDelivery {
         this.messageId.set(messageId != null ? messageId : "");
     }
 
+    public MessageDelivery(String studentName, String phone, String messageId, String status) {
+        this.studentName.set(studentName);
+        this.phone.set(phone);
+        this.messageId.set(messageId != null ? messageId : "");
+        this.status.set(status);
+    }
+
     // --- Properties (required by PropertyValueFactory in TableView) ---
     public StringProperty studentNameProperty() { return studentName; }
     public StringProperty phoneProperty()       { return phone; }

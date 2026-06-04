@@ -220,7 +220,7 @@ public class DeliveryTrackerViewController {
             total++;
             if (s.startsWith("read"))                          read++;
             else if (s.startsWith("deliv"))                    delivered++;
-            else if (s.startsWith("fail"))                     failed++;
+            else if (s.startsWith("fail") || s.startsWith("Fail") || s.startsWith("No ID"))                     failed++;
             else if (s.equals("sent") || s.equals("accepted")) sent++;
             else if (s.equals("pending"))                      pending++;
         }

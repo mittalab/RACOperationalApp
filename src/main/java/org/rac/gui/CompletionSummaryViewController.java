@@ -30,7 +30,7 @@ public class CompletionSummaryViewController {
     private List<MessageDelivery> deliveryRecords;
 
     void setup(Stage stage, int parentSuccess, int parentTotal, boolean waEnabled,
-               int adminSuccess,
+               int adminSuccess, int adminTotal,
                boolean quotaExceeded, String quotaStudentName,
                List<String> errors, List<MessageDelivery> deliveryRecords) {
         this.stage = stage;
@@ -51,7 +51,7 @@ public class CompletionSummaryViewController {
         }
         if (adminSuccess > 0) {
             if (summary.length() > 0) summary.append("\n");
-            summary.append("Admin: ").append(adminSuccess).append(" message(s) sent");
+            summary.append("Admin: ").append(adminSuccess).append(" / ").append(adminTotal).append(" message(s) sent");
         }
         summaryLabel.setText(summary.toString());
 
@@ -83,7 +83,7 @@ public class CompletionSummaryViewController {
     }
 
     public static void show(int parentSuccess, int parentTotal, boolean waEnabled,
-                            int adminSuccess,
+                            int adminSuccess, int adminTotal,
                             boolean quotaExceeded, String quotaStudentName,
                             List<String> errors, List<MessageDelivery> deliveryRecords) throws IOException {
         FXMLLoader loader = new FXMLLoader(
@@ -98,7 +98,7 @@ public class CompletionSummaryViewController {
         stage.setResizable(true);
         stage.setScene(new Scene(root));
 
-        controller.setup(stage, parentSuccess, parentTotal, waEnabled, adminSuccess,
+        controller.setup(stage, parentSuccess, parentTotal, waEnabled, adminSuccess, adminTotal,
                 quotaExceeded, quotaStudentName, errors, deliveryRecords);
         stage.showAndWait();
     }

@@ -324,7 +324,7 @@ public class SendAdminNotificationsViewController {
                 Platform.runLater(() -> {
                     try {
                         CompletionSummaryViewController.show(
-                                0, 0, false, finalSuccess,
+                                0, 0, false, finalSuccess, 2,
                                 finalQuotaExceeded, finalQuotaStudentName, finalErrors,
                                 finalDeliveryRecords);
                     } catch (IOException e) {
