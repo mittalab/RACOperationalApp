@@ -30,7 +30,7 @@ public class GoogleDriveService {
     private static final String EXTERNAL_CLIENT_SECRETS_FILENAME = "client_secrets.json";
     private static final String UPLOAD_ROOT_FOLDER_ID = "1U1WcDx8Ge5EcfNBxFDEQskmgM7MyxJNq";
 
-    private Drive getDriveService() throws IOException, GeneralSecurityException {
+    private Drive getOAuthDriveService() throws IOException, GeneralSecurityException {
         InputStream in = null;
         File externalFile = new File(EXTERNAL_CLIENT_SECRETS_FILENAME);
         if (externalFile.exists()) {
@@ -82,10 +82,58 @@ public class GoogleDriveService {
                 .build();
     }
 
+    private Drive getServiceAccountDriveService() throws IOException, GeneralSecurityException {
+        InputStream serviceAccountIn = null;
+        File externalServiceAccount = new File("google-credentials.json");
+        if (externalServiceAccount.exists()) {
+            logger.info("Loading Google Service Account from external file: {}", externalServiceAccount.getAbsolutePath());
+            serviceAccountIn = new FileInputStream(externalServiceAccount);
+        } else {
+            serviceAccountIn = GoogleDriveService.class.getResourceAsStream("/credentials/google-credentials.json");
+            if (serviceAccountIn != null) {
+                logger.info("Loading Google Service Account from bundled resource: /credentials/google-credentials.json");
+            }
+        }
+
+        if (serviceAccountIn == null) {
+            throw new FileNotFoundException("Service Account credentials file (google-credentials.json) not found in resources or current directory.");
+        }
+
+        try {
+            com.google.auth.oauth2.GoogleCredentials credentials = com.google.auth.oauth2.GoogleCredentials
+                    .fromStream(serviceAccountIn)
+                    .createScoped(Collections.singleton(DriveScopes.DRIVE));
+            
+            logger.info("Google Drive Service initialized successfully via Service Account.");
+            return new Drive.Builder(
+                    GoogleNetHttpTransport.newTrustedTransport(),
+                    GsonFactory.getDefaultInstance(),
+                    new com.google.auth.http.HttpCredentialsAdapter(credentials))
+                    .setApplicationName(APPLICATION_NAME)
+                    .build();
+        } finally {
+            serviceAccountIn.close();
+        }
+    }
+
+    private Drive getDriveServiceForRead() throws IOException, GeneralSecurityException {
+        try {
+            return getServiceAccountDriveService();
+        } catch (Exception e) {
+            logger.warn("Failed to initialize Google Drive via Service Account: {}. Falling back to OAuth 2.0 Flow...", e.getMessage());
+            return getOAuthDriveService();
+        }
+    }
+
+    private Drive getDriveServiceForWrite() throws IOException, GeneralSecurityException {
+        // Always use OAuth for writing to bypass the Service Account 0-quota limit
+        return getOAuthDriveService();
+    }
+
     public void downloadSpreadsheetAsExcel(String spreadsheetId, File targetFile) throws IOException, GeneralSecurityException {
         logger.info("Downloading Google Spreadsheet {} as Excel to {}", spreadsheetId, targetFile.getAbsolutePath());
         
-        Drive service = getDriveService();
+        Drive service = getDriveServiceForRead();
         
         // Export the Google Sheet as an .xlsx file
         try (OutputStream outputStream = new FileOutputStream(targetFile)) {
@@ -121,7 +169,7 @@ public class GoogleDriveService {
 
     public void uploadRunFolder(File pngDir, LocalDate date, String userName) throws IOException, GeneralSecurityException {
         logger.info("Uploading run folder {} to Drive as {}/{}", pngDir.getName(), date, userName);
-        Drive service = getDriveService();
+        Drive service = getDriveServiceForWrite();
         String yearId  = findOrCreateFolder(service, String.valueOf(date.getYear()), UPLOAD_ROOT_FOLDER_ID);
         String monthId = findOrCreateFolder(service, String.format("%02d", date.getMonthValue()), yearId);
         String dayId   = findOrCreateFolder(service, String.format("%02d", date.getDayOfMonth()), monthId);
@@ -140,7 +188,7 @@ public class GoogleDriveService {
 
     public void downloadFileFromFolder(String folderId, String fileName, File targetFile) throws IOException, GeneralSecurityException {
         logger.info("Looking for file '{}' inside Google Drive folder '{}'", fileName, folderId);
-        Drive service = getDriveService();
+        Drive service = getDriveServiceForRead();
         FileList result = service.files().list()
                 .setQ("name = '" + fileName + "' and '" + folderId + "' in parents and trashed = false")
                 .setFields("files(id, name)")
