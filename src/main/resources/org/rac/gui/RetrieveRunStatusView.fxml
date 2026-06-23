@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!--
+    Retrieve Run Status — checks WhatsApp message status for a selected run folder (local or Google Drive).
+    Controller: org.rac.gui.RetrieveRunStatusViewController
+-->
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.rac.gui.RetrieveRunStatusViewController"
+      stylesheets="@rac-styles.css"
+      prefWidth="1100" prefHeight="1000"
+      spacing="0">
+
+    <!-- ── Header bar ─────────────────────────────────────────── -->
+    <HBox styleClass="send-header-bar" alignment="CENTER_LEFT" spacing="12">
+        <StackPane styleClass="send-header-icon-box">
+            <Label text="↺" style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+        </StackPane>
+        <VBox spacing="2" HBox.hgrow="ALWAYS">
+            <Label text="Retrieve Run Status" styleClass="send-header-title"/>
+            <Label text="Check real-time WhatsApp delivery status from a past run report" styleClass="send-header-subtitle"/>
+        </VBox>
+        <Button text="← Home"
+                styleClass="back-button"
+                onAction="#handleBackToHome"/>
+    </HBox>
+
+    <!-- ── Input & Selector Card ──────────────────────────────── -->
+    <VBox styleClass="send-content-vbox" spacing="12">
+        <VBox styleClass="form-card" spacing="12">
+            <Label text="SELECT PAST RUN FOLDER" styleClass="form-card-header"/>
+            
+            <HBox spacing="20" alignment="CENTER_LEFT">
+                <RadioButton fx:id="localRadio" text="Local Folder" selected="true" style="-fx-text-fill: #475569;">
+                    <toggleGroup>
+                        <ToggleGroup fx:id="folderSourceGroup"/>
+                    </toggleGroup>
+                </RadioButton>
+                <RadioButton fx:id="driveRadio" text="Google Drive Folder" toggleGroup="$folderSourceGroup" style="-fx-text-fill: #475569;"/>
+            </HBox>
+
+            <!-- Local Folder HBox -->
+            <HBox fx:id="localInputBox" spacing="12" alignment="CENTER_LEFT">
+                <Button text="Browse Folder..." onAction="#handleBrowseLocalFolder" styleClass="dialog-button" style="-fx-padding: 8 16 8 16;"/>
+                <Label fx:id="localFolderLabel" text="No folder selected" style="-fx-text-fill: #64748b; -fx-font-size: 13px;"/>
+            </HBox>
+
+            <!-- Google Drive Folder HBox -->
+            <HBox fx:id="driveInputBox" spacing="12" alignment="CENTER_LEFT" visible="false" managed="false">
+                <Label text="Drive Folder URL:" style="-fx-text-fill: #475569; -fx-font-weight: bold; -fx-font-size: 12px;"/>
+                <TextField fx:id="driveUrlField" promptText="https://drive.google.com/drive/folders/..." HBox.hgrow="ALWAYS" styleClass="form-text-field"/>
+            </HBox>
+
+            <Separator style="-fx-opacity: 0.4;"/>
+
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <Button fx:id="loadButton" text="Load Run &amp; Check Status" onAction="#handleLoadRun" styleClass="proceed-button"/>
+                <ProgressIndicator fx:id="loadingIndicator" visible="false" prefWidth="24" prefHeight="24"/>
+                <Label fx:id="statusLabel" text="Select a folder to begin." style="-fx-text-fill: #64748b; -fx-font-size: 12px;"/>
+            </HBox>
+        </VBox>
+    </VBox>
+
+    <!-- ── Delivery Table ──────────────────────────────────────── -->
+    <TableView fx:id="deliveryTable"
+               VBox.vgrow="ALWAYS"
+               style="-fx-background-color: #f4f8fd; -fx-border-color: transparent;">
+        <columns>
+            <TableColumn text="Student / Recipient" fx:id="nameCol" prefWidth="250"/>
+            <TableColumn text="Phone" fx:id="phoneCol" prefWidth="150"/>
+            <TableColumn text="WAMID" fx:id="wamidCol" prefWidth="280"/>
+            <TableColumn text="Status" fx:id="statusCol" prefWidth="180"/>
+            <TableColumn text="Last Checked" fx:id="lastCheckedCol" prefWidth="180"/>
+        </columns>
+        <placeholder>
+            <Label text="No records loaded. Please select a valid run folder above." style="-fx-text-fill: #94a3b8;"/>
+        </placeholder>
+    </TableView>
+
+    <!-- ── Summary bar ────────────────────────────────────────── -->
+    <HBox spacing="20" alignment="CENTER_LEFT"
+          style="-fx-padding: 7 18 7 18; -fx-background-color: #f0f7ff;
+                 -fx-border-color: #e2eaf5; -fx-border-width: 1 0 0 0;">
+        <Label text="SUMMARY" style="-fx-font-weight: bold; -fx-text-fill: #1a3355; -fx-font-size: 11px;"/>
+        <Label fx:id="sumTotal"     text="Total: 0"     style="-fx-font-size: 11px; -fx-text-fill: #475569;"/>
+        <Label fx:id="sumSent"      text="Sent: 0"      style="-fx-font-size: 11px; -fx-text-fill: #92400e;"/>
+        <Label fx:id="sumDelivered" text="Delivered: 0" style="-fx-font-size: 11px; -fx-text-fill: #1d4ed8;"/>
+        <Label fx:id="sumRead"      text="Read: 0"      style="-fx-font-size: 11px; -fx-text-fill: #166534; -fx-font-weight: bold;"/>
+        <Label fx:id="sumFailed"    text="Failed: 0"    style="-fx-font-size: 11px; -fx-text-fill: #dc2626; -fx-font-weight: bold;"/>
+        <Label fx:id="sumPending"   text="Pending: 0"   style="-fx-font-size: 11px; -fx-text-fill: #94a3b8;"/>
+    </HBox>
+
+    <!-- ── Bottom toolbar ──────────────────────────────────────── -->
+    <HBox spacing="12" alignment="CENTER_LEFT"
+          style="-fx-padding: 10 18 10 18; -fx-background-color: white;
+                 -fx-border-color: #e2eaf5; -fx-border-width: 1 0 0 0;">
+
+        <CheckBox fx:id="autoRefreshCheckbox"
+                  text="Auto-refresh (30 s)"
+                  onAction="#handleAutoRefreshToggle"
+                  style="-fx-text-fill: #475569; -fx-font-size: 12px;"/>
+
+        <Label fx:id="refreshLabel"
+               text=""
+               style="-fx-text-fill: #64748b; -fx-font-size: 11px;"/>
+
+        <Region HBox.hgrow="ALWAYS"/>
+
+        <Button fx:id="refreshButton"
+                text="↺  Refresh Statuses"
+                styleClass="proceed-button"
+                onAction="#handleRefresh"
+                style="-fx-padding: 8 18 8 18;"
+                disable="true"/>
+    </HBox>
+
+</VBox>

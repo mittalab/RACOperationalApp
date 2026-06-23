@@ -137,4 +137,24 @@ public class GoogleDriveService {
         }
         logger.info("Drive upload complete: {} files", files != null ? files.length : 0);
     }
+
+    public void downloadFileFromFolder(String folderId, String fileName, File targetFile) throws IOException, GeneralSecurityException {
+        logger.info("Looking for file '{}' inside Google Drive folder '{}'", fileName, folderId);
+        Drive service = getDriveService();
+        FileList result = service.files().list()
+                .setQ("name = '" + fileName + "' and '" + folderId + "' in parents and trashed = false")
+                .setFields("files(id, name)")
+                .execute();
+        
+        if (result.getFiles().isEmpty()) {
+            throw new FileNotFoundException("File '" + fileName + "' not found in Google Drive folder: " + folderId);
+        }
+        
+        String fileId = result.getFiles().get(0).getId();
+        logger.info("Downloading file ID '{}' to '{}'", fileId, targetFile.getAbsolutePath());
+        try (OutputStream outputStream = new FileOutputStream(targetFile)) {
+            service.files().get(fileId).executeMediaAndDownloadTo(outputStream);
+            outputStream.flush();
+        }
+    }
 }
