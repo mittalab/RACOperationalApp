@@ -32,14 +32,11 @@ public class GoogleDriveService {
 
     private Drive getDriveService() throws IOException, GeneralSecurityException {
         InputStream in = null;
-        
-        // 1. Try to load from external file in current directory first
         File externalFile = new File(EXTERNAL_CLIENT_SECRETS_FILENAME);
         if (externalFile.exists()) {
             logger.info("Loading Google Client Secrets from external file: {}", externalFile.getAbsolutePath());
             in = new FileInputStream(externalFile);
         } else {
-            // 2. Fallback to bundled resource
             logger.info("Loading Google Client Secrets from bundled resource: {}", CLIENT_SECRETS_RESOURCE_PATH);
             in = GoogleDriveService.class.getResourceAsStream(CLIENT_SECRETS_RESOURCE_PATH);
         }
@@ -53,7 +50,6 @@ public class GoogleDriveService {
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(
                 GsonFactory.getDefaultInstance(), new InputStreamReader(in));
 
-        // Build flow and trigger user authorization request.
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
                 GoogleNetHttpTransport.newTrustedTransport(),
                 GsonFactory.getDefaultInstance(),
@@ -63,8 +59,20 @@ public class GoogleDriveService {
                 .setAccessType("offline")
                 .build();
         
-        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
-        Credential credential = new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
+        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(-1).build();
+        Credential credential;
+        try {
+            credential = new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
+        } catch (com.google.api.client.auth.oauth2.TokenResponseException e) {
+            if ("invalid_grant".equals(e.getDetails() != null ? e.getDetails().getError() : null) ||
+                (e.getMessage() != null && e.getMessage().contains("invalid_grant"))) {
+                logger.warn("Stored Google credentials are expired or revoked. Clearing token store and retrying authorization...");
+                flow.getCredentialDataStore().clear();
+                credential = new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
+            } else {
+                throw e;
+            }
+        }
 
         return new Drive.Builder(
                 GoogleNetHttpTransport.newTrustedTransport(),
