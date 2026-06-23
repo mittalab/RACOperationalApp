@@ -505,6 +505,13 @@
     -fx-alignment: center-left;
 }
 
+.dialog-header-warning {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 0%, #b45309, #d97706);
+    -fx-padding: 16 22 16 22;
+    -fx-spacing: 12;
+    -fx-alignment: center-left;
+}
+
 .dialog-icon-box {
     -fx-background-color: rgba(255, 255, 255, 0.15);
     -fx-background-radius: 8;

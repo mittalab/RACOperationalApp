@@ -364,6 +364,7 @@ public class SendAdminNotificationsViewController {
                         googleDriveService.uploadRunFolder(pngDir, LocalDate.now(), MachineIdentifier.getUserName());
                     } catch (Exception e) {
                         logger.error("Failed to upload run folder to Google Drive", e);
+                        showAlert("Warning: Google Drive Upload Failed", "Please inform Abhishek that the Google Drive uploads are failing.\n\nError details: " + e.getMessage());
                     }
                     File finalPngDir = pngDir;
                     try { Desktop.getDesktop().open(finalPngDir); }
@@ -417,10 +418,13 @@ public class SendAdminNotificationsViewController {
     }
 
     private void showAlertDirect(String title, String message) {
-        if (title.equals("Info") || title.equals("Warning"))
+        if (title.equals("Info")) {
             MessageDialogViewController.showInfo(title, message);
-        else
+        } else if (title.equals("Warning") || title.contains("Warning")) {
+            MessageDialogViewController.showWarning(title, message);
+        } else {
             MessageDialogViewController.showError(title, message);
+        }
     }
 
     private void showAlert(String title, String message) {

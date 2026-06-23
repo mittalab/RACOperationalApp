@@ -37,6 +37,11 @@ public class MessageDialogViewController {
                 iconLabel.setText("i");
                 subtitleLabel.setText("");
             }
+            case WARNING -> {
+                headerBar.getStyleClass().setAll("dialog-header-warning");
+                iconLabel.setText("⚠");
+                subtitleLabel.setText("Please review the warning details below.");
+            }
         }
     }
 
@@ -73,5 +78,9 @@ public class MessageDialogViewController {
         show(title, message, Type.INFO);
     }
 
-    private enum Type { ERROR, INFO }
+    public static void showWarning(String title, String message) {
+        show(title, message, Type.WARNING);
+    }
+
+    private enum Type { ERROR, INFO, WARNING }
 }
