@@ -105,10 +105,9 @@
                 <!-- Class -->
                 <HBox spacing="12" alignment="CENTER_LEFT">
                     <Label text="Class:" styleClass="form-label"/>
-                    <TextField fx:id="classField"
-                               styleClass="form-text-field"
-                               promptText="e.g. Class X"
-                               prefWidth="260"/>
+                    <ComboBox fx:id="classField"
+                              styleClass="form-combo-box"
+                              prefWidth="260"/>
                 </HBox>
 
                 <!-- Batch -->

@@ -176,7 +176,13 @@ public class GoogleDriveService {
         String userFolderId = findOrCreateFolder(service, userName, dayId);
         String runFolderId  = findOrCreateFolder(service, pngDir.getName(), userFolderId);
         logger.info("Drive run folder ID: {}", runFolderId);
-        File[] files = pngDir.listFiles(File::isFile);
+        File[] files = pngDir.listFiles(f -> f.isFile() && 
+                !f.isHidden() && 
+                !f.getName().startsWith("~$") && 
+                !f.getName().startsWith(".") && 
+                !f.getName().endsWith(".tmp") && 
+                !f.getName().endsWith(".temp")
+        );
         if (files != null) {
             for (File f : files) {
                 logger.info("Uploading: {}", f.getName());

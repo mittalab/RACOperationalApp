@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!--
+    Validation name mismatch dialog — displays mismatched names and available contacts.
+    Controller: org.rac.gui.MismatchSummaryViewController
+-->
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.rac.gui.MismatchSummaryViewController"
+      stylesheets="@rac-styles.css"
+      styleClass="dialog-root"
+      minWidth="560" prefWidth="640"
+      spacing="0">
+
+    <!-- ── Header bar ───────────────────────────────────────── -->
+    <HBox styleClass="dialog-header-error" alignment="CENTER_LEFT" spacing="12">
+        <StackPane styleClass="dialog-icon-box">
+            <Label text="✕" style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+        </StackPane>
+        <VBox spacing="2">
+            <Label text="Validation Name Mismatch" styleClass="dialog-title"/>
+            <Label text="Please resolve the name mismatches between Results and Contacts"
+                   styleClass="dialog-subtitle"/>
+        </VBox>
+    </HBox>
+
+    <!-- ── Content ──────────────────────────────────────────── -->
+    <VBox styleClass="dialog-content" spacing="14" fillWidth="true">
+
+        <!-- Info card -->
+        <VBox styleClass="dialog-info-card" spacing="10">
+            <HBox spacing="8" alignment="CENTER_LEFT">
+                <Label text="Mismatched Names:"
+                       style="-fx-text-fill: #475569; -fx-font-size: 12px; -fx-min-width: 140px;"/>
+                <Label fx:id="mismatchCountLabel" styleClass="dialog-errors-heading" style="-fx-font-size: 13px;"/>
+            </HBox>
+
+            <Pane styleClass="section-divider"/>
+
+            <Label fx:id="descriptionLabel"
+                   text="Some student names in the Results Excel do not match the contact master spreadsheet."
+                   wrapText="true"
+                   style="-fx-text-fill: #334155; -fx-font-size: 12px;"/>
+        </VBox>
+
+
+
+        <!-- Expandable mismatched names list -->
+        <TitledPane fx:id="mismatchedPane"
+                    text="Show mismatched names in Results"
+                    expanded="true"
+                    maxWidth="Infinity"
+                    style="-fx-font-size: 12px; -fx-text-fill: #991b1b;">
+            <TableView fx:id="mismatchedTableView"
+                       prefHeight="180"
+                       maxWidth="Infinity"
+                       style="-fx-font-size: 12px;">
+                <columns>
+                    <TableColumn fx:id="colMismatchIndex" text="#" maxWidth="40" minWidth="40" sortable="false"/>
+                    <TableColumn fx:id="colMismatchName" text="Student Name in Results File" sortable="false"/>
+                </columns>
+            </TableView>
+        </TitledPane>
+
+        <!-- Expandable contacts list -->
+        <TitledPane fx:id="contactsPane"
+                    text="Show available contacts in Google Sheet"
+                    expanded="false"
+                    maxWidth="Infinity"
+                    style="-fx-font-size: 12px; -fx-text-fill: #1e3a8a;">
+            <TableView fx:id="contactsTableView"
+                       prefHeight="220"
+                       maxWidth="Infinity"
+                       style="-fx-font-size: 12px;">
+                <columns>
+                    <TableColumn fx:id="colContactIndex" text="#" maxWidth="40" minWidth="40" sortable="false"/>
+                    <TableColumn fx:id="colContactName" text="Name" sortable="false"/>
+                    <TableColumn fx:id="colContactPhone" text="WhatsApp Number" prefWidth="180" sortable="false"/>
+                </columns>
+            </TableView>
+        </TitledPane>
+
+        <!-- Button row -->
+        <HBox styleClass="dialog-button-row">
+            <Button fx:id="openFileButton" text="📂 Open Results File" styleClass="cancel-button" onAction="#handleOpenFile"/>
+            <Button text="Close" styleClass="ok-button" onAction="#handleClose" defaultButton="true"/>
+        </HBox>
+
+    </VBox>
+</VBox>

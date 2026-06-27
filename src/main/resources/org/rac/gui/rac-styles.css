@@ -260,12 +260,41 @@
     -fx-border-width: 0.8;
     -fx-font-size: 12.5px;
     -fx-font-family: "Segoe UI";
-    -fx-padding: 3 6 3 6;
+    -fx-padding: 0;
 }
 
 .form-combo-box:focused {
     -fx-border-color: #3b82f6;
     -fx-background-color: #eff6ff;
+}
+
+/* Style for non-editable combo box text/label padding */
+.form-combo-box > .list-cell {
+    -fx-padding: 5 8 5 8;
+    -fx-text-fill: #1e293b;
+}
+
+/* Style for editable combo box text-field */
+.form-combo-box:editable > .text-field {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-border-width: 0;
+    -fx-padding: 5 8 5 8;
+    -fx-text-fill: #1e293b;
+    -fx-font-size: 12.5px;
+    -fx-font-family: "Segoe UI";
+}
+
+.form-combo-box:editable > .arrow-button {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-border-width: 0;
+}
+
+.form-combo-box > .arrow-button > .arrow {
+    -fx-background-color: #475569;
 }
 
 .form-date-picker {

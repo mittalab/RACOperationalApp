@@ -53,7 +53,7 @@ public class SendResultsViewController {
     );
 
     @FXML private DatePicker datePicker;
-    @FXML private TextField classField;
+    @FXML private ComboBox<String> classField;
     @FXML private ComboBox<String> batchComboBox;
     @FXML private Label customBatchLabel;
     @FXML private TextField customBatchField;
@@ -104,6 +104,8 @@ public class SendResultsViewController {
             showAlertDirect("Error", "Failed to load templates: " + e.getMessage());
         }
 
+        classField.setItems(FXCollections.observableArrayList("IX", "X", "XI", "XII"));
+        classField.setValue(null);
         batchComboBox.setItems(FXCollections.observableArrayList(BATCH_OPTIONS));
 
 //        batchComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
@@ -147,17 +149,17 @@ public class SendResultsViewController {
         Matcher m = p.matcher(baseName);
         if (m.find()) {
             filenameMatchedPattern = true;
-            classField.setText(m.group(1).toUpperCase());
+            classField.setValue(m.group(1).toUpperCase());
             String batchToken = m.group(2).toLowerCase();
             String matched = BATCH_TOKEN_MAP.get(batchToken);
             batchComboBox.setValue(matched != null ? matched : "Other");
         } else {
             filenameMatchedPattern = false;
-            classField.setText("");
+            classField.setValue(null);
             batchComboBox.setValue("Other");
         }
         logger.info("Auto-populated: class='{}', batch='{}', standardFormat={}",
-                classField.getText(), batchComboBox.getValue(), filenameMatchedPattern);
+                classField.getValue(), batchComboBox.getValue(), filenameMatchedPattern);
     }
 
     private String getBatchValue() {
@@ -176,7 +178,7 @@ public class SendResultsViewController {
         // Capture UI state on FX thread before background thread starts
         final boolean sendWA = sendWhatsAppCheckbox.isSelected();
         final boolean sendAdminNotifications = sendAdminNotificationsCheckbox.isSelected();
-        final String classNameStr = classField.getText();
+        final String classNameStr = classField.getValue() != null ? classField.getValue() : "";
         final String batchStr = getBatchValue();
 
         new Thread(() -> {
@@ -215,27 +217,43 @@ public class SendResultsViewController {
 
                 if (!readResult.success) {
                     updateProgress("Validation failed.", 0);
-                    StringBuilder msg = new StringBuilder("Validation failed:\n\n");
-                    for (String err : readResult.validationErrors) {
-                        msg.append("• ").append(err).append("\n");
-                    }
                     
-                    if (cloudContactsFile != null) {
-                        msg.append("\nTIP: Please check student names in the downloaded contact file:\n");
-                        msg.append("File: ").append(cloudContactsFile.getName()).append("\n");
-                        if (readResult.targetSheetName != null) {
-                            msg.append("Sheet: ").append(readResult.targetSheetName).append("\n");
+                    if (readResult.mismatchedNames != null && !readResult.mismatchedNames.isEmpty()) {
+                        Platform.runLater(() -> {
+                            try {
+                                MismatchSummaryViewController.show(
+                                    readResult.mismatchedNames,
+                                    readResult.allContacts,
+                                    excelFile,
+                                    readResult.targetSheetName
+                                );
+                            } catch (Exception e) {
+                                logger.error("Failed to show mismatch summary dialog", e);
+                                showAlert("Validation Error", "Validation failed due to name mismatches: " + readResult.mismatchedNames);
+                            }
+                        });
+                    } else {
+                        StringBuilder msg = new StringBuilder("Validation failed:\n\n");
+                        for (String err : readResult.validationErrors) {
+                            msg.append("• ").append(err).append("\n");
                         }
                         
-                        // Automatically open the cloud contacts file for the user
-                        File finalCloudFile = cloudContactsFile;
-                        Platform.runLater(() -> {
-                            try { Desktop.getDesktop().open(finalCloudFile); }
-                            catch (Exception e) { logger.error("Failed to open cloud contacts file", e); }
-                        });
+                        if (cloudContactsFile != null) {
+                            msg.append("\nTIP: Please check student names in the downloaded contact file:\n");
+                            msg.append("File: ").append(cloudContactsFile.getName()).append("\n");
+                            if (readResult.targetSheetName != null) {
+                                msg.append("Sheet: ").append(readResult.targetSheetName).append("\n");
+                            }
+                            
+                            File finalCloudFile = cloudContactsFile;
+                            Platform.runLater(() -> {
+                                try { Desktop.getDesktop().open(finalCloudFile); }
+                                catch (Exception e) { logger.error("Failed to open cloud contacts file", e); }
+                            });
+                        }
+                        
+                        showAlert("Validation Error", msg.toString());
                     }
-                    
-                    showAlert("Validation Error", msg.toString());
                     return;
                 }
                 updateProgress("Validation completed.", 0);
@@ -573,7 +591,7 @@ public class SendResultsViewController {
         if (datePicker.getValue() == null) {
             showAlertDirect("Error", "Test Conducted Date is required."); return false;
         }
-        if (classField.getText().isEmpty()) {
+        if (classField.getValue() == null || classField.getValue().isEmpty()) {
             showAlertDirect("Error", "Class is required."); return false;
         }
         if (batchComboBox.getValue() == null) {

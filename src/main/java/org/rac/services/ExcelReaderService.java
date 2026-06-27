@@ -18,18 +18,36 @@ public class ExcelReaderService {
 
     private static final Logger logger = LoggerFactory.getLogger(ExcelReaderService.class);
 
+    public static class StudentContact {
+        private final String name;
+        private final String phone;
+
+        public StudentContact(String name, String phone) {
+            this.name = name;
+            this.phone = phone;
+        }
+
+        public String getName() { return name; }
+        public String getPhone() { return phone; }
+    }
+
     public static class ExcelReadResult {
         public final List<Student> students;
         public final List<String> validationErrors;
         public final boolean success;
         public final List<String> absentStudentNames;
         public String targetSheetName; // New field
+        public final List<String> mismatchedNames;
+        public final List<StudentContact> allContacts;
 
-        ExcelReadResult(List<Student> students, List<String> validationErrors, List<String> absentStudentNames) {
+        ExcelReadResult(List<Student> students, List<String> validationErrors, List<String> absentStudentNames,
+                        List<String> mismatchedNames, List<StudentContact> allContacts) {
             this.students = students;
             this.validationErrors = validationErrors;
             this.success = validationErrors.isEmpty();
             this.absentStudentNames = Collections.unmodifiableList(absentStudentNames);
+            this.mismatchedNames = Collections.unmodifiableList(mismatchedNames);
+            this.allContacts = Collections.unmodifiableList(allContacts);
         }
     }
 
@@ -45,6 +63,8 @@ public class ExcelReaderService {
         List<String> errors = new ArrayList<>();
         List<Student> students = new ArrayList<>();
         List<String> absentNames = new ArrayList<>();
+        List<String> mismatchedNames = new ArrayList<>();
+        List<StudentContact> allContacts = new ArrayList<>();
 
         try (FileInputStream fisMarks = new FileInputStream(marksFile);
              Workbook workbookMarks = new XSSFWorkbook(fisMarks)) {
@@ -58,13 +78,13 @@ public class ExcelReaderService {
             if (cloudContactsFile != null) {
                 try (FileInputStream fisCloud = new FileInputStream(cloudContactsFile);
                      Workbook workbookCloud = new XSSFWorkbook(fisCloud)) {
-                    readWithExternalContacts(resultSheet, workbookCloud, students, errors, absentNames, className, batch);
+                    readWithExternalContacts(resultSheet, workbookCloud, students, errors, absentNames, className, batch, mismatchedNames, allContacts);
                 }
             } else {
                 // Fallback to legacy behavior: check if Contact sheet exists in same file
                 Sheet contactSheet = workbookMarks.getSheet("Contact");
                 if (contactSheet != null) {
-                    readTwoSheetFormat(workbookMarks, students, errors, absentNames);
+                    readTwoSheetFormat(workbookMarks, students, errors, absentNames, mismatchedNames, allContacts);
                 } else {
                     readSingleSheetFormat(workbookMarks, students, errors);
                 }
@@ -73,20 +93,26 @@ public class ExcelReaderService {
             logger.info("Read {} students, {} validation errors, {} absent", students.size(), errors.size(), absentNames.size());
         }
 
-        ExcelReadResult finalResult = new ExcelReadResult(students, errors, absentNames);
+        ExcelReadResult finalResult = new ExcelReadResult(students, errors, absentNames, mismatchedNames, allContacts);
         if (cloudContactsFile != null) {
             finalResult.targetSheetName = findTargetSheetName(className, batch);
         }
         return finalResult;
     }
 
-    private static String normalizeName(String name) {
-        return name.trim().replaceAll("\\s+", " ");
+    public static String normalizeName(String name) {
+        if (name == null) return "";
+        String clean = name.replace('\u00A0', ' ')
+                           .replace('\u2007', ' ')
+                           .replace('\u202F', ' ')
+                           .replace('\uFEFF', ' ')
+                           .trim();
+        return clean.replaceAll("\\s+", " ");
     }
 
     private void readWithExternalContacts(Sheet resultSheet, Workbook contactWorkbook,
                                         List<Student> students, List<String> errors, List<String> absentNames,
-                                        String className, String batch) {
+                                        String className, String batch, List<String> mismatchedNames, List<StudentContact> allContacts) {
         // Build contact lookup from matched sheets
         Map<String, String> nameToPhone = new LinkedHashMap<>();
         Map<String, String> rollNoToPhone = new LinkedHashMap<>();
@@ -130,6 +156,8 @@ public class ExcelReaderService {
                     upperToOriginal.put(name, rawName);
                 }
 
+                allContacts.add(new StudentContact(rawName, phone));
+
                 if (!rollNo.isEmpty()) rollNoToPhone.put(rollNo, phone);
             }
         }
@@ -165,7 +193,9 @@ public class ExcelReaderService {
                 String upperName = name.toUpperCase();
                 String phone = resolvePhone(upperName, rollNo, nameToPhone, rollNoToPhone, duplicateNames, errors);
 
-                if (phone != null) {
+                if (phone == null) {
+                    mismatchedNames.add(name);
+                } else {
                     String e = validatePhone(upperName, phone);
                     if (e != null) { errors.add(e); phone = null; }
                 }
@@ -195,7 +225,8 @@ public class ExcelReaderService {
         return readAndValidate(file, null, "", "");
     }
 
-    private void readTwoSheetFormat(Workbook workbook, List<Student> students, List<String> errors, List<String> absentNames) {
+    private void readTwoSheetFormat(Workbook workbook, List<Student> students, List<String> errors, List<String> absentNames,
+                                    List<String> mismatchedNames, List<StudentContact> allContacts) {
         Sheet resultSheet = workbook.getSheet("Result");
         if (resultSheet == null) {
             logger.warn("Sheet 'Result' not found, falling back to sheet index 0");
@@ -235,6 +266,8 @@ public class ExcelReaderService {
                 upperToOriginal.put(name, rawName);
             }
 
+            allContacts.add(new StudentContact(rawName, phone));
+
             if (!rollNo.isEmpty()) rollNoToPhone.put(rollNo, phone);
         }
 
@@ -264,7 +297,9 @@ public class ExcelReaderService {
                 String upperName = name.toUpperCase();
                 String phone = resolvePhone(upperName, rollNo, nameToPhone, rollNoToPhone, duplicateNames, errors);
 
-                if (phone != null) {
+                if (phone == null) {
+                    mismatchedNames.add(name);
+                } else {
                     String e = validatePhone(upperName, phone);
                     if (e != null) { errors.add(e); phone = null; }
                 }
