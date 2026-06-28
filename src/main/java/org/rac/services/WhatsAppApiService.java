@@ -375,6 +375,23 @@ public class WhatsAppApiService {
     }
 
     /**
+     * Sends the test_message template (no media, no arguments) to any phone number.
+     * Returns the WhatsApp message ID for delivery tracking.
+     */
+    public String sendTestMessage(String toPhone) throws IOException, InterruptedException {
+        logger.info("Sending test_message to {}", toPhone);
+        String json = "{"
+                + "\"messaging_product\":\"whatsapp\","
+                + "\"to\":\"" + toPhone + "\","
+                + "\"type\":\"template\","
+                + "\"template\":{"
+                + "\"name\":\"test_message\","
+                + "\"language\":{\"code\":\"en\"}"
+                + "}}";
+        return postMessage(json);
+    }
+
+    /**
      * Extracts the WhatsApp error code from {"error": {"code": N, ...}}.
      * Returns -1 if not found.
      */

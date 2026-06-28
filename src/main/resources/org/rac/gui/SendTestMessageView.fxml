@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!--
+    Send Test Message — sends test_message template to a phone number and tracks delivery.
+    Controller: org.rac.gui.SendTestMessageViewController
+-->
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.rac.gui.SendTestMessageViewController"
+      stylesheets="@rac-styles.css"
+      prefWidth="1100" prefHeight="1000"
+      spacing="0">
+
+    <!-- ── Header bar ─────────────────────────────────────────── -->
+    <HBox styleClass="send-header-bar" alignment="CENTER_LEFT" spacing="12">
+        <StackPane styleClass="send-header-icon-box">
+            <Label text="✉" style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+        </StackPane>
+        <VBox spacing="2" HBox.hgrow="ALWAYS">
+            <Label text="Send Test Message" styleClass="send-header-title"/>
+            <Label text="Send the test_message WhatsApp template to a phone number" styleClass="send-header-subtitle"/>
+        </VBox>
+        <Button text="← Home"
+                styleClass="back-button"
+                onAction="#handleBackToHome"/>
+    </HBox>
+
+    <!-- ── Send section ──────────────────────────────────────── -->
+    <VBox styleClass="send-content-vbox" spacing="12">
+        <VBox styleClass="form-card" spacing="8">
+            <Label text="SEND TEST MESSAGE" styleClass="form-card-header"/>
+            <Label text="Enter phone number with country code, no + or spaces (e.g. 919811658385)"
+                   style="-fx-text-fill: #64748b; -fx-font-size: 11px;"/>
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <TextField fx:id="phoneField"
+                           promptText="919811658385"
+                           HBox.hgrow="ALWAYS"
+                           style="-fx-font-size: 13px; -fx-padding: 6 10;"/>
+                <Button fx:id="sendButton"
+                        text="Send Test Message"
+                        styleClass="proceed-button"
+                        onAction="#handleSend"/>
+            </HBox>
+            <Label fx:id="sendStatusLabel" text="" style="-fx-text-fill: #64748b; -fx-font-size: 12px;"/>
+        </VBox>
+    </VBox>
+
+    <!-- ── Demarcation ───────────────────────────────────────── -->
+    <Separator/>
+
+    <!-- ── Tracking section header ───────────────────────────── -->
+    <HBox spacing="12" alignment="CENTER_LEFT"
+          style="-fx-padding: 8 18 8 18; -fx-background-color: #f8fafc;
+                 -fx-border-color: #e2eaf5; -fx-border-width: 0 0 1 0;">
+        <Label text="MESSAGE STATUS"
+               style="-fx-font-weight: bold; -fx-text-fill: #1a3355; -fx-font-size: 12px;"/>
+        <Label fx:id="trackingStatusLabel"
+               text="Send a message above to start tracking."
+               style="-fx-text-fill: #64748b; -fx-font-size: 12px;"
+               HBox.hgrow="ALWAYS"/>
+        <CheckBox fx:id="autoRefreshCheck"
+                  text="Auto-refresh (30s)"
+                  onAction="#handleAutoRefreshToggle"/>
+        <Button fx:id="refreshButton"
+                text="↻ Refresh"
+                onAction="#handleRefresh"
+                style="-fx-background-color: #1a3355; -fx-text-fill: white; -fx-font-size: 12px;
+                       -fx-padding: 4 12; -fx-background-radius: 4; -fx-cursor: hand;"/>
+    </HBox>
+
+    <!-- ── Results table ─────────────────────────────────────── -->
+    <TableView fx:id="resultTable"
+               VBox.vgrow="ALWAYS"
+               style="-fx-background-color: #f4f8fd; -fx-border-color: transparent;">
+        <columns>
+            <TableColumn text="WAMID"        fx:id="colWamid"       prefWidth="220"/>
+            <TableColumn text="Recipient"    fx:id="colRecipient"   prefWidth="130"/>
+            <TableColumn text="Status"       fx:id="colStatus"      prefWidth="140"/>
+            <TableColumn text="Sent At"      fx:id="colSentAt"      prefWidth="145"/>
+            <TableColumn text="Delivered At" fx:id="colDeliveredAt" prefWidth="145"/>
+            <TableColumn text="Read At"      fx:id="colReadAt"      prefWidth="145"/>
+            <TableColumn text="Error"        fx:id="colError"       prefWidth="200"/>
+        </columns>
+        <placeholder>
+            <Label text="Send a test message above to see the delivery status here."
+                   style="-fx-text-fill: #94a3b8;"/>
+        </placeholder>
+    </TableView>
+
+    <!-- ── Summary bar ──────────────────────────────────────── -->
+    <HBox spacing="20" alignment="CENTER_LEFT"
+          style="-fx-padding: 7 18 7 18; -fx-background-color: #f0f7ff;
+                 -fx-border-color: #e2eaf5; -fx-border-width: 1 0 0 0;">
+        <Label text="SUMMARY" style="-fx-font-weight: bold; -fx-text-fill: #1a3355; -fx-font-size: 11px;"/>
+        <Label fx:id="wsTotal"     text="Total: 0"     style="-fx-font-size: 11px; -fx-text-fill: #475569;"/>
+        <Label fx:id="wsSent"      text="Sent: 0"      style="-fx-font-size: 11px; -fx-text-fill: #92400e;"/>
+        <Label fx:id="wsDelivered" text="Delivered: 0" style="-fx-font-size: 11px; -fx-text-fill: #1d4ed8;"/>
+        <Label fx:id="wsRead"      text="Read: 0"      style="-fx-font-size: 11px; -fx-text-fill: #166534; -fx-font-weight: bold;"/>
+        <Label fx:id="wsFailed"    text="Failed: 0"    style="-fx-font-size: 11px; -fx-text-fill: #dc2626; -fx-font-weight: bold;"/>
+        <Label fx:id="wsPending"   text="Pending: 0"   style="-fx-font-size: 11px; -fx-text-fill: #94a3b8;"/>
+    </HBox>
+
+</VBox>

@@ -2,9 +2,10 @@ package org.rac.services;
 
 import org.rac.model.Activity;
 import org.rac.model.CheckWamidStatusActivity;
-import org.rac.model.SendResultsActivity;
-import org.rac.model.SendTopperAbsentActivity;
 import org.rac.model.RetrieveRunStatusActivity;
+import org.rac.model.SendResultsActivity;
+import org.rac.model.SendTestMessageActivity;
+import org.rac.model.SendTopperAbsentActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,7 @@ public class ActivityService {
         activities.add(new SendTopperAbsentActivity());
         activities.add(new CheckWamidStatusActivity());
         activities.add(new RetrieveRunStatusActivity());
+        activities.add(new SendTestMessageActivity());
         return activities;
     }
 }
