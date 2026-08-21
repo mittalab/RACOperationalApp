@@ -2,10 +2,13 @@ package org.rac;
 
 import com.microsoft.playwright.Playwright;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,13 +30,22 @@ public class Main extends Application {
         showMainView();
     }
 
+    private static void applyFullScreen() {
+        Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
+        primaryStage.setX(bounds.getMinX());
+        primaryStage.setY(bounds.getMinY());
+        primaryStage.setWidth(bounds.getWidth());
+        primaryStage.setHeight(bounds.getHeight());
+        primaryStage.setMaximized(true);
+    }
+
     public static void showMainView() throws IOException {
         logger.info("Showing Main View");
         FXMLLoader loader = new FXMLLoader(Main.class.getResource("/org/rac/gui/MainView.fxml"));
         Parent root = loader.load();
         primaryStage.setScene(new Scene(root));
-        primaryStage.setMaximized(true);
         primaryStage.show();
+        Platform.runLater(() -> Platform.runLater(Main::applyFullScreen));
     }
 
     public static void showActivityView(String fxmlPath) throws IOException {
@@ -41,8 +53,8 @@ public class Main extends Application {
         FXMLLoader loader = new FXMLLoader(Main.class.getResource(fxmlPath));
         Parent root = loader.load();
         primaryStage.setScene(new Scene(root));
-        primaryStage.setMaximized(true);
         primaryStage.show();
+        Platform.runLater(() -> Platform.runLater(Main::applyFullScreen));
     }
 
 
