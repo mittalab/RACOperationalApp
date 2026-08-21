@@ -32,6 +32,7 @@ public class Main extends Application {
         FXMLLoader loader = new FXMLLoader(Main.class.getResource("/org/rac/gui/MainView.fxml"));
         Parent root = loader.load();
         primaryStage.setScene(new Scene(root));
+        primaryStage.setMaximized(true);
         primaryStage.show();
     }
 
@@ -40,6 +41,7 @@ public class Main extends Application {
         FXMLLoader loader = new FXMLLoader(Main.class.getResource(fxmlPath));
         Parent root = loader.load();
         primaryStage.setScene(new Scene(root));
+        primaryStage.setMaximized(true);
         primaryStage.show();
     }
 
