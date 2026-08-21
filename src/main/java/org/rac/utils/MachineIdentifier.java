@@ -9,7 +9,8 @@ public class MachineIdentifier {
     private static final Map<String, String> MACHINE_USERS = Map.of(
             "ed2a2802-67b4-40a9-a82a-de1a226e13f8", "Abhishek",
             "00b12c29-29a5-4258-8c29-9c87fb9d1334", "Nisha",
-            "62b2f9cc-8ab3-4826-ae70-0a293b6e7bc6", "Meena"
+            "62b2f9cc-8ab3-4826-ae70-0a293b6e7bc6", "Meena",
+            "d737e8f1-3ca8-4589-9171-feed2f85bab0", "Shipli"
     );
 
     private static String cachedGuid;
