@@ -23,6 +23,7 @@ public class Main extends Application {
         primaryStage = stage;
         primaryStage.setTitle("RAC Operational App");
         primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/app_icon.png")));
+        primaryStage.setMaximized(true);
         showMainView();
     }
 
