@@ -47,7 +47,7 @@ public class WamidStatusService {
 
     private Map<String, WamidStatus> sendBatchRequest(List<String> wamids) throws IOException, InterruptedException {
         String body = buildRequestBody(wamids);
-        logger.debug("Sending batch status request for {} wamids", wamids.size());
+        logger.info("Sending batch status request for {} wamids to {}", wamids.size(), BATCH_URL);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BATCH_URL))
@@ -61,7 +61,7 @@ public class WamidStatusService {
         } catch (java.net.ConnectException e) {
             throw new IOException("Cannot reach status server (" + BATCH_URL + "): " + e.getMessage(), e);
         }
-        logger.debug("Batch status response {}: {}", response.statusCode(), response.body());
+        logger.info("Batch status response {}: {}", response.statusCode(), response.body());
 
         if (response.statusCode() < 200 || response.statusCode() >= 300) {
             throw new IOException("Batch status API error " + response.statusCode() + ": " + response.body());

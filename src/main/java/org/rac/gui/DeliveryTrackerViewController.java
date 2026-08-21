@@ -88,7 +88,16 @@ public class DeliveryTrackerViewController {
                 cc.putString(joined);
                 Clipboard.getSystemClipboard().setContent(cc);
             });
-            ContextMenu menu = new ContextMenu(copyWamid, copyAllWamids);
+            MenuItem copyStatus = new MenuItem("Copy Status");
+            copyStatus.setOnAction(e -> {
+                MessageDelivery item = row.getItem();
+                if (item != null) {
+                    ClipboardContent cc = new ClipboardContent();
+                    cc.putString(item.getStatus() != null ? item.getStatus() : "");
+                    Clipboard.getSystemClipboard().setContent(cc);
+                }
+            });
+            ContextMenu menu = new ContextMenu(copyWamid, copyStatus, copyAllWamids);
             row.contextMenuProperty().bind(
                     javafx.beans.binding.Bindings.when(row.emptyProperty())
                             .then((ContextMenu) null)
@@ -96,6 +105,14 @@ public class DeliveryTrackerViewController {
             );
             return row;
         });
+
+        MenuItem copyStatusMsg = new MenuItem("Copy");
+        copyStatusMsg.setOnAction(e -> {
+            ClipboardContent cc = new ClipboardContent();
+            cc.putString(statusLabel.getText() != null ? statusLabel.getText() : "");
+            Clipboard.getSystemClipboard().setContent(cc);
+        });
+        statusLabel.setContextMenu(new ContextMenu(copyStatusMsg));
 
         // Colour-coded status cell
         statusCol.setCellFactory(col -> new TableCell<>() {

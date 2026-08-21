@@ -7,6 +7,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import org.rac.Main;
 import org.rac.services.WamidStatusService;
 import org.rac.services.WhatsAppApiService;
@@ -75,6 +77,35 @@ public class SendTestMessageViewController {
         colReadAt.setCellValueFactory(cd -> cd.getValue().readAt);
         colError.setCellValueFactory(cd -> cd.getValue().error);
 
+        resultTable.setRowFactory(tv -> {
+            TableRow<WamidStatusRow> row = new TableRow<>();
+            MenuItem copyStatus = new MenuItem("Copy Status");
+            copyStatus.setOnAction(e -> {
+                WamidStatusRow item = row.getItem();
+                if (item != null) {
+                    ClipboardContent cc = new ClipboardContent();
+                    cc.putString(item.status.get() != null ? item.status.get() : "");
+                    Clipboard.getSystemClipboard().setContent(cc);
+                }
+            });
+            MenuItem copyWamid = new MenuItem("Copy WAMID");
+            copyWamid.setOnAction(e -> {
+                WamidStatusRow item = row.getItem();
+                if (item != null) {
+                    ClipboardContent cc = new ClipboardContent();
+                    cc.putString(item.wamid.get() != null ? item.wamid.get() : "");
+                    Clipboard.getSystemClipboard().setContent(cc);
+                }
+            });
+            ContextMenu menu = new ContextMenu(copyStatus, copyWamid);
+            row.contextMenuProperty().bind(
+                    javafx.beans.binding.Bindings.when(row.emptyProperty())
+                            .then((ContextMenu) null)
+                            .otherwise(menu)
+            );
+            return row;
+        });
+
         colStatus.setCellFactory(col -> new TableCell<>() {
             @Override
             protected void updateItem(String status, boolean empty) {
@@ -92,6 +123,14 @@ public class SendTestMessageViewController {
 
         refreshButton.setDisable(true);
         autoRefreshCheck.setDisable(true);
+
+        MenuItem copyMsg = new MenuItem("Copy");
+        copyMsg.setOnAction(e -> {
+            ClipboardContent cc = new ClipboardContent();
+            cc.putString(trackingStatusLabel.getText() != null ? trackingStatusLabel.getText() : "");
+            Clipboard.getSystemClipboard().setContent(cc);
+        });
+        trackingStatusLabel.setContextMenu(new ContextMenu(copyMsg));
     }
 
     @FXML
